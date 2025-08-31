@@ -9,3 +9,6 @@ Seems like the connection between Controller and Processor requires async commun
 
 ## Sequence Diagram
 ![pipeline seq](./drawio/img/sequence.svg)
+
+## Block Diagram
+![](./drawio/img/block.svg)
