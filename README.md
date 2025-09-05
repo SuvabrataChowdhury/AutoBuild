@@ -14,3 +14,6 @@ Frontend is to be developed with REACT JS.
 
 ## Quick Links
 1. [Architecture](./architecture/architecture.md)
+
+## Suggenstions for git integration
+1. [ChatGPT](https://chatgpt.com/share/68bb1099-fb90-8005-87ed-df04e59f8634)
