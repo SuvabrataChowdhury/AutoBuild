@@ -1,5 +1,6 @@
 # AutoBuild Architecture
 
+## Quick Links
 - [Block Diagram](#block-diagram)
 - [Sequence Diagram](#sequence-diagram)
 - [Activity Diagram](#tech-stack)
