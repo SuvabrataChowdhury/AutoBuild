@@ -9,6 +9,7 @@ AutoBuild is platform to build your CI/CD pipelines at ease.
     3. **As a developer**, I should be able to run the pipeline on specific events i.e, push, commit or schedule the pipeline to run for specific time period.
     4. **As a developer**, I should be able to see the status of build from VCS.
     5. **As a developer**, I should be able to see detailed status of build i.e., stages and logs in the application.
+    6. **As a developer**, I should be able to build manually from the Application UI.
 - **Technical Requirements:**
     1. Application must respond back an acknowledgement within 10 second after receiving a VCS event (Especially for GitHub as mentioned [here](https://docs.github.com/en/webhooks/using-webhooks/handling-webhook-deliveries#javascript-example)).
 
