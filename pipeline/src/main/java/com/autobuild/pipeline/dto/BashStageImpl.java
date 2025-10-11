@@ -13,7 +13,7 @@ public class BashStageImpl{
 
     @Getter
     @Id
-    private String name;
+    private String name; //TODO: Change this primary key. Two stages can have same name
 
     @Getter
     private String command;

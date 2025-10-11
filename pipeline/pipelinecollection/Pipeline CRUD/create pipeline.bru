@@ -4,6 +4,20 @@ meta {
   seq: 1
 }
 
-get {
-  url: 
+post {
+  url: {{host}}/{{prefix}}/pipeline
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "my pipeline",
+    "stages" : [
+      {
+        "name": "init",
+        "command": "echo Hello"
+      }
+    ]
+  }
 }
