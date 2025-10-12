@@ -1,10 +1,10 @@
 package com.autobuild.pipeline.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.autobuild.pipeline.dto.PipelineResponse;
 import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 
+//TODO: Need to refactor
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
@@ -27,29 +30,44 @@ public class PipelineController {
     private PipelineService pipelineService;
 
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<Pipeline> getPipelineById(@PathVariable String pipelineId){
+    public ResponseEntity<PipelineResponse> getPipelineById(@PathVariable String pipelineId){
         try {
             Pipeline pipeline = pipelineService.getPipelineById(pipelineId);
 
             if(null == pipeline) {
-                return ResponseEntity.notFound().build();
+                PipelineResponse response = new PipelineResponse();
+                response.setErrors(List.of("Pipeline with id " + pipelineId + " not found"));
+
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            return ResponseEntity.ok().body(pipeline);
-        } catch (InvalidIdException e) {
+            PipelineResponse response = new PipelineResponse(pipeline);
 
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.ok().body(response);
+        } catch (InvalidIdException e) {
+            PipelineResponse response = new PipelineResponse();
+            response.setErrors(List.of(e.getMessage()));
+
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
     @PostMapping
-    public ResponseEntity<Pipeline> createPipeline(@RequestBody Pipeline pipelineRequest) {
-        Pipeline createdPipeline = pipelineService.createPipeline(pipelineRequest);
+    public ResponseEntity<PipelineResponse> createPipeline(@RequestBody Pipeline pipelineRequest) {
+        
+        try {
+            Pipeline createdPipeline = pipelineService.createPipeline(pipelineRequest);
 
-        // URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{pipelineid}").buildAndExpand(createdPipeline.getId()).toUri();
-        URI location = URI.create("/pipeline/" + createdPipeline.getId());
+            PipelineResponse response = new PipelineResponse(createdPipeline);
 
-        return ResponseEntity.created(location).body(createdPipeline);
+            URI location = URI.create("/pipeline/" + createdPipeline.getId());
+            return ResponseEntity.created(location).body(response);
+        } catch (DuplicateEntryException e) {
+            PipelineResponse response = new PipelineResponse();
+            response.setErrors(List.of(e.getMessage()));
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
     }
 
     // @PatchMapping

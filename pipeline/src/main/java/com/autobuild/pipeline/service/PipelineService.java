@@ -5,13 +5,17 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
 
 import lombok.extern.slf4j.Slf4j;
+
+//TODO: Stages belonging to same pipeline should not have same name
 
 @Slf4j
 @Service
@@ -26,7 +30,14 @@ public class PipelineService {
         try {
             Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
 
-            return (optionalPipeline.isPresent()) ? optionalPipeline.get() : null;
+            if(optionalPipeline.isPresent()) {
+                return optionalPipeline.get();
+            }
+
+            log.info("Pipeline with id " + pipelineId + " not found");
+
+            return null;
+
         } catch (IllegalArgumentException e) {
             // log.debug("Exception occured", e); //TODO: check correct places for debug logs
             log.error("Pipeline Id is invalid");
@@ -35,7 +46,11 @@ public class PipelineService {
         }
     }
 
-    public Pipeline createPipeline(final Pipeline pipeline) {
-        return repository.save(pipeline);
+    public Pipeline createPipeline(final Pipeline pipeline) throws DuplicateEntryException {
+        try {
+            return repository.save(pipeline);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEntryException("Pipeline with the name " + pipeline.getName() + " already exists");
+        }
     }
 }

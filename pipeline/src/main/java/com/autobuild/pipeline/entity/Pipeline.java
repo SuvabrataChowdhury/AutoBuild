@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_pipeline_name",
+            columnNames = {"name"}
+        )
+    }
+)
 public class Pipeline {
     @Getter
     @Id
@@ -24,7 +34,7 @@ public class Pipeline {
     private UUID id;
 
     @Getter
-    private String name;
+    private String name; //Should be unique
 
     @Getter
     @OneToMany(cascade = CascadeType.ALL)
