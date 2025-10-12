@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.autobuild.pipeline.dto.Pipeline;
+import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 
 @RestController
@@ -26,14 +27,19 @@ public class PipelineController {
     private PipelineService pipelineService;
 
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<Pipeline> getPipeline(@PathVariable String pipelineId){
-        Pipeline pipeline = pipelineService.getPipelineById(pipelineId);
+    public ResponseEntity<Pipeline> getPipelineById(@PathVariable String pipelineId){
+        try {
+            Pipeline pipeline = pipelineService.getPipelineById(pipelineId);
 
-        if(null == pipeline) {
-            return ResponseEntity.notFound().build();
+            if(null == pipeline) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok().body(pipeline);
+        } catch (InvalidIdException e) {
+
+            return ResponseEntity.badRequest().body(null);
         }
-
-        return ResponseEntity.ok().body(pipeline);
     }
 
     @PostMapping
@@ -46,17 +52,17 @@ public class PipelineController {
         return ResponseEntity.created(location).body(createdPipeline);
     }
 
-    @PatchMapping
-    public ResponseEntity<String> updatePipeline(RequestEntity<String> pipeline) {
-        // return "Requested Update: " + pipeline.getBody();
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
+    // @PatchMapping
+    // public ResponseEntity<String> updatePipeline(RequestEntity<String> pipeline) {
+    //     // return "Requested Update: " + pipeline.getBody();
+    //     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
 
-        // pipelineService.deletePipeline()
-    }
+    //     // pipelineService.deletePipeline()
+    // }
 
-    @DeleteMapping
-    public ResponseEntity<String> deletePipeline(RequestEntity<String> pipeline) {
-        // return "Requested Delete: " + pipeline.getBody();
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
-    }
+    // @DeleteMapping
+    // public ResponseEntity<String> deletePipeline(RequestEntity<String> pipeline) {
+    //     // return "Requested Delete: " + pipeline.getBody();
+    //     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
+    // }
 }

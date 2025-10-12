@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.dto;
+package com.autobuild.pipeline.entity;
 
 import java.util.List;
 import java.util.UUID;

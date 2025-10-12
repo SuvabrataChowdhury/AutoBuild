@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.dto;
+package com.autobuild.pipeline.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
