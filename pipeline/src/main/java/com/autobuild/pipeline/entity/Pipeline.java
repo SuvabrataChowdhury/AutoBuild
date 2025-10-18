@@ -43,5 +43,5 @@ public class Pipeline {
         joinColumns = @JoinColumn(name = "pipeline_id"),
         inverseJoinColumns = @JoinColumn(name = "stage_name")
     )
-    private List<BashStageImpl> stages; //TODO: need to take an abstract implementation of stage
+    private List<Stage> stages; //TODO: need to take an abstract implementation of stage
 }

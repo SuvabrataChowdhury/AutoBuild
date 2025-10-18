@@ -22,6 +22,7 @@ import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 
 //TODO: Need to refactor
+//TODO: Define in terms of DTOs
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {

@@ -1,12 +1,29 @@
 package com.autobuild.pipeline.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.Getter;
+import java.util.UUID;
 
-// @Entity
-public abstract class Stage {
-    // @Getter
-    // @Id
-    // private String name;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Stage {
+    @Getter
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @Getter
+    private String name; //TODO: Change this primary key. Two stages can have same name
+
+    @Getter
+    private String path; //Created script's path
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
+import com.autobuild.pipeline.entity.BashStageImpl;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
@@ -51,18 +52,31 @@ public class PipelineService {
     }
 
     public Pipeline createPipeline(final Pipeline pipeline) throws DuplicateEntryException {
+        validatePipeline(pipeline);
+
+        // createPipelineStageScripts(pipeline);
+
+        try {
+            return repository.save(pipeline);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEntryException("Pipeline with the name \"" + pipeline.getName() + "\" already exists");
+        }
+    }
+
+    // private void createPipelineStageScripts(Pipeline pipeline) {
+    //     for(BashStageImpl stage: pipeline.getStages()) {
+
+    //     }
+    // }
+
+    //TODO: Use a better validation class implementation
+    private void validatePipeline(final Pipeline pipeline) throws DuplicateEntryException {
         Errors validationErrors = new BeanPropertyBindingResult(pipeline, "pipeline");
         validator.validate(pipeline, validationErrors);
 
         if(validationErrors.hasErrors()) {
             log.error("Error Occurred duplicate stages"); //TODO: better log
             throw new DuplicateEntryException(validationErrors.getAllErrors().get(0).getDefaultMessage());
-        }
-
-        try {
-            return repository.save(pipeline);
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicateEntryException("Pipeline with the name " + pipeline.getName() + " already exists");
         }
     }
 }

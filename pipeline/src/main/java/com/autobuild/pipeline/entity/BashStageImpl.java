@@ -1,5 +1,6 @@
 package com.autobuild.pipeline.entity;
 
+import java.nio.file.Path;
 import java.util.UUID;
 
 import jakarta.annotation.Generated;
@@ -10,18 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-public class BashStageImpl{
-    @Getter
-    @Id
-    @GeneratedValue
-    private UUID id;
-
-    @Getter
-    private String name; //TODO: Change this primary key. Two stages can have same name
-
+public class BashStageImpl extends Stage{
     @Getter
     private String command;
 }

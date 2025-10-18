@@ -10,7 +10,9 @@ import org.springframework.validation.Validator;
 
 import com.autobuild.pipeline.entity.BashStageImpl;
 import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.entity.Stage;
 
+//TODO: Improve design
 @Component
 public class PipelineValidator implements Validator{
 
@@ -28,10 +30,10 @@ public class PipelineValidator implements Validator{
         }
     }
 
-    private boolean containsDuplicateStageName(List<BashStageImpl> stages) {
+    private boolean containsDuplicateStageName(List<Stage> stages) {
         Set<String> stageNameTable = new HashSet<>();
 
-        for(BashStageImpl stage: stages) {
+        for(Stage stage: stages) {
             if(stageNameTable.contains(stage.getName())) {
                 return true;
             }

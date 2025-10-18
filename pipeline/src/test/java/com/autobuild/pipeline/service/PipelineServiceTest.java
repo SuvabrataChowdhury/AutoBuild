@@ -5,8 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.Optional;
@@ -16,13 +19,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
 
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
+import com.autobuild.pipeline.validator.PipelineValidator;
 
 public class PipelineServiceTest {
 
@@ -31,6 +38,9 @@ public class PipelineServiceTest {
 
     @Mock
     private Pipeline pipeline;
+
+    @Mock
+    private PipelineValidator validator;
 
     @InjectMocks
     private PipelineService service;
@@ -93,4 +103,6 @@ public class PipelineServiceTest {
 
         assertEquals(pipeline, service.createPipeline(pipeline));
     }
+
+    
 }
