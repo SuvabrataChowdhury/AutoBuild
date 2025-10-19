@@ -6,7 +6,6 @@ package com.autobuild.pipeline.dto.mapper;
  * @author Suvabrata Chowdhury
  */
 public interface Mapper<T, R> {
-    //TODO: Change the thrown exception to IllegalArgumentException
     public R dtoToEntity(T dto);
     public T entityToDto(R entity);
 }

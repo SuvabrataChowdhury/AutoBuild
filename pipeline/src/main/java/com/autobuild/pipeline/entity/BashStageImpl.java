@@ -8,7 +8,7 @@ import lombok.Getter;
  * @author Suvabrata Chowdhury
  */
 
-@Entity
+// @Entity
 public class BashStageImpl{
     @Getter
     private String command;

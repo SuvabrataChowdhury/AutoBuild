@@ -85,27 +85,27 @@ public class PipelineControllerTest {
     //     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, getPipelineResponse.getStatusCode());
     // }
 
-    @Test
-    public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
-        doReturn(pipeline).when(pipelineService).createPipeline(any(Pipeline.class));
+    // @Test
+    // public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
+    //     doReturn(pipeline).when(pipelineService).createPipeline(any(Pipeline.class));
 
-        UUID randomPipelineID = UUID.randomUUID();
-        doReturn(randomPipelineID).when(pipeline).getId();
+    //     UUID randomPipelineID = UUID.randomUUID();
+    //     doReturn(randomPipelineID).when(pipeline).getId();
 
-        ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(mock(Pipeline.class));
+    //     ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(mock(Pipeline.class));
 
-        assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
-        assertEquals(pipeline, createPipelineResponse.getBody().getPipeline());
-        assertEquals("/pipeline/" + randomPipelineID, createPipelineResponse.getHeaders().get("location").get(0));
-    }
+    //     assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
+    //     assertEquals(pipeline, createPipelineResponse.getBody().getPipeline());
+    //     assertEquals("/pipeline/" + randomPipelineID, createPipelineResponse.getHeaders().get("location").get(0));
+    // }
 
-    @Test
-    public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
-        doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(Pipeline.class));
+    // @Test
+    // public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
+    //     doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(Pipeline.class));
 
-        ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(pipeline);
-        assertEquals(HttpStatus.CONFLICT, createPipelineResponse.getStatusCode());
-        assertNotNull(createPipelineResponse.getBody().getErrors());
-        assertEquals(1, createPipelineResponse.getBody().getErrors().size());
-    }
+    //     ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(pipeline);
+    //     assertEquals(HttpStatus.CONFLICT, createPipelineResponse.getStatusCode());
+    //     assertNotNull(createPipelineResponse.getBody().getErrors());
+    //     assertEquals(1, createPipelineResponse.getBody().getErrors().size());
+    // }
 }

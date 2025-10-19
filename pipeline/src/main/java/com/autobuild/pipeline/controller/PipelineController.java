@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.PipelineResponse;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
@@ -57,7 +58,7 @@ public class PipelineController {
     }
 
     @PostMapping
-    public ResponseEntity<PipelineResponse> createPipeline(@RequestBody Pipeline pipelineRequest) {
+    public ResponseEntity<PipelineResponse> createPipeline(@RequestBody PipelineDTO pipelineRequest) {
         
         try {
             Pipeline createdPipeline = pipelineService.createPipeline(pipelineRequest);

@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
+import com.autobuild.pipeline.dto.mapper.PipelineMapper;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
@@ -30,6 +32,9 @@ public class PipelineService {
 
     @Autowired
     private PipelineValidator validator;
+
+    @Autowired
+    private PipelineMapper mapper;
 
     public Pipeline getPipelineById(final String pipelineId) throws InvalidIdException {
         if (StringUtils.isEmpty(pipelineId))
@@ -54,10 +59,12 @@ public class PipelineService {
         }
     }
 
-    public Pipeline createPipeline(final Pipeline pipeline) throws DuplicateEntryException {
-        validatePipeline(pipeline);
+    public Pipeline createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
+        validatePipeline(pipelineDto);
 
         // createPipelineStageScripts(pipeline);
+
+        Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
         try {
             return repository.save(pipeline);
@@ -73,11 +80,11 @@ public class PipelineService {
     // }
 
     //TODO: Use a better validation class implementation
-    private void validatePipeline(final Pipeline pipeline) throws DuplicateEntryException {
+    private void validatePipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
         // Errors validationErrors = new BeanPropertyBindingResult(pipeline, "pipeline");
         // validator.validate(pipeline, validationErrors);
 
-        Errors validationErrors = validator.validatePipeline(pipeline);
+        Errors validationErrors = validator.validatePipeline(pipelineDto);
 
         if (null != validationErrors && validationErrors.hasErrors()) {
             log.error("Error Occurred duplicate stages"); //TODO: better log

@@ -24,11 +24,6 @@ public class StageMapper implements Mapper<StageDTO, Stage>{
             throw new IllegalArgumentException("Given null object can not be mapped");
         }
 
-        TypeMap<StageDTO, Stage> typeMapper = this.mapper.createTypeMap(StageDTO.class, Stage.class);
-        typeMapper.addMapping(StageDTO::getName, Stage::setName);
-        typeMapper.addMapping(StageDTO::getScriptType, Stage::setScriptType);
-        typeMapper.addMapping(StageDTO::getCommand, Stage::setCommand);
-
         return this.mapper.map(stageDto, Stage.class);
     }
 
@@ -37,12 +32,6 @@ public class StageMapper implements Mapper<StageDTO, Stage>{
         if (null == stage) {
             throw new IllegalArgumentException("Given null object can not be mapped");
         }
-
-        TypeMap<Stage, StageDTO> typeMapper = this.mapper.createTypeMap(Stage.class, StageDTO.class);
-        typeMapper.addMapping(Stage::getId, StageDTO::setId);
-        typeMapper.addMapping(Stage::getName, StageDTO::setName);
-        typeMapper.addMapping(Stage::getScriptType, StageDTO::setScriptType);
-        typeMapper.addMapping(Stage::getCommand, StageDTO::setCommand);
 
         return this.mapper.map(stage, StageDTO.class);
     }
