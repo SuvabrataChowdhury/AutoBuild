@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.dto;
+package com.autobuild.pipeline.entity;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,28 +10,36 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Entity
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_pipeline_name",
+            columnNames = {"name"}
+        )
+    }
+)
 public class Pipeline {
-    @Getter
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Getter
-    private String name;
+    private String name; //Should be unique
 
-    @Getter
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "pipeline_stages",
         joinColumns = @JoinColumn(name = "pipeline_id"),
         inverseJoinColumns = @JoinColumn(name = "stage_name")
     )
-    private List<BashStageImpl> stages; //TODO: need to take an abstract implementation of stage
+    private List<Stage> stages; //TODO: need to take an abstract implementation of stage
 }
