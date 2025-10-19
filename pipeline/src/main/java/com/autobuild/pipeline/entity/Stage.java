@@ -4,12 +4,12 @@ import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Stage Entity Definition.
@@ -20,13 +20,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+// @Inheritance(strategy = InheritanceType.JOINED)
 public class Stage {
-    @Getter
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Setter
     private String name; //TODO: Change this primary key. Two stages can have same name
+
+    @Setter
     private String scriptType;
+
+    @Setter
     private String path; //Created script's path
+
+    @Setter
+    private String command; //Temporary addition
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Data Transfer Object for Stage.
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class StageDTO {
     private UUID id;
     private String name;

@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 
 @Entity
-public class BashStageImpl extends Stage{
+public class BashStageImpl{
     @Getter
     private String command;
 }

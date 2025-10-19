@@ -43,6 +43,7 @@ public class PipelineValidator implements Validator{
         }
     }
 
+    //TODO: Check if this can be enforced in db level
     private boolean containsDuplicateStageName(List<Stage> stages) {
         Set<String> stageNameTable = new HashSet<>();
 

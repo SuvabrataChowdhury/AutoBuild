@@ -81,6 +81,12 @@
 			<artifactId>guava</artifactId>
 			<version>31.0.1-jre</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.2.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -156,7 +162,7 @@
                                 <limit>
                                     <counter>LINE</counter>
                                     <value>COVEREDRATIO</value>
-                                    <minimum>0.60</minimum>
+                                    <minimum>0.75</minimum>
 									<!-- TODO: Gradually increase the coverage -->
                                 </limit>
                             </limits>
