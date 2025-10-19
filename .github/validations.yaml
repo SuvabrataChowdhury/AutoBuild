@@ -18,4 +18,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Basic Validation
-      run: mvn --batch-mode clean install
+      run: cd pipeline && mvn --batch-mode clean install
