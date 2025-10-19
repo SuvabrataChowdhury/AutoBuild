@@ -1,0 +1,23 @@
+meta {
+  name: create pipeline
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/{{prefix}}/pipeline
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "my pipeline",
+    "stages" : [
+      {
+        "name": "init",
+        "command": "echo Hello"
+      }
+    ]
+  }
+}

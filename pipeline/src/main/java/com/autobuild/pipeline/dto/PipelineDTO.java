@@ -1,0 +1,17 @@
+package com.autobuild.pipeline.dto;
+
+import java.util.List;
+import java.util.UUID;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+public class PipelineDTO {
+    private UUID id;
+    private String name;
+    private List<StageDTO> stages;
+}

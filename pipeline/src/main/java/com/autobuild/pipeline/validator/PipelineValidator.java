@@ -1,0 +1,46 @@
+package com.autobuild.pipeline.validator;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+import com.autobuild.pipeline.entity.BashStageImpl;
+import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.entity.Stage;
+
+//TODO: Improve design
+@Component
+public class PipelineValidator implements Validator{
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Pipeline.class.equals(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        Pipeline pipeline = (Pipeline) target;
+
+        if(containsDuplicateStageName(pipeline.getStages())) {
+            errors.rejectValue("stages", "stages.duplicate" , "stages having duplicate name");
+        }
+    }
+
+    private boolean containsDuplicateStageName(List<Stage> stages) {
+        Set<String> stageNameTable = new HashSet<>();
+
+        for(Stage stage: stages) {
+            if(stageNameTable.contains(stage.getName())) {
+                return true;
+            }
+
+            stageNameTable.add(stage.getName());
+        }
+
+        return false;
+    }
+}
