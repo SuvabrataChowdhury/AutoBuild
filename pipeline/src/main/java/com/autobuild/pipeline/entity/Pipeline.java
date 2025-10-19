@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Entity
 @Table(
     uniqueConstraints = {
@@ -28,15 +29,12 @@ import lombok.NoArgsConstructor;
     }
 )
 public class Pipeline {
-    @Getter
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Getter
     private String name; //Should be unique
 
-    @Getter
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "pipeline_stages",

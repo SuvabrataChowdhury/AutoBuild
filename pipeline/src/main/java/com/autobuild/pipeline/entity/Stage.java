@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Stage {
@@ -20,10 +21,7 @@ public class Stage {
     @Id
     @GeneratedValue
     private UUID id;
-
-    @Getter
     private String name; //TODO: Change this primary key. Two stages can have same name
-
-    @Getter
+    private String scriptType;
     private String path; //Created script's path
 }
