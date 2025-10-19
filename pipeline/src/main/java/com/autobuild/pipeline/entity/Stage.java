@@ -11,6 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Stage Entity Definition.
+ * @author Suvabrata Chowdhury
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

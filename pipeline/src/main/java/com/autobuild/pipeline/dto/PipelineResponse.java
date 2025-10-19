@@ -9,6 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * <b>Temporary Solution</b>: Used for any CRUD response on Pipeline entity.
+ * @author Suvabrata Chowdhury
+ */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @NoArgsConstructor
 public class PipelineResponse {

@@ -7,6 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object for Pipeline Entity.
+ * @author Suvabrata Chowdhury
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

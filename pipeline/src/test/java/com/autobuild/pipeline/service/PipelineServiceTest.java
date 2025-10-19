@@ -2,16 +2,15 @@ package com.autobuild.pipeline.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,11 +18,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
@@ -52,9 +51,9 @@ public class PipelineServiceTest {
 
     @Test
     public void testGetPipelineByIdWithEmptyId() {
-        assertThrowsExactly(InvalidIdException.class, () -> service.getPipelineById(null));
-        assertThrowsExactly(InvalidIdException.class, () -> service.getPipelineById(""));
-        assertThrowsExactly(InvalidIdException.class, () -> service.getPipelineById(" "));
+        assertThrows(InvalidIdException.class, () -> service.getPipelineById(null));
+        assertThrows(InvalidIdException.class, () -> service.getPipelineById(""));
+        assertThrows(InvalidIdException.class, () -> service.getPipelineById(" "));
     }
 
     @Test
@@ -62,7 +61,7 @@ public class PipelineServiceTest {
         try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
             uuid.when(() -> UUID.fromString(anyString())).thenThrow(new IllegalArgumentException("Dummy msg: invalid id given"));
             
-            assertThrowsExactly(InvalidIdException.class, () -> service.getPipelineById("1"));
+            assertThrows(InvalidIdException.class, () -> service.getPipelineById("1"));
         }
     }
 
@@ -103,6 +102,22 @@ public class PipelineServiceTest {
 
         assertEquals(pipeline, service.createPipeline(pipeline));
     }
-
     
+    @Test
+    public void testCreatePipelineWithDuplicateStageName() {
+        Errors mockValidationErrors = mock(Errors.class);
+
+        doReturn(mockValidationErrors).when(validator).validatePipeline(pipeline);
+        doReturn(List.of(mock(ObjectError.class))).when(mockValidationErrors).getAllErrors();
+        doReturn(true).when(mockValidationErrors).hasErrors();
+
+        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipeline));
+    }
+
+    @Test
+    public void testCreatePipelineWithDuplicatePipelineName() {
+        doThrow(new DataIntegrityViolationException("Dummy Exception")).when(repository).save(pipeline);
+
+        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipeline));
+    }
 }

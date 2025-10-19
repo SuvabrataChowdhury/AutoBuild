@@ -7,10 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 
-import com.autobuild.pipeline.entity.BashStageImpl;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
@@ -18,6 +16,11 @@ import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
 import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Service Layer for all Pipeline CRUD operations.
+ * @author Suvabrata Chowdhury
+ */
 
 @Slf4j
 @Service
@@ -29,13 +32,13 @@ public class PipelineService {
     private PipelineValidator validator;
 
     public Pipeline getPipelineById(final String pipelineId) throws InvalidIdException {
-        if(StringUtils.isEmpty(pipelineId))
+        if (StringUtils.isEmpty(pipelineId))
             throw new InvalidIdException("Pipeline Id is empty");
 
         try {
             Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
 
-            if(optionalPipeline.isPresent()) {
+            if (optionalPipeline.isPresent()) {
                 return optionalPipeline.get();
             }
 
@@ -71,10 +74,12 @@ public class PipelineService {
 
     //TODO: Use a better validation class implementation
     private void validatePipeline(final Pipeline pipeline) throws DuplicateEntryException {
-        Errors validationErrors = new BeanPropertyBindingResult(pipeline, "pipeline");
-        validator.validate(pipeline, validationErrors);
+        // Errors validationErrors = new BeanPropertyBindingResult(pipeline, "pipeline");
+        // validator.validate(pipeline, validationErrors);
 
-        if(validationErrors.hasErrors()) {
+        Errors validationErrors = validator.validatePipeline(pipeline);
+
+        if (null != validationErrors && validationErrors.hasErrors()) {
             log.error("Error Occurred duplicate stages"); //TODO: better log
             throw new DuplicateEntryException(validationErrors.getAllErrors().get(0).getDefaultMessage());
         }

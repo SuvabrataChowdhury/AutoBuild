@@ -16,6 +16,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Pipeline Entity definition.
+ * @author Suvabrata Chowdhury
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -25,7 +30,7 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(
             name = "uk_pipeline_name",
             columnNames = {"name"}
-        )
+            )
     }
 )
 public class Pipeline {

@@ -41,7 +41,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    void testGetPipelineWithNoPipeline() throws InvalidIdException {
+    public void testGetPipelineWithNoPipeline() throws InvalidIdException {
         doReturn(null).when(pipelineService).getPipelineById(anyString());
 
         ResponseEntity<PipelineResponse> getPipelineResponse = controller.getPipelineById("1");
@@ -51,7 +51,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    void testGetPipelineWithPipeline() throws InvalidIdException {
+    public void testGetPipelineWithPipeline() throws InvalidIdException {
         doReturn(pipeline).when(pipelineService).getPipelineById(anyString());
 
         ResponseEntity<PipelineResponse> getPipelineResponse = controller.getPipelineById("1");
@@ -63,7 +63,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    void testGetPipelineWithInvalidId() throws InvalidIdException {
+    public void testGetPipelineWithInvalidId() throws InvalidIdException {
         doThrow(
             new InvalidIdException("Dummy msg: Invalid id given")
         ).when(pipelineService).getPipelineById(anyString());
@@ -86,7 +86,7 @@ public class PipelineControllerTest {
     // }
 
     @Test
-    void testCreatePipelineWithPipeline() throws DuplicateEntryException {
+    public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
         doReturn(pipeline).when(pipelineService).createPipeline(any(Pipeline.class));
 
         UUID randomPipelineID = UUID.randomUUID();
@@ -97,5 +97,15 @@ public class PipelineControllerTest {
         assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
         assertEquals(pipeline, createPipelineResponse.getBody().getPipeline());
         assertEquals("/pipeline/" + randomPipelineID, createPipelineResponse.getHeaders().get("location").get(0));
+    }
+
+    @Test
+    public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
+        doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(Pipeline.class));
+
+        ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(pipeline);
+        assertEquals(HttpStatus.CONFLICT, createPipelineResponse.getStatusCode());
+        assertNotNull(createPipelineResponse.getBody().getErrors());
+        assertEquals(1, createPipelineResponse.getBody().getErrors().size());
     }
 }

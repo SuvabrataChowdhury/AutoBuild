@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object for Stage.
+ * @author Suvabrata Chowdhury
+ */
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
