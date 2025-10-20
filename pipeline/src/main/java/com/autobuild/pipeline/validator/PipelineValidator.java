@@ -11,8 +11,6 @@ import org.springframework.validation.Validator;
 
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.StageDTO;
-import com.autobuild.pipeline.entity.Pipeline;
-import com.autobuild.pipeline.entity.Stage;
 
 /**
  * Validator for pipeline requests.

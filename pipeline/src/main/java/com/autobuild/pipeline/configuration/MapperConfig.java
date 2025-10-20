@@ -16,7 +16,7 @@ import com.autobuild.pipeline.entity.Stage;
  */
 
 @Configuration
-public class AppConfig {
+public class MapperConfig {
     @Bean
     public ModelMapper getModelMapper() {
         ModelMapper mapper = new ModelMapper();

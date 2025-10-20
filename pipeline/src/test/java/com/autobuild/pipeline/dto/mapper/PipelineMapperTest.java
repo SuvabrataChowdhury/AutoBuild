@@ -5,25 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import com.autobuild.pipeline.configuration.AppConfig;
+import com.autobuild.pipeline.configuration.MapperConfig;
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.testutility.DummyData;
 
-// @ContextConfiguration(classes = {AppConfig.class})
-@ExtendWith(SpringExtension.class)
+@SpringJUnitConfig
+@ContextConfiguration(classes = {MapperConfig.class,PipelineMapper.class})
 public class PipelineMapperTest {
     // private ModelMapper mapper;
 

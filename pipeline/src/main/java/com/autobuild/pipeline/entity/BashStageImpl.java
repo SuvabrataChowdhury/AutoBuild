@@ -1,6 +1,5 @@
 package com.autobuild.pipeline.entity;
 
-import jakarta.persistence.Entity;
 import lombok.Getter;
 
 /**
