@@ -1,6 +1,7 @@
 package com.autobuild.pipeline.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.autobuild.pipeline.dto.PipelineDTO;
+import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 import com.autobuild.pipeline.testutility.DummyData;
@@ -78,19 +80,19 @@ public class PipelineControllerTest {
     //     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, getPipelineResponse.getStatusCode());
     // }
 
-    // @Test
-    // public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
-    //     doReturn(pipeline).when(pipelineService).createPipeline(any(Pipeline.class));
+    @Test
+    public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
+        doReturn(pipelineDTO).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
-    //     UUID randomPipelineID = UUID.randomUUID();
-    //     doReturn(randomPipelineID).when(pipeline).getId();
+        // UUID randomPipelineID = UUID.randomUUID();
+        // doReturn(randomPipelineID).when(pipeline).getId();
 
-    //     ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(mock(Pipeline.class));
+        ResponseEntity<?> createPipelineResponse = controller.createPipeline(pipelineDTO);
 
-    //     assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
-    //     assertEquals(pipeline, createPipelineResponse.getBody().getPipeline());
-    //     assertEquals("/pipeline/" + randomPipelineID, createPipelineResponse.getHeaders().get("location").get(0));
-    // }
+        assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
+        assertEquals(pipelineDTO, createPipelineResponse.getBody());
+        assertEquals("/pipeline/" + pipelineDTO.getId(), createPipelineResponse.getHeaders().get("location").get(0));
+    }
 
     // @Test
     // public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {

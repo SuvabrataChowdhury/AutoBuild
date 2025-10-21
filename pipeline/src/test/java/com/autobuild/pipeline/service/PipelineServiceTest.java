@@ -81,8 +81,9 @@ public class PipelineServiceTest {
         try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
             uuid.when(() -> UUID.fromString(anyString())).thenReturn(randomId);
             doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
+            doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 
-            assertEquals(pipeline, service.getPipelineById("1"));
+            assertEquals(pipelineDTO, service.getPipelineById("1"));
         }
     }
 

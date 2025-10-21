@@ -30,14 +30,17 @@ public class PipelineController {
     @Autowired
     private PipelineService pipelineService;
 
+    //TODO: send errors through global exception handler
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<?> getPipelineById(@PathVariable String pipelineId){ //TODO: send errors through global exception handler
+    public ResponseEntity<?> getPipelineById(@PathVariable String pipelineId){
         try {
             PipelineDTO pipeline = pipelineService.getPipelineById(pipelineId);
 
             if (null == pipeline) {
 
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pipeline with id " + pipelineId + " not found");
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Pipeline with id " + pipelineId + " not found");
             }
 
             return ResponseEntity.ok().body(pipeline);
@@ -47,9 +50,9 @@ public class PipelineController {
         }
     }
 
+    //TODO: send errors through global exception handler
     @PostMapping
-    public ResponseEntity<?> createPipeline(@RequestBody PipelineDTO pipelineRequest) { //TODO: send errors through global exception handler
-        
+    public ResponseEntity<?> createPipeline(@RequestBody PipelineDTO pipelineRequest) {
         try {
             PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
             URI location = URI.create("/pipeline/" + createdPipeline.getId());
