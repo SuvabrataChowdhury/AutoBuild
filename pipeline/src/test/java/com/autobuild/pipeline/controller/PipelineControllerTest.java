@@ -91,7 +91,7 @@ public class PipelineControllerTest {
 
         assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
         assertEquals(pipelineDTO, createPipelineResponse.getBody());
-        assertEquals("/pipeline/" + pipelineDTO.getId(), createPipelineResponse.getHeaders().get("location").get(0));
+        assertEquals("/api/v1/pipeline/" + pipelineDTO.getId(), createPipelineResponse.getHeaders().get("location").get(0));
     }
 
     // @Test

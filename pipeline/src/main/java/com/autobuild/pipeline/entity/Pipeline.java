@@ -47,7 +47,7 @@ public class Pipeline {
     @JoinTable(
         name = "pipeline_stages",
         joinColumns = @JoinColumn(name = "pipeline_id"),
-        inverseJoinColumns = @JoinColumn(name = "stage_name")
+        inverseJoinColumns = @JoinColumn(name = "stage_id")
     )
     @Setter
     private List<Stage> stages; //TODO: need to take an abstract implementation of stage

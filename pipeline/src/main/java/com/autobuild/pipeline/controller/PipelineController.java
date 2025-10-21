@@ -55,7 +55,7 @@ public class PipelineController {
     public ResponseEntity<?> createPipeline(@RequestBody PipelineDTO pipelineRequest) {
         try {
             PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
-            URI location = URI.create("/pipeline/" + createdPipeline.getId());
+            URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());
 
             return ResponseEntity.created(location).body(createdPipeline);
         } catch (DuplicateEntryException e) {
