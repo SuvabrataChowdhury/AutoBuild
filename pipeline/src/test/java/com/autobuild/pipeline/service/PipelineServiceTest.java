@@ -108,8 +108,9 @@ public class PipelineServiceTest {
     @Test
     public void testCreatePipelineWithValidPipeline() throws DuplicateEntryException {
         doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 
-        assertEquals(pipeline, service.createPipeline(pipelineDTO));
+        assertEquals(pipelineDTO, service.createPipeline(pipelineDTO));
     }
     
     @Test

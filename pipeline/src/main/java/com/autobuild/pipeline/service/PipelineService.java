@@ -36,7 +36,7 @@ public class PipelineService {
     @Autowired
     private PipelineMapper mapper;
 
-    public Pipeline getPipelineById(final String pipelineId) throws InvalidIdException {
+    public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException {
         if (StringUtils.isEmpty(pipelineId))
             throw new InvalidIdException("Pipeline Id is empty");
 
@@ -44,7 +44,7 @@ public class PipelineService {
             Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
 
             if (optionalPipeline.isPresent()) {
-                return optionalPipeline.get();
+                return mapper.entityToDto(optionalPipeline.get());
             }
 
             log.info("Pipeline with id " + pipelineId + " not found");
@@ -59,7 +59,7 @@ public class PipelineService {
         }
     }
 
-    public Pipeline createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
+    public PipelineDTO createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
         validatePipeline(pipelineDto);
 
         // createPipelineStageScripts(pipeline);
@@ -67,7 +67,7 @@ public class PipelineService {
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
         try {
-            return repository.save(pipeline);
+            return mapper.entityToDto(repository.save(pipeline));
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateEntryException("Pipeline with the name \"" + pipeline.getName() + "\" already exists");
         }

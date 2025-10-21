@@ -27,8 +27,7 @@ public class Stage {
     private UUID id;
 
     @Setter
-    private String name; //TODO: Change this primary key. Two stages can have same name
-
+    private String name;
     @Setter
     private String scriptType;
 
