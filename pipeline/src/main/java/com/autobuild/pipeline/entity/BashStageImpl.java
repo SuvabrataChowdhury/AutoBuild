@@ -1,6 +1,5 @@
 package com.autobuild.pipeline.entity;
 
-import jakarta.persistence.Entity;
 import lombok.Getter;
 
 /**
@@ -8,8 +7,8 @@ import lombok.Getter;
  * @author Suvabrata Chowdhury
  */
 
-@Entity
-public class BashStageImpl extends Stage{
+// @Entity
+public class BashStageImpl{
     @Getter
     private String command;
 }

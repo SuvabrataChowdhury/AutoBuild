@@ -1,7 +1,6 @@
 package com.autobuild.pipeline.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.autobuild.pipeline.dto.PipelineResponse;
-import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
@@ -25,7 +23,6 @@ import com.autobuild.pipeline.service.PipelineService;
  */
 
 //TODO: Need to refactor
-//TODO: Define in terms of DTOs
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
@@ -33,44 +30,36 @@ public class PipelineController {
     @Autowired
     private PipelineService pipelineService;
 
+    //TODO: send errors through global exception handler
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<PipelineResponse> getPipelineById(@PathVariable String pipelineId){
+    public ResponseEntity<?> getPipelineById(@PathVariable String pipelineId){
         try {
-            Pipeline pipeline = pipelineService.getPipelineById(pipelineId);
+            PipelineDTO pipeline = pipelineService.getPipelineById(pipelineId);
 
             if (null == pipeline) {
-                PipelineResponse response = new PipelineResponse();
-                response.setErrors(List.of("Pipeline with id " + pipelineId + " not found"));
 
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Pipeline with id " + pipelineId + " not found");
             }
 
-            PipelineResponse response = new PipelineResponse(pipeline);
-
-            return ResponseEntity.ok().body(response);
+            return ResponseEntity.ok().body(pipeline);
         } catch (InvalidIdException e) {
-            PipelineResponse response = new PipelineResponse();
-            response.setErrors(List.of(e.getMessage()));
 
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    //TODO: send errors through global exception handler
     @PostMapping
-    public ResponseEntity<PipelineResponse> createPipeline(@RequestBody Pipeline pipelineRequest) {
-        
+    public ResponseEntity<?> createPipeline(@RequestBody PipelineDTO pipelineRequest) {
         try {
-            Pipeline createdPipeline = pipelineService.createPipeline(pipelineRequest);
+            PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
+            URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());
 
-            PipelineResponse response = new PipelineResponse(createdPipeline);
-
-            URI location = URI.create("/pipeline/" + createdPipeline.getId());
-            return ResponseEntity.created(location).body(response);
+            return ResponseEntity.created(location).body(createdPipeline);
         } catch (DuplicateEntryException e) {
-            PipelineResponse response = new PipelineResponse();
-            response.setErrors(List.of(e.getMessage()));
-
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 

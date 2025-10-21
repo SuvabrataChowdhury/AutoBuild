@@ -24,22 +24,28 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
+import com.autobuild.pipeline.dto.mapper.PipelineMapper;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
+import com.autobuild.pipeline.testutility.DummyData;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
 public class PipelineServiceTest {
+
+    private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
+    private Pipeline pipeline = DummyData.pipeline;
 
     @Mock
     private PipelineRepository repository;
 
     @Mock
-    private Pipeline pipeline;
+    private PipelineValidator validator;
 
     @Mock
-    private PipelineValidator validator;
+    private PipelineMapper mapper;
 
     @InjectMocks
     private PipelineService service;
@@ -47,6 +53,9 @@ public class PipelineServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        doReturn(pipelineDTO).when(mapper).entityToDto(any(Pipeline.class));
+        doReturn(pipeline).when(mapper).dtoToEntity(any(PipelineDTO.class));
     }
 
     @Test
@@ -72,8 +81,9 @@ public class PipelineServiceTest {
         try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
             uuid.when(() -> UUID.fromString(anyString())).thenReturn(randomId);
             doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
+            doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 
-            assertEquals(pipeline, service.getPipelineById("1"));
+            assertEquals(pipelineDTO, service.getPipelineById("1"));
         }
     }
 
@@ -99,25 +109,26 @@ public class PipelineServiceTest {
     @Test
     public void testCreatePipelineWithValidPipeline() throws DuplicateEntryException {
         doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 
-        assertEquals(pipeline, service.createPipeline(pipeline));
+        assertEquals(pipelineDTO, service.createPipeline(pipelineDTO));
     }
     
     @Test
     public void testCreatePipelineWithDuplicateStageName() {
         Errors mockValidationErrors = mock(Errors.class);
 
-        doReturn(mockValidationErrors).when(validator).validatePipeline(pipeline);
+        doReturn(mockValidationErrors).when(validator).validatePipeline(pipelineDTO);
         doReturn(List.of(mock(ObjectError.class))).when(mockValidationErrors).getAllErrors();
         doReturn(true).when(mockValidationErrors).hasErrors();
 
-        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipeline));
+        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipelineDTO));
     }
 
     @Test
     public void testCreatePipelineWithDuplicatePipelineName() {
         doThrow(new DataIntegrityViolationException("Dummy Exception")).when(repository).save(pipeline);
 
-        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipeline));
+        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipelineDTO));
     }
 }
