@@ -39,7 +39,7 @@ public class PipelineValidator implements Validator{
         PipelineDTO pipeline = (PipelineDTO) target;
 
         if (containsDuplicateStageName(pipeline.getStages())) {
-            errors.rejectValue("stages", "stages.duplicate" , "stages having duplicate name");
+            errors.rejectValue("stages", "stages.duplicate" , "Stages having duplicate name");
         }
     }
 

@@ -1,6 +1,7 @@
 package com.autobuild.pipeline.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -20,13 +21,14 @@ import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 import com.autobuild.pipeline.testutility.DummyData;
 
+import jakarta.persistence.EntityNotFoundException;
+
 public class PipelineControllerTest {
+
+    private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
 
     @Mock
     private PipelineService pipelineService;
-
-    // private Pipeline pipeline = DummyData.pipeline;
-    private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
 
     @InjectMocks
     private PipelineController controller ;
@@ -38,12 +40,9 @@ public class PipelineControllerTest {
 
     @Test
     public void testGetPipelineWithNoPipeline() throws InvalidIdException {
-        doReturn(null).when(pipelineService).getPipelineById(anyString());
+        doThrow(new EntityNotFoundException("Dummy Exception")).when(pipelineService).getPipelineById(anyString());
 
-        ResponseEntity<PipelineDTO> getPipelineResponse = (ResponseEntity<PipelineDTO>) controller.getPipelineById("1");
-
-        assertEquals(HttpStatus.NOT_FOUND, getPipelineResponse.getStatusCode());
-        // assertNotNull(getPipelineResponse.getBody().getErrors());
+        assertThrows(EntityNotFoundException.class, () -> controller.getPipelineById("1"));
     }
 
     @Test
@@ -54,53 +53,32 @@ public class PipelineControllerTest {
 
         assertEquals(HttpStatus.OK, getPipelineResponse.getStatusCode());
         assertEquals(pipelineDTO, getPipelineResponse.getBody());
-        // assertEquals(null, getPipelineResponse.getBody().getErrors());
     }
 
     @Test
     public void testGetPipelineWithInvalidId() throws InvalidIdException {
         doThrow(
-            new InvalidIdException("Dummy msg: Invalid id given")
+            new InvalidIdException("Dummy Exception")
         ).when(pipelineService).getPipelineById(anyString());
 
-        ResponseEntity<PipelineDTO> getPipelineResponse = (ResponseEntity<PipelineDTO>) controller.getPipelineById("1");
-
-        assertEquals(HttpStatus.BAD_REQUEST, getPipelineResponse.getStatusCode());
-        // assertNotNull(getPipelineResponse.getBody().getErrors());
+        assertThrows(InvalidIdException.class, () -> controller.getPipelineById("1"));
     }
-
-    //TODO: Test in integration test
-    //Need MockMVC for it
-    // @Test
-    // void testGetPipelineWithException() {
-    //     doThrow(new RuntimeException("Dummy Exception")).when(pipelineService).getPipelineById(anyString());
-
-    //     ResponseEntity<Pipeline> getPipelineResponse = controller.getPipelineById("1");
-
-    //     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, getPipelineResponse.getStatusCode());
-    // }
 
     @Test
     public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
         doReturn(pipelineDTO).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
-        // UUID randomPipelineID = UUID.randomUUID();
-        // doReturn(randomPipelineID).when(pipeline).getId();
-
-        ResponseEntity<?> createPipelineResponse = controller.createPipeline(pipelineDTO);
+        ResponseEntity<PipelineDTO> createPipelineResponse = controller.createPipeline(pipelineDTO);
 
         assertEquals(HttpStatus.CREATED, createPipelineResponse.getStatusCode());
         assertEquals(pipelineDTO, createPipelineResponse.getBody());
         assertEquals("/api/v1/pipeline/" + pipelineDTO.getId(), createPipelineResponse.getHeaders().get("location").get(0));
     }
 
-    // @Test
-    // public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
-    //     doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(Pipeline.class));
+    @Test
+    public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
+        doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
-    //     ResponseEntity<PipelineResponse> createPipelineResponse = controller.createPipeline(pipeline);
-    //     assertEquals(HttpStatus.CONFLICT, createPipelineResponse.getStatusCode());
-    //     assertNotNull(createPipelineResponse.getBody().getErrors());
-    //     assertEquals(1, createPipelineResponse.getBody().getErrors().size());
-    // }
+        assertThrows(DuplicateEntryException.class, () -> controller.createPipeline(pipelineDTO));
+    }
 }

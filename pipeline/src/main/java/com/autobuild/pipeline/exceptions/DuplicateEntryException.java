@@ -1,7 +1,7 @@
 package com.autobuild.pipeline.exceptions;
 
 /**
- * Exception to throw when duplicate entry is provided.
+ * Exception to throw when duplicate entry of any entity is provided.
  * @author Suvabrata Chowdhury
  */
 public class DuplicateEntryException extends Exception{

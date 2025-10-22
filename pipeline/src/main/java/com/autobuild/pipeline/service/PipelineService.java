@@ -17,6 +17,7 @@ import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -43,18 +44,13 @@ public class PipelineService {
         try {
             Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
 
-            if (optionalPipeline.isPresent()) {
-                return mapper.entityToDto(optionalPipeline.get());
+            if (!optionalPipeline.isPresent()) {
+                throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
             }
 
-            log.info("Pipeline with id " + pipelineId + " not found");
-
-            return null;
+            return mapper.entityToDto(optionalPipeline.get());
 
         } catch (IllegalArgumentException e) {
-            // log.debug("Exception occured", e); //TODO: check correct places for debug logs
-            log.error("Pipeline Id is invalid");
-
             throw new InvalidIdException("Pipeline Id is invalid");
         }
     }
