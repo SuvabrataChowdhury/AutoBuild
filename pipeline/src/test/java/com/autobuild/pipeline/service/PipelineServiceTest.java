@@ -33,6 +33,8 @@ import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.testutility.DummyData;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
+import jakarta.persistence.EntityNotFoundException;
+
 public class PipelineServiceTest {
 
     private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
@@ -95,7 +97,7 @@ public class PipelineServiceTest {
             uuid.when(() -> UUID.fromString(anyString())).thenReturn(randomId);
             doReturn(Optional.ofNullable(null)).when(repository).findById(any(UUID.class));
 
-            assertEquals(null, service.getPipelineById("1"));
+            assertThrows(EntityNotFoundException.class, () -> service.getPipelineById("1"));
         }
     }
 

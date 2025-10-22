@@ -3,7 +3,6 @@ package com.autobuild.pipeline.controller;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +18,11 @@ import com.autobuild.pipeline.service.PipelineService;
 
 /**
  * Controller for all CRUD operations on Pipeline.
+ * 
  * @author Suvabrata Chowdhury
  */
 
-//TODO: Need to refactor
+// TODO: Need to refactor
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
@@ -30,50 +30,39 @@ public class PipelineController {
     @Autowired
     private PipelineService pipelineService;
 
-    //TODO: send errors through global exception handler
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<?> getPipelineById(@PathVariable String pipelineId){
-        try {
-            PipelineDTO pipeline = pipelineService.getPipelineById(pipelineId);
+    public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId) throws InvalidIdException {
 
-            if (null == pipeline) {
+        PipelineDTO pipeline = pipelineService.getPipelineById(pipelineId);
 
-                return ResponseEntity
-                        .status(HttpStatus.NOT_FOUND)
-                        .body("Pipeline with id " + pipelineId + " not found");
-            }
-
-            return ResponseEntity.ok().body(pipeline);
-        } catch (InvalidIdException e) {
-
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok().body(pipeline);
     }
 
-    //TODO: send errors through global exception handler
     @PostMapping
-    public ResponseEntity<?> createPipeline(@RequestBody PipelineDTO pipelineRequest) {
-        try {
-            PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
-            URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());
+    public ResponseEntity<PipelineDTO> createPipeline(@RequestBody PipelineDTO pipelineRequest)
+            throws DuplicateEntryException {
 
-            return ResponseEntity.created(location).body(createdPipeline);
-        } catch (DuplicateEntryException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
+        URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());
+
+        return ResponseEntity.created(location).body(createdPipeline);
     }
 
     // @PatchMapping
-    // public ResponseEntity<String> updatePipeline(RequestEntity<String> pipeline) {
-    //     // return "Requested Update: " + pipeline.getBody();
-    //     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
+    // public ResponseEntity<String> updatePipeline(RequestEntity<String> pipeline)
+    // {
+    // // return "Requested Update: " + pipeline.getBody();
+    // return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be
+    // implemented");
 
-    //     // pipelineService.deletePipeline()
+    // // pipelineService.deletePipeline()
     // }
 
     // @DeleteMapping
-    // public ResponseEntity<String> deletePipeline(RequestEntity<String> pipeline) {
-    //     // return "Requested Delete: " + pipeline.getBody();
-    //     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be implemented");
+    // public ResponseEntity<String> deletePipeline(RequestEntity<String> pipeline)
+    // {
+    // // return "Requested Delete: " + pipeline.getBody();
+    // return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be
+    // implemented");
     // }
 }
