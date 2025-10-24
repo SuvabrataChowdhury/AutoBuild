@@ -12,8 +12,8 @@ import com.autobuild.pipeline.exceptions.InvalidIdException;
 
 import jakarta.persistence.EntityNotFoundException;
 
-public class GlobalPipelineControllerHandlerTest {
-    private GlobalPipelineControllerHandler globalHandler = new GlobalPipelineControllerHandler();
+public class ServiceLevelExceptionHandlerTest {
+    private ServiceLevelExceptionHandler globalHandler = new ServiceLevelExceptionHandler();
 
     @Test
     void testHandleDuplicateEntryException() {
@@ -22,16 +22,6 @@ public class GlobalPipelineControllerHandlerTest {
         ErrorResponse errorResponse = globalHandler.handleDuplicateEntryException(exception);
 
         assertEquals(HttpStatus.CONFLICT, errorResponse.getStatusCode());
-        assertNotNull(errorResponse.getBody().getDetail());
-    }
-
-    @Test
-    void testHandleEntityNotFoundException() {
-        EntityNotFoundException exception = new EntityNotFoundException("Dummy Exception");
-
-        ErrorResponse errorResponse = globalHandler.handleEntityNotFoundException(exception);
-
-        assertEquals(HttpStatus.NOT_FOUND, errorResponse.getStatusCode());
         assertNotNull(errorResponse.getBody().getDetail());
     }
 

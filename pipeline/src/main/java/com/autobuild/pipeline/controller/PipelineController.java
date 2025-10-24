@@ -16,6 +16,8 @@ import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.service.PipelineService;
 
+import jakarta.validation.Valid;
+
 /**
  * Controller for all CRUD operations on Pipeline.
  * 
@@ -25,6 +27,7 @@ import com.autobuild.pipeline.service.PipelineService;
 // TODO: Need to refactor
 @RestController
 @RequestMapping("/api/v1/pipeline")
+// @Validated
 public class PipelineController {
 
     @Autowired
@@ -39,7 +42,7 @@ public class PipelineController {
     }
 
     @PostMapping
-    public ResponseEntity<PipelineDTO> createPipeline(@RequestBody PipelineDTO pipelineRequest)
+    public ResponseEntity<PipelineDTO> createPipeline(@RequestBody @Valid PipelineDTO pipelineRequest)
             throws DuplicateEntryException {
 
         PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);

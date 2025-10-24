@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Service Layer for all Pipeline CRUD operations.
+ * 
  * @author Suvabrata Chowdhury
  */
 
@@ -36,6 +37,8 @@ public class PipelineService {
 
     @Autowired
     private PipelineMapper mapper;
+
+    private static final String DEFAULT_SCRIPT_PATH = "./scripts"; // TODO: take this from application properties
 
     public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException {
         if (StringUtils.isEmpty(pipelineId))
@@ -58,32 +61,25 @@ public class PipelineService {
     public PipelineDTO createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
         validatePipeline(pipelineDto);
 
-        // createPipelineStageScripts(pipeline);
-
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
-        try {
-            return mapper.entityToDto(repository.save(pipeline));
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicateEntryException("Pipeline with the name \"" + pipeline.getName() + "\" already exists");
-        }
+        // TODO: Need to remove this hard coded path setting
+        pipeline.getStages().stream()
+                .forEach(stage -> stage.setPath(DEFAULT_SCRIPT_PATH + "/" + pipeline.getId() + "/" + stage.getId()));
+
+        Pipeline createdPipeline = repository.save(pipeline);
+        log.info("Pipeline with id {} successfully created", createdPipeline.getId());
+
+        return mapper.entityToDto(createdPipeline);
+
     }
 
-    // private void createPipelineStageScripts(Pipeline pipeline) {
-    //     for(BashStageImpl stage: pipeline.getStages()) {
-
-    //     }
-    // }
-
-    //TODO: Use a better validation class implementation
     private void validatePipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
-        // Errors validationErrors = new BeanPropertyBindingResult(pipeline, "pipeline");
-        // validator.validate(pipeline, validationErrors);
 
         Errors validationErrors = validator.validatePipeline(pipelineDto);
 
         if (null != validationErrors && validationErrors.hasErrors()) {
-            log.error("Error Occurred duplicate stages"); //TODO: better log
+            log.error("Error Occurred duplicate stages"); // TODO: better log
             throw new DuplicateEntryException(validationErrors.getAllErrors().get(0).getDefaultMessage());
         }
     }
