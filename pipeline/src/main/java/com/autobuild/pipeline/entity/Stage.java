@@ -45,7 +45,7 @@ public class Stage {
 
     @NotEmpty
     @Setter
-    @Column(name = "scriptType", nullable = false)
+    @Column(name = "script_type", nullable = false)
     private String scriptType;
 
     @NotEmpty
