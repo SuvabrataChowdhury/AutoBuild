@@ -45,9 +45,14 @@ public class ServiceLevelExceptionHandler {
     public ErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
         log.error(exception.getMessage(), exception);
 
-        List<String> errorMessages = exception.getConstraintViolations().stream().map(
-                constraintViolation -> constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage())
-                .toList();
+        List<String> errorMessages = exception.getConstraintViolations()
+                                                .stream().map(
+                                                                constraintViolation -> constraintViolation
+                                                                                        .getPropertyPath() 
+                                                                                        + " " + 
+                                                                                        constraintViolation.getMessage()
+                                                            )
+                                                .toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
@@ -57,7 +62,14 @@ public class ServiceLevelExceptionHandler {
     public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         log.error(exception.getMessage(), exception);
 
-        List<String> errorMessages = exception.getBindingResult().getFieldErrors().stream().map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage()).toList();
+        List<String> errorMessages = exception.getBindingResult()
+                                                .getFieldErrors()
+                                                .stream()
+                                                .map(
+                                                    fieldError -> fieldError.getField() 
+                                                                    + ": " 
+                                                                    + fieldError.getDefaultMessage()
+                                                ).toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();

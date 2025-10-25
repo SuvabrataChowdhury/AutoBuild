@@ -34,7 +34,7 @@ import lombok.Setter;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "UK_PIPELINE_NAME", columnNames = { "name" })
+    @UniqueConstraint(name = "UK_PIPELINE_NAME", columnNames = { "name" })
 })
 @Check(name = "CHK_PIPELINE_NAME", constraints = "name != '' ")
 public class Pipeline {
@@ -51,6 +51,10 @@ public class Pipeline {
     @NotEmpty
     @Setter
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "pipeline_stages", joinColumns = @JoinColumn(name = "pipeline_id"), inverseJoinColumns = @JoinColumn(name = "stage_id"))
+    @JoinTable(
+        name = "pipeline_stages", 
+        joinColumns = @JoinColumn(name = "pipeline_id"),
+        inverseJoinColumns = @JoinColumn(name = "stage_id")
+    )
     private List<Stage> stages; // TODO: need to take an abstract implementation of stage
 }

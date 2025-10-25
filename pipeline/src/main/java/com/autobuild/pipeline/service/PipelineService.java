@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
@@ -59,6 +58,10 @@ public class PipelineService {
     }
 
     public PipelineDTO createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
+        if (null == pipelineDto) {
+            return null;
+        }
+
         validatePipeline(pipelineDto);
 
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
