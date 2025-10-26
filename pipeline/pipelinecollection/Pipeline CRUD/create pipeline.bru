@@ -16,7 +16,13 @@ body:json {
     "stages" : [
       {
         "name": "init",
-        "command": "echo Hello"
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
+      },
+      {
+        "name": "init2",
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
       }
     ]
   }

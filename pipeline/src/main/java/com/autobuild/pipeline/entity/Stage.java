@@ -50,6 +50,7 @@ public class Stage {
     @Column(name = "script_type", nullable = false)
     private String scriptType;
 
+    //TODO: Check if Path needs to be stored as we are following the storage format /pipelineId/stageId
     @NotEmpty
     @Setter
     @Column(name = "path", nullable = false)

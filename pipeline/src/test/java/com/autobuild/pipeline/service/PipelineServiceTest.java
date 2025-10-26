@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,14 +103,14 @@ public class PipelineServiceTest {
     }
 
     @Test
-    public void testCreatePipelineWithNullPipeline() throws DuplicateEntryException {
+    public void testCreatePipelineWithNullPipeline() throws DuplicateEntryException, IOException {
         // doThrow(IllegalArgumentException.class).when(repository).save(any(Pipeline.class));
 
         assertNull(service.createPipeline(null));
     }
 
     @Test
-    public void testCreatePipelineWithValidPipeline() throws DuplicateEntryException {
+    public void testCreatePipelineWithValidPipeline() throws DuplicateEntryException, IOException {
         doReturn(pipeline).when(repository).save(any(Pipeline.class));
         doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 

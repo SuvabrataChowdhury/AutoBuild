@@ -1,5 +1,6 @@
 package com.autobuild.pipeline.controller;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class PipelineController {
 
     @PostMapping
     public ResponseEntity<PipelineDTO> createPipeline(@RequestBody @Valid PipelineDTO pipelineRequest)
-            throws DuplicateEntryException {
+            throws DuplicateEntryException, IOException {
 
         PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
         URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());

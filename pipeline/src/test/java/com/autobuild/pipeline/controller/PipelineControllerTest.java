@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -65,7 +67,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    public void testCreatePipelineWithPipeline() throws DuplicateEntryException {
+    public void testCreatePipelineWithPipeline() throws DuplicateEntryException, IOException {
         doReturn(pipelineDTO).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
         ResponseEntity<PipelineDTO> createPipelineResponse = controller.createPipeline(pipelineDTO);
@@ -76,7 +78,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException {
+    public void testCreatePipelineWithDuplicateStages() throws DuplicateEntryException, IOException {
         doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
         assertThrows(DuplicateEntryException.class, () -> controller.createPipeline(pipelineDTO));
