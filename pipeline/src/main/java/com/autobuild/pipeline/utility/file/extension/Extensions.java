@@ -1,7 +1,7 @@
 package com.autobuild.pipeline.utility.file.extension;
 
 public class Extensions {
-    public static final String SHELL_SCRIPT_EXTENSION = ".sh";
+    private static final String SHELL_SCRIPT_EXTENSION = ".sh";
 
     public static String nameFor(String scriptType) {
         String extension = "";
