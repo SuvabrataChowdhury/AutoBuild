@@ -29,7 +29,6 @@ import lombok.Setter;
 @Checks({
     @Check(name = "CHK_STAGE_NAME", constraints = "name != '' "),
     @Check(name = "CHK_STAGE_SCRIPT_TYPE", constraints = "script_type != '' "),
-    // @Check(name = "CHK_STAGE_PATH", constraints = "path != '' "),
     
     // TODO: remove it as it should be stored as a file later
     @Check(name = "CHK_STAGE_COMMAND", constraints = "command != '' ")
