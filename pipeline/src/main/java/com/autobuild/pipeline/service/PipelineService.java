@@ -1,7 +1,6 @@
 package com.autobuild.pipeline.service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,12 +12,10 @@ import org.springframework.validation.Errors;
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.mapper.PipelineMapper;
 import com.autobuild.pipeline.entity.Pipeline;
-import com.autobuild.pipeline.entity.Stage;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
-import com.autobuild.pipeline.utility.file.extension.Extensions;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -74,11 +71,8 @@ public class PipelineService {
 
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
-        // TODO: Need to remove this hard coded path setting
-        // pipeline.getStages().stream()
-        //         .forEach(stage -> stage.setPath(DEFAULT_SCRIPT_PATH + "/" + pipeline.getId() + "/" + stage.getId()));
-
-        Pipeline createdPipeline = repository.save(pipeline); //TODO: Make Sure to revert changes in case of file creation errors
+        //TODO: Make Sure to revert changes in case of file creation errors
+        Pipeline createdPipeline = repository.save(pipeline);
 
         createScriptFiles(createdPipeline);
 
@@ -87,23 +81,13 @@ public class PipelineService {
         return mapper.entityToDto(createdPipeline);
     }
 
-    //TODO: Too low level method. Make it more abstract
     private void createScriptFiles(Pipeline pipeline) throws IOException {
-        String pipelineId = pipeline.getId().toString();
-        
         try {
             fileService.createScriptFiles(pipeline);
-            // for (Stage stage : pipeline.getStages()) {
-            //     fileService.createScriptFiles(pipeline); //TODO: too low level call. Make it more abstract
-            // }
         } catch (IOException e) {
-            deleteScriptFiles(pipeline);
+            fileService.removeScriptFiles(pipeline); //to roll-back the file creation operation
             throw e;
         }
-    }
-
-    private void deleteScriptFiles(Pipeline pipeline) throws IOException {
-        fileService.removeScriptFiles(pipeline);
     }
 
     private void validatePipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {

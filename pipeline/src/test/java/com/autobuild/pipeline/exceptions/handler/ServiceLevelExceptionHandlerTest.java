@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,16 @@ public class ServiceLevelExceptionHandlerTest {
         ErrorResponse errorResponse = globalHandler.handleMethodArgumentNotValidException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, errorResponse.getStatusCode());
+        assertNotNull(errorResponse.getBody().getDetail());
+    }
+
+    @Test
+    public void testHandleIOException() {
+        IOException exception = new IOException("Dummy Exception");
+
+        ErrorResponse errorResponse = globalHandler.handleIOException(exception);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatusCode());
         assertNotNull(errorResponse.getBody().getDetail());
     }
 }

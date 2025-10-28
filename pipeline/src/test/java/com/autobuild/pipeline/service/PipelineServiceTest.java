@@ -9,6 +9,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +34,7 @@ import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.testutility.DummyData;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -49,6 +52,9 @@ public class PipelineServiceTest {
 
     @Mock
     private PipelineMapper mapper;
+
+    @Mock
+    private PipelineFileService fileService;
 
     @InjectMocks
     private PipelineService service;
@@ -104,8 +110,6 @@ public class PipelineServiceTest {
 
     @Test
     public void testCreatePipelineWithNullPipeline() throws DuplicateEntryException, IOException {
-        // doThrow(IllegalArgumentException.class).when(repository).save(any(Pipeline.class));
-
         assertNull(service.createPipeline(null));
     }
 
@@ -115,6 +119,20 @@ public class PipelineServiceTest {
         doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
 
         assertEquals(pipelineDTO, service.createPipeline(pipelineDTO));
+
+        verify(fileService,times(1)).createScriptFiles(pipeline);
+    }
+
+    @Test
+    public void testCreatePipelineWithValidPipelineWithIOException() throws DuplicateEntryException, IOException {
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
+        doThrow(new IOException("Dummy Exception")).when(fileService).createScriptFiles(pipeline);
+
+        assertThrows(IOException.class, () -> service.createPipeline(pipelineDTO));
+
+        verify(fileService,times(1)).createScriptFiles(pipeline);
+        verify(fileService,times(1)).removeScriptFiles(pipeline);
     }
     
     @Test

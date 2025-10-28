@@ -1,5 +1,6 @@
 package com.autobuild.pipeline.exceptions.handler;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
@@ -73,5 +74,12 @@ public class ServiceLevelExceptionHandler {
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ErrorResponse handleIOException(IOException exception) {
+        log.error(exception.getMessage(), exception);
+
+        return ErrorResponse.builder(exception, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage()).build();
     }
 }
