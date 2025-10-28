@@ -12,11 +12,27 @@ post {
 
 body:json {
   {
-    "name": "my pipeline",
+    "name": "my pipeline2",
     "stages" : [
       {
         "name": "init",
-        "command": "echo Hello"
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
+      },
+      {
+        "name": "init2",
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
+      },
+      {
+        "name": "init3",
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
+      },
+      {
+        "name": "init4",
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Hello World\""
       }
     ]
   }

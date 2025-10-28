@@ -1,5 +1,6 @@
 package com.autobuild.pipeline.service;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.validator.PipelineValidator;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +39,9 @@ public class PipelineService {
     @Autowired
     private PipelineMapper mapper;
 
+    @Autowired
+    private PipelineFileService fileService;
+
     private static final String DEFAULT_SCRIPT_PATH = "./scripts"; // TODO: take this from application properties
 
     public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException {
@@ -57,7 +62,7 @@ public class PipelineService {
         }
     }
 
-    public PipelineDTO createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
+    public PipelineDTO createPipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException, IOException {
         if (null == pipelineDto) {
             return null;
         }
@@ -66,15 +71,23 @@ public class PipelineService {
 
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
-        // TODO: Need to remove this hard coded path setting
-        pipeline.getStages().stream()
-                .forEach(stage -> stage.setPath(DEFAULT_SCRIPT_PATH + "/" + pipeline.getId() + "/" + stage.getId()));
-
+        //TODO: Make Sure to revert changes in case of file creation errors
         Pipeline createdPipeline = repository.save(pipeline);
+
+        createScriptFiles(createdPipeline);
+
         log.info("Pipeline with id {} successfully created", createdPipeline.getId());
 
         return mapper.entityToDto(createdPipeline);
+    }
 
+    private void createScriptFiles(Pipeline pipeline) throws IOException {
+        try {
+            fileService.createScriptFiles(pipeline);
+        } catch (IOException e) {
+            fileService.removeScriptFiles(pipeline); //to roll-back the file creation operation
+            throw e;
+        }
     }
 
     private void validatePipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
