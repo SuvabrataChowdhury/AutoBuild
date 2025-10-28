@@ -25,9 +25,6 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
  * @author Suvabrata Chowdhury
  */
 
-// TODO: make a getPipelineDirectory to centralize the path calculation
-// TODO: use the constants. donot pass them along to methods
-// TODO: write UnitTests and IntegrationTests for these flows
 @Component
 public class LocalPipelineFileServiceImpl implements PipelineFileService {
     private static final Path DEFAULT_SCRIPT_PATH = Path.of("..", "pipeline_scripts");
@@ -39,43 +36,18 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
 
     @Override
     public void createScriptFiles(final Pipeline pipeline) throws IOException {
-        createParentDirectory(DEFAULT_SCRIPT_PATH);
+        createParentDirectory();
 
-        Path directoryPath = createPipelineDirectory(DEFAULT_SCRIPT_PATH, pipeline);
+        Path directoryPath = createPipelineDirectory(pipeline);
 
         for (Stage stage : pipeline.getStages()) {
             createStageFile(directoryPath, stage);
         }
     }
 
-    private void createParentDirectory(Path defaultScriptPath) throws IOException {
-        if (!Files.exists(defaultScriptPath)) {
-            Files.createDirectories(defaultScriptPath, PERMISSIONS);
-        }
-    }
-
-    private void createStageFile(Path directoryPath, Stage stage) throws IOException {
-        String scriptName = stage.getId() + Extensions.nameFor(stage.getScriptType());
-        Path filePath = directoryPath.resolve(scriptName);
-
-        Files.createFile(filePath, PERMISSIONS);
-        Files.write(filePath, stage.getCommand().getBytes());
-    }
-
-    private Path createPipelineDirectory(Path defaultScriptPath, Pipeline pipeline) throws IOException {
-        Path directoryPath = defaultScriptPath.resolve(pipeline.getId().toString());
-
-        directoryPath = Files.createDirectories(directoryPath, PERMISSIONS);
-        // if (!Files.exists(directoryPath)) {
-        //     directoryPath = Files.createDirectory(directoryPath, PERMISSIONS);
-        // }
-
-        return directoryPath;
-    }
-
     @Override
     public void removeScriptFiles(final Pipeline pipeline) throws IOException {
-        Path directoryPath = DEFAULT_SCRIPT_PATH.resolve(pipeline.getId().toString());
+        Path directoryPath = getPipelineDirectoryPath(pipeline);
 
         try (Stream<Path> paths = Files.walk(directoryPath)) {
             paths.sorted(Comparator.reverseOrder()).forEach(path -> {
@@ -88,5 +60,31 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
+    }
+
+    private void createParentDirectory() throws IOException {
+        if (!Files.exists(DEFAULT_SCRIPT_PATH)) {
+            Files.createDirectories(DEFAULT_SCRIPT_PATH, PERMISSIONS);
+        }
+    }
+
+    private Path createPipelineDirectory(Pipeline pipeline) throws IOException {
+        Path directoryPath = getPipelineDirectoryPath(pipeline);
+        directoryPath = Files.createDirectories(directoryPath, PERMISSIONS);
+
+        return directoryPath;
+    }
+
+    private void createStageFile(Path directoryPath, Stage stage) throws IOException {
+        String scriptName = stage.getId() + Extensions.nameFor(stage.getScriptType());
+        Path filePath = directoryPath.resolve(scriptName);
+
+        Files.createFile(filePath, PERMISSIONS);
+        Files.write(filePath, stage.getCommand().getBytes());
+    }
+
+
+    private Path getPipelineDirectoryPath(Pipeline pipeline) {
+        return DEFAULT_SCRIPT_PATH.resolve(pipeline.getId().toString());
     }
 }
