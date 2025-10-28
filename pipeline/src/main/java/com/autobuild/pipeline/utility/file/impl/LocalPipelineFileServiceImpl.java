@@ -22,6 +22,9 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
  * Pipeline file service implementation for storing script file in local
  * machine.
  * 
+ * The maintained directory structure is,
+ * /pipeline_id/stage_id
+ * 
  * @author Suvabrata Chowdhury
  */
 
