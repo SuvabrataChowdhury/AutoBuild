@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,11 +66,10 @@ public class PipelineController {
     // // pipelineService.deletePipeline()
     // }
 
-    // @DeleteMapping
-    // public ResponseEntity<String> deletePipeline(RequestEntity<String> pipeline)
-    // {
-    // // return "Requested Delete: " + pipeline.getBody();
-    // return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be
-    // implemented");
-    // }
+    @DeleteMapping("/{pipelineId}")
+    public ResponseEntity<String> deletePipeline(@PathVariable String pipelineId) throws IOException {
+        pipelineService.deletePipelineById(pipelineId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

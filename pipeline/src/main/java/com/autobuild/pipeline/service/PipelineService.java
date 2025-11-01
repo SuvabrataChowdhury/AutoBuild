@@ -45,7 +45,7 @@ public class PipelineService {
         }
 
         try {
-            Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
+            Optional<Pipeline> optionalPipeline = getPipelineFromRepository(pipelineId);
 
             if (!optionalPipeline.isPresent()) {
                 throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
@@ -85,6 +85,22 @@ public class PipelineService {
         return mapper.entityToDto(createdPipeline);
     }
 
+    public void deletePipelineById(String pipelineId) throws IOException {
+        Optional<Pipeline> optionalPipeline = getPipelineFromRepository(pipelineId);
+
+        if(!optionalPipeline.isPresent()) {
+            throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
+        }
+
+        Pipeline pipeline = optionalPipeline.get();
+
+        deletePipeline(pipeline);
+    }
+
+    private Optional<Pipeline> getPipelineFromRepository(final String pipelineId) {
+        return repository.findById(UUID.fromString(pipelineId));
+    }
+
     private Map<UUID, String> createScriptFiles(PipelineDTO pipeline) throws IOException {
         try {
             return fileService.createScriptFiles(pipeline);
@@ -92,5 +108,14 @@ public class PipelineService {
             fileService.removeScriptFiles(pipeline); //to roll-back the file creation operation
             throw e;
         }
+    }
+
+    private void deletePipeline(Pipeline pipeline) throws IOException {
+        deleteScriptFiles(pipeline);
+        repository.delete(pipeline);
+    }
+
+    private void deleteScriptFiles(Pipeline pipeline) throws IOException {
+        fileService.removeScriptFiles(pipeline);
     }
 }

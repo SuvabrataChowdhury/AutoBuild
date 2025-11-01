@@ -15,5 +15,6 @@ import com.autobuild.pipeline.entity.Pipeline;
 public interface PipelineFileService {
     public Map<UUID, String> readScriptFiles(final Pipeline pipeline) throws IOException;
     public Map<UUID, String> createScriptFiles(final PipelineDTO pipeline) throws IOException;
-    public void removeScriptFiles(final PipelineDTO pipeline) throws IOException; //can also be done with entity
+    public void removeScriptFiles(final PipelineDTO pipeline) throws IOException;
+    public void removeScriptFiles(final Pipeline pipeline) throws IOException;
 }
