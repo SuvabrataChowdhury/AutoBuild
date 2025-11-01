@@ -67,8 +67,6 @@ public class PipelineService {
             return null;
         }
 
-        validatePipeline(pipelineDto);
-
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
         //TODO: Make Sure to revert changes in case of file creation errors
@@ -87,16 +85,6 @@ public class PipelineService {
         } catch (IOException e) {
             fileService.removeScriptFiles(pipeline); //to roll-back the file creation operation
             throw e;
-        }
-    }
-
-    private void validatePipeline(final PipelineDTO pipelineDto) throws DuplicateEntryException {
-
-        Errors validationErrors = validator.validatePipeline(pipelineDto);
-
-        if (null != validationErrors && validationErrors.hasErrors()) {
-            log.error("Error Occurred duplicate stages"); // TODO: better log
-            throw new DuplicateEntryException(validationErrors.getAllErrors().get(0).getDefaultMessage());
         }
     }
 }
