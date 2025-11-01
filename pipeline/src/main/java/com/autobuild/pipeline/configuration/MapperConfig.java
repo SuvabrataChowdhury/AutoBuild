@@ -37,7 +37,6 @@ public class MapperConfig {
         typeMapper.addMapping(StageDTO::getId, Stage::setId);
         typeMapper.addMapping(StageDTO::getName, Stage::setName);
         typeMapper.addMapping(StageDTO::getScriptType, Stage::setScriptType);
-        // typeMapper.addMapping(StageDTO::getCommand, Stage::setCommand);
     }
 
     private void setStageEntityDTOMapping(ModelMapper mapper) {
@@ -45,7 +44,6 @@ public class MapperConfig {
         typeMapper.addMapping(Stage::getId, StageDTO::setId);
         typeMapper.addMapping(Stage::getName, StageDTO::setName);
         typeMapper.addMapping(Stage::getScriptType, StageDTO::setScriptType);
-        // typeMapper.addMapping(Stage::getCommand, StageDTO::setCommand);
     }
 
     private void setPipelineMapping(ModelMapper mapper) {
@@ -63,14 +61,5 @@ public class MapperConfig {
         TypeMap<Pipeline, PipelineDTO> typeMapper = mapper.createTypeMap(Pipeline.class, PipelineDTO.class);
         typeMapper.addMapping(Pipeline::getName, PipelineDTO::setName);
         typeMapper.addMapping(Pipeline::getId, PipelineDTO::setId);
-        // typeMapper.addMapping(p -> p.getStages().stream().map(s -> {
-        //     try {
-        //         return stageMapper.entityToDto(s);
-        //     } catch (InvalidMappingOperationException e) {
-        //         e.printStackTrace();
-        //     }
-
-        //     return null;
-        // }).collect(Collectors.toList()), PipelineDTO::setStages);
     }
 }

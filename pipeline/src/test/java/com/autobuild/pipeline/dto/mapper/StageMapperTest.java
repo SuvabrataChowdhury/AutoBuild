@@ -60,14 +60,12 @@ public class StageMapperTest {
     private void assertEntity(Stage convertedStageEntity) {
         assertEquals(dto.getId(), convertedStageEntity.getId());
         assertEquals(dto.getName(), convertedStageEntity.getName());
-        // assertEquals(dto.getCommand(), convertedStageEntity.getCommand());
         assertEquals(dto.getScriptType(), convertedStageEntity.getScriptType());
     } 
 
     private void assertDto(StageDTO convertedStageDTO) {
         assertEquals(stage.getId(), convertedStageDTO.getId());
         assertEquals(stage.getName(), convertedStageDTO.getName());
-        // assertEquals(stage.getCommand(), convertedStageDTO.getCommand());
         assertEquals(stage.getScriptType(), convertedStageDTO.getScriptType());
     }
 }

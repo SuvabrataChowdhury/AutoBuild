@@ -8,14 +8,7 @@ import com.autobuild.pipeline.dto.StageDTO;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.entity.Stage;
 
-import lombok.Getter;
-
 public class DummyData {
-    // private static final Stage stage = new Stage(UUID.randomUUID(),"dummyStage1","bash","echo Hello");
-    // private static final StageDTO stageDto = new StageDTO(UUID.randomUUID(), "dummyStage1", "bash", "echo Hello");
-
-    // private static final Pipeline pipeline = new Pipeline(UUID.randomUUID(), "my pipeline",List.of(stage));
-    // private static final PipelineDTO pipelineDTO = new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(stageDto));
 
     public static Stage getStage() {
         return new Stage(UUID.randomUUID(),"dummyStage1","bash","./dummyFolder/");

@@ -31,6 +31,4 @@ public class StageDTO {
 
     @NotEmpty
     private String command;
-
-    // private String path;
 }

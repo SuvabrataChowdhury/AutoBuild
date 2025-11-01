@@ -7,13 +7,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,8 +22,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.mapper.PipelineMapper;
@@ -45,9 +41,6 @@ public class PipelineServiceTest {
 
     @Mock
     private PipelineRepository repository;
-
-    // @Mock
-    // private PipelineValidator validator;
 
     @Mock
     private PipelineMapper mapper;
@@ -133,17 +126,6 @@ public class PipelineServiceTest {
         verify(fileService,times(1)).createScriptFiles(pipelineDTO);
         verify(fileService,times(1)).removeScriptFiles(pipelineDTO);
     }
-    
-    // @Test
-    // public void testCreatePipelineWithDuplicateStageName() {
-    //     Errors mockValidationErrors = mock(Errors.class);
-
-    //     // doReturn(mockValidationErrors).when(validator).validatePipeline(pipelineDTO);
-    //     doReturn(List.of(mock(ObjectError.class))).when(mockValidationErrors).getAllErrors();
-    //     doReturn(true).when(mockValidationErrors).hasErrors();
-
-    //     assertThrows(DuplicateEntryException.class, () -> service.createPipeline(pipelineDTO));
-    // }
 
     @Test
     public void testCreatePipelineWithDuplicatePipelineName() {

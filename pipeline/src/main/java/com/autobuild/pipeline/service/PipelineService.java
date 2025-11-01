@@ -38,8 +38,6 @@ public class PipelineService {
     @Autowired
     private PipelineFileService fileService;
 
-    // private static final String DEFAULT_SCRIPT_PATH = "./scripts"; // TODO: take this from application properties
-
     public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException, IOException {
         
         if (StringUtils.isEmpty(pipelineId)){
