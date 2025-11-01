@@ -9,9 +9,20 @@ import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.entity.Stage;
 
 public class DummyData {
-    public static final Stage stage = new Stage(UUID.randomUUID(),"dummyStage1","bash","echo Hello");
-    public static final StageDTO stageDto = new StageDTO(UUID.randomUUID(), "dummyStage1", "bash", "echo Hello");
 
-    public static final Pipeline pipeline = new Pipeline(UUID.randomUUID(), "my pipeline",List.of(stage));
-    public static final PipelineDTO pipelineDTO = new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(stageDto));
+    public static Stage getStage() {
+        return new Stage(UUID.randomUUID(),"dummyStage1","bash","./dummyFolder/");
+    }
+
+    public static  StageDTO getStageDTO() {
+        return new StageDTO(UUID.randomUUID(), "dummyStage1", "bash", "echo Hello");
+    }
+
+    public static  Pipeline getPipeline() {
+        return new Pipeline(UUID.randomUUID(), "my pipeline",List.of(getStage()));
+    }
+
+    public static PipelineDTO getPipelineDTO() {
+        return new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(getStageDTO()));
+    }
 }

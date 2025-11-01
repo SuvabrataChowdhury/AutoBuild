@@ -17,8 +17,8 @@ import com.autobuild.pipeline.testutility.DummyData;
 @ContextConfiguration(classes = {MapperConfig.class,StageMapper.class})
 public class StageMapperTest {
     
-    private Stage stage = DummyData.stage;
-    private StageDTO dto = DummyData.stageDto;
+    private Stage stage = DummyData.getStage();
+    private StageDTO dto = DummyData.getStageDTO();
 
     @Autowired
     private StageMapper stageMapper;
@@ -58,16 +58,14 @@ public class StageMapperTest {
     }
 
     private void assertEntity(Stage convertedStageEntity) {
-        assertEquals(null, convertedStageEntity.getId());
+        assertEquals(dto.getId(), convertedStageEntity.getId());
         assertEquals(dto.getName(), convertedStageEntity.getName());
-        assertEquals(dto.getCommand(), convertedStageEntity.getCommand());
         assertEquals(dto.getScriptType(), convertedStageEntity.getScriptType());
     } 
 
     private void assertDto(StageDTO convertedStageDTO) {
         assertEquals(stage.getId(), convertedStageDTO.getId());
         assertEquals(stage.getName(), convertedStageDTO.getName());
-        assertEquals(stage.getCommand(), convertedStageDTO.getCommand());
         assertEquals(stage.getScriptType(), convertedStageDTO.getScriptType());
     }
 }

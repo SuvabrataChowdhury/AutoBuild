@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -15,13 +16,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.testutility.DummyData;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 
 public class LocalPipelineFileServiceImplTest {
-    private Pipeline pipeline = DummyData.pipeline;
+    private Pipeline pipeline = DummyData.getPipeline();
+    private PipelineDTO pipelineDTO = DummyData.getPipelineDTO();
 
     private Path pipelinePath = Path.of("..","pipeline_scripts",pipeline.getId().toString());
 
@@ -33,6 +36,7 @@ public class LocalPipelineFileServiceImplTest {
     public void setUp() {
         filesMockedStatic = mockStatic(Files.class);
 
+        filesMockedStatic.when(() -> Files.readAllLines(any(Path.class))).thenReturn(List.of(pipelineDTO.getStages().get(0).getCommand()));
         filesMockedStatic.when(() -> Files.exists(any(Path.class))).thenReturn(false);
         filesMockedStatic.when(() -> Files.createDirectory(any(Path.class), any(FileAttribute.class))).thenReturn(pipelinePath);
         filesMockedStatic.when(() -> Files.createDirectories(any(Path.class), any(FileAttribute.class))).thenReturn(pipelinePath);
@@ -45,8 +49,15 @@ public class LocalPipelineFileServiceImplTest {
     }
 
     @Test
+    public void testReadScriptFiles() throws IOException {
+        pipelineFileService.readScriptFiles(pipeline);
+
+        filesMockedStatic.verify(() -> Files.readAllLines(any(Path.class)), times(pipeline.getStages().size()));
+    }
+
+    @Test
     public void testCreateScriptFiles() throws IOException {
-        pipelineFileService.createScriptFiles(pipeline);
+        pipelineFileService.createScriptFiles(pipelineDTO);
 
         filesMockedStatic.verify(() -> Files.createFile(any(Path.class),any(FileAttribute.class)),times(pipeline.getStages().size()));
         filesMockedStatic.verify(() -> Files.write(any(Path.class),any(byte[].class)),times(pipeline.getStages().size()));
@@ -59,7 +70,7 @@ public class LocalPipelineFileServiceImplTest {
 
         filesMockedStatic.when(() -> Files.walk(any(Path.class))).thenReturn(paths);
 
-        pipelineFileService.removeScriptFiles(pipeline);
+        pipelineFileService.removeScriptFiles(pipelineDTO);
 
         filesMockedStatic.verify(() -> Files.delete(any(Path.class)),times(pipeline.getStages().size() + 1));
     }

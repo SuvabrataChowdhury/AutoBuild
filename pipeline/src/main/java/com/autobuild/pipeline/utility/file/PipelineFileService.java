@@ -1,7 +1,10 @@
 package com.autobuild.pipeline.utility.file;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.UUID;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.entity.Pipeline;
 
 /**
@@ -10,7 +13,7 @@ import com.autobuild.pipeline.entity.Pipeline;
  * @author Suvabrata Chowdhury
  */
 public interface PipelineFileService {
-    //TODO: Too low level calls. Make more abstractions
-    public void createScriptFiles(final Pipeline pipeline) throws IOException;
-    public void removeScriptFiles(final Pipeline pipeline) throws IOException;
+    public Map<UUID, String> readScriptFiles(final Pipeline pipeline) throws IOException;
+    public Map<UUID, String> createScriptFiles(final PipelineDTO pipeline) throws IOException;
+    public void removeScriptFiles(final PipelineDTO pipeline) throws IOException; //can also be done with entity
 }
