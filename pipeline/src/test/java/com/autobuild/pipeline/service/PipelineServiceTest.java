@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
@@ -132,5 +133,16 @@ public class PipelineServiceTest {
         doThrow(new DataIntegrityViolationException("Dummy Exception")).when(repository).save(pipeline);
 
         assertThrows(DataIntegrityViolationException.class, () -> service.createPipeline(pipelineDTO));
+    }
+
+    @Test
+    public void testDeletePipelineById() throws IOException, InvalidIdException {
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doNothing().when(repository).delete(any(Pipeline.class));
+
+        service.deletePipelineById(pipeline.getId().toString());
+
+        verify(repository,times(1)).findById(pipeline.getId());
+        verify(repository,times(1)).delete(pipeline);
     }
 }

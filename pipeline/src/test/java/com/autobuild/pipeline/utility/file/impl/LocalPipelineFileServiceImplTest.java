@@ -74,4 +74,11 @@ public class LocalPipelineFileServiceImplTest {
 
         filesMockedStatic.verify(() -> Files.delete(any(Path.class)),times(pipeline.getStages().size() + 1));
     }
+
+    @Test
+    public void testRemoveScriptFilesWithEntity() throws IOException {
+        pipelineFileService.removeScriptFiles(pipeline);
+
+        filesMockedStatic.verify(() -> Files.deleteIfExists(any(Path.class)), times(2));
+    }
 }

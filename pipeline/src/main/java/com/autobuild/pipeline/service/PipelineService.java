@@ -39,23 +39,16 @@ public class PipelineService {
     private PipelineFileService fileService;
 
     public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException, IOException {
-        
-        if (StringUtils.isEmpty(pipelineId)){
-            throw new InvalidIdException("Pipeline Id is empty");
-        }
+        emptyIdCheck(pipelineId);
 
         try {
-            Optional<Pipeline> optionalPipeline = getPipelineFromRepository(pipelineId);
-
-            if (!optionalPipeline.isPresent()) {
-                throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
-            }
-            
-            Pipeline pipeline = optionalPipeline.get();
+            Pipeline pipeline = getPipelineFromId(pipelineId);
             Map<UUID, String> stageContents = fileService.readScriptFiles(pipeline);
             
             PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
             pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
+
+            log.info("Pipeline with id {} successfully obtained", pipelineDTO.getId());
 
             return pipelineDTO;
 
@@ -85,16 +78,35 @@ public class PipelineService {
         return mapper.entityToDto(createdPipeline);
     }
 
-    public void deletePipelineById(String pipelineId) throws IOException {
+    public void deletePipelineById(String pipelineId) throws IOException, InvalidIdException {
+        emptyIdCheck(pipelineId);
+
+        try {
+            Pipeline pipeline = getPipelineFromId(pipelineId);
+
+            deletePipeline(pipeline);
+            log.info("Pipeline with id {} successfully deleted", pipelineId);
+
+        } catch (IllegalArgumentException e) {
+            throw new InvalidIdException("Pipeline Id is invalid");
+        }
+    }
+
+    private void emptyIdCheck(final String pipelineId) throws InvalidIdException {
+        if (StringUtils.isEmpty(pipelineId)){
+            throw new InvalidIdException("Pipeline Id is empty");
+        }
+    }
+
+    private Pipeline getPipelineFromId(final String pipelineId) {
         Optional<Pipeline> optionalPipeline = getPipelineFromRepository(pipelineId);
 
-        if(!optionalPipeline.isPresent()) {
+        if (!optionalPipeline.isPresent()) {
             throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
         }
-
+        
         Pipeline pipeline = optionalPipeline.get();
-
-        deletePipeline(pipeline);
+        return pipeline;
     }
 
     private Optional<Pipeline> getPipelineFromRepository(final String pipelineId) {

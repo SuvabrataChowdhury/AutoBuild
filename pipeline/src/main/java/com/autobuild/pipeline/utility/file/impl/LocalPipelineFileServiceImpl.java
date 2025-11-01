@@ -84,7 +84,7 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
     }
 
     /**
-     * Used when parent directory is known but the path to script is not known
+     * Used when parent directory is known but the path to script is not known.
      */
 
     @Override
@@ -105,9 +105,9 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
     }
 
     /**
-     * Used when both parent directory and the path to script is known
+     * Used when both parent directory and the path to script is known.
      */
-    
+
     @Override
     public void removeScriptFiles(final Pipeline pipeline) throws IOException {
         try {
