@@ -35,7 +35,7 @@ public class PipelineController {
     private PipelineService pipelineService;
 
     @GetMapping("/{pipelineId}")
-    public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId) throws InvalidIdException {
+    public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId) throws InvalidIdException, IOException {
 
         PipelineDTO pipeline = pipelineService.getPipelineById(pipelineId);
 

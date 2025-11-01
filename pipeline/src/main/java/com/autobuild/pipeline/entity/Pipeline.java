@@ -31,7 +31,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-
+@Setter
 @Entity
 @Table(uniqueConstraints = {
     @UniqueConstraint(name = "UK_PIPELINE_NAME", columnNames = { "name" })
@@ -39,17 +39,14 @@ import lombok.Setter;
 @Check(name = "CHK_PIPELINE_NAME", constraints = "name != '' ")
 public class Pipeline {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
     @NotEmpty
-    @Setter
     @Column(name = "name", nullable = false)
     private String name;
 
     @NotEmpty
-    @Setter
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "pipeline_stages", 

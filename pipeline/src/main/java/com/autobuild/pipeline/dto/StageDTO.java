@@ -2,6 +2,8 @@ package com.autobuild.pipeline.dto;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import lombok.Setter;
  * @author Suvabrata Chowdhury
  */
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -28,4 +31,6 @@ public class StageDTO {
 
     @NotEmpty
     private String command;
+
+    // private String path;
 }

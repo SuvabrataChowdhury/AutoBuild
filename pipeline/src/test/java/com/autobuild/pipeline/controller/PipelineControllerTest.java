@@ -27,7 +27,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 public class PipelineControllerTest {
 
-    private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
+    private PipelineDTO pipelineDTO = DummyData.getPipelineDTO();
 
     @Mock
     private PipelineService pipelineService;
@@ -41,14 +41,14 @@ public class PipelineControllerTest {
     }
 
     @Test
-    public void testGetPipelineWithNoPipeline() throws InvalidIdException {
+    public void testGetPipelineWithNoPipeline() throws InvalidIdException, IOException {
         doThrow(new EntityNotFoundException("Dummy Exception")).when(pipelineService).getPipelineById(anyString());
 
         assertThrows(EntityNotFoundException.class, () -> controller.getPipelineById("1"));
     }
 
     @Test
-    public void testGetPipelineWithPipeline() throws InvalidIdException {
+    public void testGetPipelineWithPipeline() throws InvalidIdException, IOException {
         doReturn(pipelineDTO).when(pipelineService).getPipelineById(anyString());
 
         ResponseEntity<PipelineDTO> getPipelineResponse = (ResponseEntity<PipelineDTO>) controller.getPipelineById("1");
@@ -58,7 +58,7 @@ public class PipelineControllerTest {
     }
 
     @Test
-    public void testGetPipelineWithInvalidId() throws InvalidIdException {
+    public void testGetPipelineWithInvalidId() throws InvalidIdException, IOException {
         doThrow(
             new InvalidIdException("Dummy Exception")
         ).when(pipelineService).getPipelineById(anyString());

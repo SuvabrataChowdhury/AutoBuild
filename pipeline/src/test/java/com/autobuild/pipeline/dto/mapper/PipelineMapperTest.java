@@ -18,18 +18,12 @@ import com.autobuild.pipeline.testutility.DummyData;
 @SpringJUnitConfig
 @ContextConfiguration(classes = {MapperConfig.class,PipelineMapper.class})
 public class PipelineMapperTest {
-    // private ModelMapper mapper;
 
-    private Pipeline pipeline = DummyData.pipeline;
-    private PipelineDTO pipelineDTO = DummyData.pipelineDTO;
+    private Pipeline pipeline = DummyData.getPipeline();
+    private PipelineDTO pipelineDTO = DummyData.getPipelineDTO();
 
     @Autowired
     private PipelineMapper pipelineMapper;
-
-    // @BeforeEach
-    // public void setUp() {
-    //     ReflectionTestUtils.setField(pipelineMapper, "mapper", mapper);
-    // }
 
     @Test
     public void whenGivenPipelineEntityGetPipelineDTO() {
@@ -76,9 +70,9 @@ public class PipelineMapperTest {
 
     private void assertEntity(Pipeline pipeline) {
         assertEquals(pipelineDTO.getName(), pipeline.getName());
-        assertEquals(null, pipeline.getId());
+        assertEquals(pipelineDTO.getId(), pipeline.getId());
         assertEquals(pipelineDTO.getStages().size(), pipeline.getStages().size());
         assertEquals(pipelineDTO.getStages().get(0).getName(), pipeline.getStages().get(0).getName());
-        assertEquals(null, pipeline.getStages().get(0).getId());
+        assertEquals(pipelineDTO.getStages().get(0).getId(), pipeline.getStages().get(0).getId());
     }
 }

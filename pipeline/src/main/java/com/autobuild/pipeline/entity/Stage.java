@@ -25,32 +25,27 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Checks({
     @Check(name = "CHK_STAGE_NAME", constraints = "name != '' "),
     @Check(name = "CHK_STAGE_SCRIPT_TYPE", constraints = "script_type != '' "),
-    
-    // TODO: remove it as it should be stored as a file later
-    @Check(name = "CHK_STAGE_COMMAND", constraints = "command != '' ")
+    @Check(name = "CHK_PATH_COMMAND", constraints = "path != '' ")
 })
 public class Stage {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID id;
 
     @NotEmpty
-    @Setter
     @Column(name = "name", nullable = false)
     private String name;
 
     @NotEmpty
-    @Setter
     @Column(name = "script_type", nullable = false)
     private String scriptType;
 
     @NotEmpty
-    @Setter
-    @Column(name = "command", nullable = false)
-    private String command; // TODO: remove it as it should be stored as a file later
+    @Column(name = "path", nullable = false)
+    private String path;
 }

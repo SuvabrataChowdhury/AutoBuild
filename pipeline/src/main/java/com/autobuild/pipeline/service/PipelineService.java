@@ -1,6 +1,7 @@
 package com.autobuild.pipeline.service;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,19 +35,18 @@ public class PipelineService {
     private PipelineRepository repository;
 
     @Autowired
-    private PipelineValidator validator;
-
-    @Autowired
     private PipelineMapper mapper;
 
     @Autowired
     private PipelineFileService fileService;
 
-    private static final String DEFAULT_SCRIPT_PATH = "./scripts"; // TODO: take this from application properties
+    // private static final String DEFAULT_SCRIPT_PATH = "./scripts"; // TODO: take this from application properties
 
-    public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException {
-        if (StringUtils.isEmpty(pipelineId))
+    public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException, IOException {
+        
+        if (StringUtils.isEmpty(pipelineId)){
             throw new InvalidIdException("Pipeline Id is empty");
+        }
 
         try {
             Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
@@ -54,8 +54,14 @@ public class PipelineService {
             if (!optionalPipeline.isPresent()) {
                 throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
             }
+            
+            Pipeline pipeline = optionalPipeline.get();
+            Map<UUID,String> stageContents = fileService.readScriptFiles(pipeline);
+            
+            PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
+            pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
 
-            return mapper.entityToDto(optionalPipeline.get());
+            return pipelineDTO;
 
         } catch (IllegalArgumentException e) {
             throw new InvalidIdException("Pipeline Id is invalid");
@@ -67,21 +73,25 @@ public class PipelineService {
             return null;
         }
 
+        //set ids of each stage and pipeline
+        pipelineDto.setId(UUID.randomUUID());
+        pipelineDto.getStages().forEach(stage -> stage.setId(UUID.randomUUID()));
+
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
-        //TODO: Make Sure to revert changes in case of file creation errors
-        Pipeline createdPipeline = repository.save(pipeline);
+        Map<UUID,String> scriptLocations = createScriptFiles(pipelineDto);
+        pipeline.getStages().forEach(stage -> stage.setPath(scriptLocations.get(stage.getId())));
 
-        createScriptFiles(createdPipeline);
+        Pipeline createdPipeline = repository.save(pipeline);
 
         log.info("Pipeline with id {} successfully created", createdPipeline.getId());
 
         return mapper.entityToDto(createdPipeline);
     }
 
-    private void createScriptFiles(Pipeline pipeline) throws IOException {
+    private Map<UUID,String> createScriptFiles(PipelineDTO pipeline) throws IOException {
         try {
-            fileService.createScriptFiles(pipeline);
+            return fileService.createScriptFiles(pipeline);
         } catch (IOException e) {
             fileService.removeScriptFiles(pipeline); //to roll-back the file creation operation
             throw e;

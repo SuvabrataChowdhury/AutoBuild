@@ -15,13 +15,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.testutility.DummyData;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 
 public class LocalPipelineFileServiceImplTest {
-    private Pipeline pipeline = DummyData.pipeline;
+    private Pipeline pipeline = DummyData.getPipeline();
+    private PipelineDTO pipelineDTO = DummyData.getPipelineDTO();
 
     private Path pipelinePath = Path.of("..","pipeline_scripts",pipeline.getId().toString());
 
@@ -46,7 +48,7 @@ public class LocalPipelineFileServiceImplTest {
 
     @Test
     public void testCreateScriptFiles() throws IOException {
-        pipelineFileService.createScriptFiles(pipeline);
+        pipelineFileService.createScriptFiles(pipelineDTO);
 
         filesMockedStatic.verify(() -> Files.createFile(any(Path.class),any(FileAttribute.class)),times(pipeline.getStages().size()));
         filesMockedStatic.verify(() -> Files.write(any(Path.class),any(byte[].class)),times(pipeline.getStages().size()));
@@ -59,7 +61,7 @@ public class LocalPipelineFileServiceImplTest {
 
         filesMockedStatic.when(() -> Files.walk(any(Path.class))).thenReturn(paths);
 
-        pipelineFileService.removeScriptFiles(pipeline);
+        pipelineFileService.removeScriptFiles(pipelineDTO);
 
         filesMockedStatic.verify(() -> Files.delete(any(Path.class)),times(pipeline.getStages().size() + 1));
     }
