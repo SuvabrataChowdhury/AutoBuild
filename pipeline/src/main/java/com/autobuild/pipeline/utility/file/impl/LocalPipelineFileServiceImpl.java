@@ -83,6 +83,10 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
         return scriptPaths;
     }
 
+    /**
+     * Used when parent directory is known but the path to script is not known.
+     */
+
     @Override
     public void removeScriptFiles(final PipelineDTO pipeline) throws IOException {
         Path directoryPath = getPipelineDirectoryPath(pipeline.getId().toString());
@@ -95,6 +99,27 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
                     throw new UncheckedIOException(e);
                 }
             });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
+    /**
+     * Used when both parent directory and the path to script is known.
+     */
+
+    @Override
+    public void removeScriptFiles(final Pipeline pipeline) throws IOException {
+        try {
+            pipeline.getStages().forEach(stage -> {
+                try {
+                    Files.deleteIfExists(Path.of(stage.getPath()));
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+
+            Files.deleteIfExists(DEFAULT_SCRIPT_PATH.resolve(pipeline.getId().toString()));
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }

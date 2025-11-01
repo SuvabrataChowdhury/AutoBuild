@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -82,5 +83,14 @@ public class PipelineControllerTest {
         doThrow(new DuplicateEntryException("Dummy exception")).when(pipelineService).createPipeline(any(PipelineDTO.class));
 
         assertThrows(DuplicateEntryException.class, () -> controller.createPipeline(pipelineDTO));
+    }
+
+    @Test
+    public void testDeletePipeline() throws IOException, InvalidIdException {
+        doNothing().when(pipelineService).deletePipelineById(anyString());
+
+        ResponseEntity<String> response = controller.deletePipeline("abc");
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }
