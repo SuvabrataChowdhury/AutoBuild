@@ -1,0 +1,70 @@
+<mxfile host="65bd71144e">
+    <diagram id="-IpgTF8Li_w3uLlLUEPv" name="Page-1">
+        <mxGraphModel dx="1194" dy="853" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;aspect=fixed;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="120" width="30" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=vertical;endArrow=classic;endFill=1;align=center;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="2" target="4">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="500" y="480" as="sourcePoint"/>
+                        <mxPoint x="430" y="210" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="Controller receives PipelineDTO payload without id, having Stages with no id and path" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="335" y="200" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Validations on DTO" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="390" y="320" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=horizontal;endArrow=classic;endFill=1;align=left;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="4" target="5">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="500" y="480" as="sourcePoint"/>
+                        <mxPoint x="580" y="400" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="Pass onto PipelineService" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="390" y="420" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=horizontal;endArrow=classic;endFill=1;align=left;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="5" target="7">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="500" y="530" as="sourcePoint"/>
+                        <mxPoint x="580" y="450" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="9" value="Receive PipelineDTO" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="590" y="420" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=horizontal;endArrow=classic;endFill=1;align=left;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="9">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="600" y="590" as="sourcePoint"/>
+                        <mxPoint x="680" y="510" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=horizontal;endArrow=classic;endFill=1;align=left;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="9" target="12">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="670" y="590" as="sourcePoint"/>
+                        <mxPoint x="750" y="510" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="12" value="Map to Pipeline Entity" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="590" y="530" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Save entity" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="590" y="640" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="edgeStyle=elbowEdgeStyle;html=1;labelBackgroundColor=none;rounded=1;elbow=horizontal;endArrow=classic;endFill=1;align=left;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="12" target="13">
+                    <mxGeometry width="80" height="80" relative="1" as="geometry">
+                        <mxPoint x="670" y="590" as="sourcePoint"/>
+                        <mxPoint x="750" y="510" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;arcSize=37" vertex="1" parent="1">
+                    <mxGeometry x="590" y="770" width="90" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
