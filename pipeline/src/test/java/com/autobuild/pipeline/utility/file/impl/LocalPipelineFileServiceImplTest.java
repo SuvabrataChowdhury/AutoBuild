@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +36,7 @@ public class LocalPipelineFileServiceImplTest {
     public void setUp() {
         filesMockedStatic = mockStatic(Files.class);
 
+        filesMockedStatic.when(() -> Files.readAllLines(any(Path.class))).thenReturn(List.of(pipelineDTO.getStages().get(0).getCommand()));
         filesMockedStatic.when(() -> Files.exists(any(Path.class))).thenReturn(false);
         filesMockedStatic.when(() -> Files.createDirectory(any(Path.class), any(FileAttribute.class))).thenReturn(pipelinePath);
         filesMockedStatic.when(() -> Files.createDirectories(any(Path.class), any(FileAttribute.class))).thenReturn(pipelinePath);
@@ -44,6 +46,13 @@ public class LocalPipelineFileServiceImplTest {
     @AfterEach
     public void tearDown() {
         filesMockedStatic.close();
+    }
+
+    @Test
+    public void testReadScriptFiles() throws IOException {
+        pipelineFileService.readScriptFiles(pipeline);
+
+        filesMockedStatic.verify(() -> Files.readAllLines(any(Path.class)), times(pipeline.getStages().size()));
     }
 
     @Test

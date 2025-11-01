@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.Errors;
 
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.mapper.PipelineMapper;
@@ -17,7 +16,6 @@ import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
 import com.autobuild.pipeline.repository.PipelineRepository;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
-import com.autobuild.pipeline.validator.PipelineValidator;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +54,7 @@ public class PipelineService {
             }
             
             Pipeline pipeline = optionalPipeline.get();
-            Map<UUID,String> stageContents = fileService.readScriptFiles(pipeline);
+            Map<UUID, String> stageContents = fileService.readScriptFiles(pipeline);
             
             PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
             pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
@@ -79,7 +77,7 @@ public class PipelineService {
 
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
 
-        Map<UUID,String> scriptLocations = createScriptFiles(pipelineDto);
+        Map<UUID, String> scriptLocations = createScriptFiles(pipelineDto);
         pipeline.getStages().forEach(stage -> stage.setPath(scriptLocations.get(stage.getId())));
 
         Pipeline createdPipeline = repository.save(pipeline);
@@ -89,7 +87,7 @@ public class PipelineService {
         return mapper.entityToDto(createdPipeline);
     }
 
-    private Map<UUID,String> createScriptFiles(PipelineDTO pipeline) throws IOException {
+    private Map<UUID, String> createScriptFiles(PipelineDTO pipeline) throws IOException {
         try {
             return fileService.createScriptFiles(pipeline);
         } catch (IOException e) {

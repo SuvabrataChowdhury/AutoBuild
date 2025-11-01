@@ -2,7 +2,6 @@ package com.autobuild.pipeline.utility.file.impl;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
@@ -10,7 +9,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component;
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.StageDTO;
 import com.autobuild.pipeline.entity.Pipeline;
-import com.autobuild.pipeline.entity.Stage;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.utility.file.extension.Extensions;
 
@@ -54,7 +51,10 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
                     .forEach(
                             stage -> {
                                 try {
-                                    String content = StringUtils.join(Files.readAllLines(Path.of(stage.getPath())), "\n");
+                                    String content = StringUtils.join(
+                                                        Files.readAllLines(Path.of(stage.getPath())),
+                                                         "\n"
+                                                    );
                                     scriptContents.put(stage.getId(), content);
                                 } catch (IOException e) {
                                     throw new UncheckedIOException(e);

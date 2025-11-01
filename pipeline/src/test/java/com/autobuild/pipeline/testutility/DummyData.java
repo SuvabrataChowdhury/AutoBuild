@@ -18,7 +18,7 @@ public class DummyData {
     // private static final PipelineDTO pipelineDTO = new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(stageDto));
 
     public static Stage getStage() {
-        return new Stage(UUID.randomUUID(),"dummyStage1","bash","echo Hello");
+        return new Stage(UUID.randomUUID(),"dummyStage1","bash","./dummyFolder/");
     }
 
     public static  StageDTO getStageDTO() {
