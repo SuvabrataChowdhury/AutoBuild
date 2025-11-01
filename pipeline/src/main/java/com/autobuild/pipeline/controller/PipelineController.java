@@ -27,7 +27,6 @@ import jakarta.validation.Valid;
  * @author Suvabrata Chowdhury
  */
 
-// TODO: Need to refactor
 @RestController
 @RequestMapping("/api/v1/pipeline")
 // @Validated
@@ -62,8 +61,6 @@ public class PipelineController {
     // return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("To be
     // implemented");
 
-    // // pipelineService.deletePipeline()
-    // }
 
     @DeleteMapping("/{pipelineId}")
     public ResponseEntity<String> deletePipeline(@PathVariable String pipelineId)
