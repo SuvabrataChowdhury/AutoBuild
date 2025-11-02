@@ -8,4 +8,5 @@ package com.autobuild.pipeline.dto.mapper;
 public interface Mapper<T, R> {
     public R dtoToEntity(T dto);
     public T entityToDto(R entity);
+    // public R dtoToEntityForUpdate()
 }

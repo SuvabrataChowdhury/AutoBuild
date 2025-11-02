@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.autobuild.pipeline.dto.PipelineDTO;
 import com.autobuild.pipeline.dto.mapper.PipelineMapper;
+import com.autobuild.pipeline.dto.updator.PipelineUpdator;
 import com.autobuild.pipeline.entity.Pipeline;
 import com.autobuild.pipeline.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.exceptions.InvalidIdException;
@@ -26,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
  * @author Suvabrata Chowdhury
  */
 
+//TODO: Too much file reading operation is happening. Create lazy read/write logic
+
 @Slf4j
 @Service
 public class PipelineService {
@@ -38,15 +41,16 @@ public class PipelineService {
     @Autowired
     private PipelineFileService fileService;
 
+    @Autowired
+    private PipelineUpdator pipelineUpdator;
+
     public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException, IOException {
         emptyIdCheck(pipelineId);
 
         try {
             Pipeline pipeline = getPipelineFromId(pipelineId);
-            Map<UUID, String> stageContents = fileService.readScriptFiles(pipeline);
-            
-            PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
-            pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
+
+            PipelineDTO pipelineDTO = getPipelineDTOWithScriptContents(pipeline);
 
             log.info("Pipeline with id {} successfully obtained", pipelineDTO.getId());
 
@@ -72,10 +76,26 @@ public class PipelineService {
         pipeline.getStages().forEach(stage -> stage.setPath(scriptLocations.get(stage.getId())));
 
         Pipeline createdPipeline = repository.save(pipeline);
+        PipelineDTO createdPipelineDTO = getPipelineDTOWithScriptContents(createdPipeline);
 
         log.info("Pipeline with id {} successfully created", createdPipeline.getId());
 
-        return mapper.entityToDto(createdPipeline);
+        return createdPipelineDTO;
+    }
+
+    public PipelineDTO updatePipeline(String pipelineId, PipelineDTO updatePipelineRequest) throws InvalidIdException, IOException {
+        emptyIdCheck(pipelineId);
+
+        try {
+            Pipeline pipeline = getPipelineFromId(pipelineId);
+
+            pipelineUpdator.update(updatePipelineRequest,pipeline);
+            repository.save(pipeline);
+
+            return getPipelineDTOWithScriptContents(pipeline);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidIdException("Pipeline Id is invalid");
+        }
     }
 
     public void deletePipelineById(String pipelineId) throws IOException, InvalidIdException {
@@ -107,6 +127,14 @@ public class PipelineService {
         
         Pipeline pipeline = optionalPipeline.get();
         return pipeline;
+    }
+
+    private PipelineDTO getPipelineDTOWithScriptContents(Pipeline pipeline) throws IOException {
+        Map<UUID, String> stageContents = fileService.readScriptFiles(pipeline);
+        
+        PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
+        pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
+        return pipelineDTO;
     }
 
     private Optional<Pipeline> getPipelineFromRepository(final String pipelineId) {
