@@ -3,10 +3,10 @@ package com.autobuild.pipeline.testutility;
 import java.util.List;
 import java.util.UUID;
 
-import com.autobuild.pipeline.dto.PipelineDTO;
-import com.autobuild.pipeline.dto.StageDTO;
-import com.autobuild.pipeline.entity.Pipeline;
-import com.autobuild.pipeline.entity.Stage;
+import com.autobuild.pipeline.definiton.dto.PipelineDTO;
+import com.autobuild.pipeline.definiton.dto.StageDTO;
+import com.autobuild.pipeline.definiton.entity.Pipeline;
+import com.autobuild.pipeline.definiton.entity.Stage;
 
 public class DummyData {
 
