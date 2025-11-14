@@ -5,10 +5,10 @@ import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.autobuild.pipeline.dto.PipelineDTO;
-import com.autobuild.pipeline.dto.StageDTO;
-import com.autobuild.pipeline.entity.Pipeline;
-import com.autobuild.pipeline.entity.Stage;
+import com.autobuild.pipeline.definiton.dto.PipelineDTO;
+import com.autobuild.pipeline.definiton.dto.StageDTO;
+import com.autobuild.pipeline.definiton.entity.Pipeline;
+import com.autobuild.pipeline.definiton.entity.Stage;
 
 /**
  * Bean Configurations for the application.

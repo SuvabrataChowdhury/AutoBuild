@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import com.autobuild.pipeline.dto.PipelineDTO;
-import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.definiton.dto.PipelineDTO;
+import com.autobuild.pipeline.definiton.entity.Pipeline;
 
 /**
  * General Interface for any file related operations for pipeline.

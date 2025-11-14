@@ -17,9 +17,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import com.autobuild.pipeline.dto.PipelineDTO;
-import com.autobuild.pipeline.dto.StageDTO;
-import com.autobuild.pipeline.entity.Pipeline;
+import com.autobuild.pipeline.definiton.dto.PipelineDTO;
+import com.autobuild.pipeline.definiton.dto.StageDTO;
+import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.utility.file.extension.Extensions;
 
