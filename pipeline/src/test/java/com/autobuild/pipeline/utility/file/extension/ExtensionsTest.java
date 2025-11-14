@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.definition.utility.file.extension;
+package com.autobuild.pipeline.utility.file.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
