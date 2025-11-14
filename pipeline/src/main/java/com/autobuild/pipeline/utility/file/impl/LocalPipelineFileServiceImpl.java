@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.definiton.utility.file.impl;
+package com.autobuild.pipeline.utility.file.impl;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
-import com.autobuild.pipeline.definiton.utility.file.PipelineFileService;
-import com.autobuild.pipeline.definiton.utility.file.extension.Extensions;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
+import com.autobuild.pipeline.utility.file.extension.Extensions;
 
 /**
  * Pipeline file service implementation for storing script file in local

@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.definiton.utility.file;
+package com.autobuild.pipeline.utility.file;
 
 import java.io.IOException;
 import java.util.Map;

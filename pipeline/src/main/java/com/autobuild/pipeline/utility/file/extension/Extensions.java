@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.definiton.utility.file.extension;
+package com.autobuild.pipeline.utility.file.extension;
 
 /**
  * Used to fetch extensions for specific script types.

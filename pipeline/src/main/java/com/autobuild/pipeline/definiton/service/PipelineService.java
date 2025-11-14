@@ -15,7 +15,7 @@ import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
 import com.autobuild.pipeline.definiton.repository.PipelineRepository;
-import com.autobuild.pipeline.definiton.utility.file.PipelineFileService;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;

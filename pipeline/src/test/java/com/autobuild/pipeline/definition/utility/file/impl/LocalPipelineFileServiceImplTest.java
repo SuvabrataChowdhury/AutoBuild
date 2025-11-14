@@ -18,9 +18,9 @@ import org.mockito.MockedStatic;
 
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
-import com.autobuild.pipeline.definiton.utility.file.PipelineFileService;
-import com.autobuild.pipeline.definiton.utility.file.impl.LocalPipelineFileServiceImpl;
 import com.autobuild.pipeline.testutility.DummyData;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
+import com.autobuild.pipeline.utility.file.impl.LocalPipelineFileServiceImpl;
 
 
 public class LocalPipelineFileServiceImplTest {
