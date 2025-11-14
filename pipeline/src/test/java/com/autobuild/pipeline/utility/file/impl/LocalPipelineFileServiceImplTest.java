@@ -1,4 +1,4 @@
-package com.autobuild.pipeline.definition.utility.file.impl;
+package com.autobuild.pipeline.utility.file.impl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
