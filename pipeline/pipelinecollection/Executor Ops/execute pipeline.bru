@@ -1,0 +1,17 @@
+meta {
+  name: execute pipeline
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/{{prefix}}/execute/pipeline
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "pipelineId": "123"
+  }
+}
