@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.repository.PipelineRepository;
+import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
+import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
@@ -20,13 +22,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class PipelineExecutorService {
+
     @Autowired
     private PipelineRepository pipelineRepository;
 
     @Autowired
     private PipelineBuildRepository buildRepository;
 
-    public PipelineBuild executePipeline(PipelineExecuteRequest pipelineRequest) {
+    @Autowired
+    private PipelineBuildMapper mapper;
+
+    public PipelineBuildDTO executePipeline(PipelineExecuteRequest pipelineRequest) {
         UUID pipelineId = pipelineRequest.getPipelineId();
         Optional<Pipeline> optionalPipeline = pipelineRepository.findById(pipelineId);
 
@@ -51,7 +57,7 @@ public class PipelineExecutorService {
             this.startBuild(pipeline);
         }).start(); //async start job //TODO: use queue and thread limit
 
-        return pipelineBuild;
+        return mapper.entityToDto(pipelineBuild);
     }
 
     //TODO: abstract this logic

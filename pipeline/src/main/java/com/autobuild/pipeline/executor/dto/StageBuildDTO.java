@@ -14,4 +14,6 @@ import lombok.Setter;
 public class StageBuildDTO {
     private UUID id;
     // private String buildStatus; //TODO: use enums for strict enforcement
+
+    private UUID stageId;
 }

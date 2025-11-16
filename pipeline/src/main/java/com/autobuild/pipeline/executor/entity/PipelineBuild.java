@@ -22,11 +22,13 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 //TODO: Add timestamps
 //TODO: Add status like BUILDING, SUCCESS, FAILURE etc.
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 //TODO: Add it back with build number
 // @Table(

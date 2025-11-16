@@ -14,7 +14,9 @@ import lombok.Setter;
 @Setter
 public class PipelineBuildDTO {
     private UUID id;
-    private int buildNo;
+    // private int buildNo;
+
+    private UUID pipelineId;
     
-    private List<StageBuildDTO> stageBuildDTOs;
+    private List<StageBuildDTO> stageBuilds;
 }
