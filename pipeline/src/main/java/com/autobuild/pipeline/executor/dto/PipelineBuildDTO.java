@@ -8,6 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Data Transfer Object for PipelineBuild.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

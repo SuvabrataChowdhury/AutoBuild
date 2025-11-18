@@ -14,6 +14,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * StageBuild entity for holding stage execution metadata/data in table.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 //TODO: Add timestamps
 //TODO: Add status like BUILDING, SUCCESS, FAILURE etc.
 @NoArgsConstructor

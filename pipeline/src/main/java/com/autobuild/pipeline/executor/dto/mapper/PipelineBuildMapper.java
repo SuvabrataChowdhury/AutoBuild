@@ -9,15 +9,21 @@ import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 
+/**
+ * Used to map PipelineBuild to PipelineBuildDTO and vice versa.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Component
-public class PipelineBuildMapper implements Mapper<PipelineBuildDTO,PipelineBuild> {
+public class PipelineBuildMapper implements Mapper<PipelineBuildDTO, PipelineBuild> {
 
     @Autowired
     private ModelMapper mapper;
 
     @Override
     public PipelineBuild dtoToEntity(PipelineBuildDTO pipelineBuildDTO) {
-        if(null == pipelineBuildDTO) {
+        if (null == pipelineBuildDTO) {
             throw new IllegalArgumentException("Given null object can not be mapped");
         }
 
@@ -34,7 +40,7 @@ public class PipelineBuildMapper implements Mapper<PipelineBuildDTO,PipelineBuil
 
     @Override
     public PipelineBuildDTO entityToDto(PipelineBuild pipelineBuild) {
-        if( null == pipelineBuild ) {
+        if (null == pipelineBuild) {
             throw new IllegalArgumentException("Given null object can not be mapped");
         }
 

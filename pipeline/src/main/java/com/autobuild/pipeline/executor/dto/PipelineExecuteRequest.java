@@ -8,6 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Pipeline execute request DTO.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

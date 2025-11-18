@@ -16,6 +16,7 @@ import com.autobuild.pipeline.executor.entity.StageBuild;
 
 /**
  * Bean Configurations for the application.
+ * 
  * @author Suvabrata Chowdhury
  */
 
@@ -76,13 +77,13 @@ public class MapperConfig {
     }
 
     private void setStageBuildEntityDTOMapping(ModelMapper mapper) {
-        TypeMap<StageBuild,StageBuildDTO> typeMapper = mapper.createTypeMap(StageBuild.class, StageBuildDTO.class);
+        TypeMap<StageBuild, StageBuildDTO> typeMapper = mapper.createTypeMap(StageBuild.class, StageBuildDTO.class);
         typeMapper.addMapping(StageBuild::getId, StageBuildDTO::setId);
         typeMapper.addMapping(stageBuild -> stageBuild.getStage().getId(), StageBuildDTO::setId);
     }
 
     private void setStageBuildDTOEntityMapping(ModelMapper mapper) {
-        TypeMap<StageBuildDTO,StageBuild> typeMapper = mapper.createTypeMap(StageBuildDTO.class, StageBuild.class);
+        TypeMap<StageBuildDTO, StageBuild> typeMapper = mapper.createTypeMap(StageBuildDTO.class, StageBuild.class);
         typeMapper.addMapping(StageBuildDTO::getId, StageBuild::setId);
     }
 
@@ -92,13 +93,15 @@ public class MapperConfig {
     }
 
     private void setPipelineBuildEntityDTOMapping(ModelMapper mapper) {
-        TypeMap<PipelineBuild,PipelineBuildDTO> typeMapper = mapper.createTypeMap(PipelineBuild.class, PipelineBuildDTO.class);
+        TypeMap<PipelineBuild, PipelineBuildDTO> typeMapper = mapper.createTypeMap(PipelineBuild.class,
+                PipelineBuildDTO.class);
         typeMapper.addMapping(PipelineBuild::getId, PipelineBuildDTO::setId);
         typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getId(), PipelineBuildDTO::setPipelineId);
     }
 
     private void setPipelineBuildDTOEntityMapping(ModelMapper mapper) {
-        TypeMap<PipelineBuildDTO,PipelineBuild> typeMapper = mapper.createTypeMap(PipelineBuildDTO.class, PipelineBuild.class);
+        TypeMap<PipelineBuildDTO, PipelineBuild> typeMapper = mapper.createTypeMap(PipelineBuildDTO.class,
+                PipelineBuild.class);
         typeMapper.addMapping(PipelineBuildDTO::getId, PipelineBuild::setId);
     }
 }

@@ -9,10 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
-import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.service.PipelineExecutorService;
 
 import jakarta.validation.Valid;
+
+/**
+ * Controller for executing a pipeline.
+ * 
+ * @author Suvabrata Chowdhury
+ */
 
 @RestController
 @RequestMapping("/api/v1/execute")

@@ -1,5 +1,9 @@
 package com.autobuild.pipeline.executor.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +23,12 @@ import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Service layer for executing a pipeline.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
 @Service
 public class PipelineExecutorService {
@@ -36,7 +46,7 @@ public class PipelineExecutorService {
         UUID pipelineId = pipelineRequest.getPipelineId();
         Optional<Pipeline> optionalPipeline = pipelineRepository.findById(pipelineId);
 
-        if(optionalPipeline.isEmpty()) {
+        if (optionalPipeline.isEmpty()) {
             throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
         }
 
@@ -49,12 +59,12 @@ public class PipelineExecutorService {
         new Thread(() -> {
 
             try {
-                Thread.sleep(3000); //Dummy wait time
+                Thread.sleep(2000); //Dummy wait time
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            this.startBuild(pipeline);
+            this.startBuild(pipelineBuild);
         }).start(); //async start job //TODO: use queue and thread limit
 
         return mapper.entityToDto(pipelineBuild);
@@ -69,7 +79,30 @@ public class PipelineExecutorService {
     }
 
     //TODO: abstract this logic
-    private void startBuild(Pipeline pipeline) {
+    private void startBuild(PipelineBuild pipelineBuild) {
+        Pipeline pipeline = pipelineBuild.getPipeline();
+
+        try {
+            pipeline.getStages().forEach(stage -> {
+                ProcessBuilder stageProcessBuilder = new ProcessBuilder(stage.getPath());
+                try {
+                    Process stageProcess = stageProcessBuilder.start();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(stageProcess.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            log.info("OP: " + line);
+                        }                        
+                    } catch (Exception e) {
+                        log.error(e.toString());
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        }catch (UncheckedIOException exception) {
+            exception.getCause().printStackTrace();
+        }
+        
         log.info("Build started for: " + pipeline.getId());
     }
 }

@@ -9,6 +9,12 @@ import com.autobuild.pipeline.definiton.entity.Stage;
 import com.autobuild.pipeline.executor.dto.StageBuildDTO;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 
+/**
+ * Used to map StageBuild to StageBuildDTO and vice versa.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Component
 public class StageBuildMapper implements Mapper<StageBuildDTO, StageBuild>{
 
