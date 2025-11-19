@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
+import com.autobuild.pipeline.definiton.entity.Stage;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.utility.file.extension.Extensions;
 
@@ -123,6 +124,37 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
+    }
+
+    @Override
+    public String createStageScriptFile(Pipeline pipeline, StageDTO stage) throws IOException {
+        createParentDirectory();
+        
+        Path pipelineDirectoryPath = getPipelineDirectoryPath(pipeline.getId().toString());
+        if (!Files.exists(pipelineDirectoryPath)) {
+            Files.createDirectories(pipelineDirectoryPath, PERMISSIONS);
+        }
+        
+        return createStageFile(pipelineDirectoryPath, stage);
+    }
+
+    @Override
+    public void updateStageScriptFile(Stage stage, String command) throws IOException {
+        Path filePath = Path.of(stage.getPath());
+        Files.write(filePath, command.getBytes());
+    }
+
+    @Override
+    public void removeStageScriptFile(Stage stage) throws IOException {
+        Files.deleteIfExists(Path.of(stage.getPath()));
+    }
+
+    @Override
+    public String readStageScriptFile(final Stage stage) throws IOException {
+        if (stage == null || StringUtils.isBlank(stage.getPath())) {
+            return "";
+        }
+        return String.join("\n", Files.readAllLines(Path.of(stage.getPath())));
     }
 
     private void createParentDirectory() throws IOException {

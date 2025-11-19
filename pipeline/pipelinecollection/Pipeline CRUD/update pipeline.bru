@@ -4,6 +4,20 @@ meta {
   seq: 1
 }
 
-get {
-  url: 
+put {
+  url: {{host}}/{{prefix}}/pipeline/a5effcd7-2fab-456b-9034-4d875f2feca2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "stages": [
+      {
+        "name": "deploy",
+        "scriptType": "bash",
+        "command": "#!/bin/bash\necho \"Deploying...\""
+      }
+    ]
+  }
 }
