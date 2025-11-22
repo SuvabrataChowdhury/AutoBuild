@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.repository.PipelineRepository;
@@ -18,6 +19,7 @@ import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
 import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
+import com.autobuild.pipeline.executor.job.PipelineExecutor;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -40,8 +42,12 @@ public class PipelineExecutorService {
     private PipelineBuildRepository buildRepository;
 
     @Autowired
+    private PipelineExecutor pipelineExecutor;
+
+    @Autowired
     private PipelineBuildMapper mapper;
 
+    @Transactional
     public PipelineBuildDTO executePipeline(PipelineExecuteRequest pipelineRequest) {
         UUID pipelineId = pipelineRequest.getPipelineId();
         Optional<Pipeline> optionalPipeline = pipelineRepository.findById(pipelineId);
@@ -55,17 +61,7 @@ public class PipelineExecutorService {
 
         buildRepository.save(pipelineBuild);
 
-        //TODO: Abstract this logic
-        new Thread(() -> {
-
-            try {
-                Thread.sleep(2000); //Dummy wait time
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            this.startBuild(pipelineBuild);
-        }).start(); //async start job //TODO: use queue and thread limit
+        pipelineExecutor.execute(pipelineBuild);
 
         return mapper.entityToDto(pipelineBuild);
     }
@@ -76,33 +72,5 @@ public class PipelineExecutorService {
         PipelineBuild pipelineBuild = new PipelineBuild(pipeline, stageBuilds);
 
         return pipelineBuild;
-    }
-
-    //TODO: abstract this logic
-    private void startBuild(PipelineBuild pipelineBuild) {
-        Pipeline pipeline = pipelineBuild.getPipeline();
-
-        try {
-            pipeline.getStages().forEach(stage -> {
-                ProcessBuilder stageProcessBuilder = new ProcessBuilder(stage.getPath());
-                try {
-                    Process stageProcess = stageProcessBuilder.start();
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(stageProcess.getInputStream()))) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            log.info("OP: " + line);
-                        }                        
-                    } catch (Exception e) {
-                        log.error(e.toString());
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        }catch (UncheckedIOException exception) {
-            exception.getCause().printStackTrace();
-        }
-        
-        log.info("Build started for: " + pipeline.getId());
     }
 }

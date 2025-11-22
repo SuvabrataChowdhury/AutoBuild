@@ -7,9 +7,15 @@ import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.entity.Stage;
+import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
+import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
+import com.autobuild.pipeline.executor.dto.StageBuildDTO;
+import com.autobuild.pipeline.executor.entity.PipelineBuild;
+import com.autobuild.pipeline.executor.entity.StageBuild;
 
 public class DummyData {
 
+    //Pipeline Crud
     public static Stage getStage() {
         return new Stage(UUID.randomUUID(),"dummyStage1","bash","./dummyFolder/");
     }
@@ -24,5 +30,30 @@ public class DummyData {
 
     public static PipelineDTO getPipelineDTO() {
         return new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(getStageDTO()));
+    }
+
+    //Pipeline Execution
+    public static PipelineExecuteRequest getPipelineRequest() {
+        return new PipelineExecuteRequest(UUID.randomUUID());
+    }
+
+    public static StageBuild getStageBuild() {
+        return new StageBuild(UUID.randomUUID(), DummyData.getStage());
+    }
+
+    public static PipelineBuild getPipelineBuild() {
+        return new PipelineBuild(UUID.randomUUID(), DummyData.getPipeline(), List.of(DummyData.getStageBuild()));
+    }
+
+    public static StageBuildDTO getStageBuildDTO() {
+        return new StageBuildDTO(UUID.randomUUID(), UUID.randomUUID());
+    }
+
+    public static PipelineBuildDTO getPipelineBuildDTO() {
+        return new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), List.of(DummyData.getStageBuildDTO()));
+    }
+
+    public static PipelineBuildDTO getPipelineBuildDTO(UUID pipelineId) {
+        return new PipelineBuildDTO(UUID.randomUUID(), pipelineId, List.of(DummyData.getStageBuildDTO()));
     }
 }
