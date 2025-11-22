@@ -4,20 +4,14 @@ meta {
   seq: 1
 }
 
-put {
-  url: {{host}}/{{prefix}}/pipeline/a5effcd7-2fab-456b-9034-4d875f2feca2
+patch {
+  url: {{host}}/{{prefix}}/pipeline/059569af-5bc3-4d69-bbd4-3e5b53669f00
   body: json
   auth: none
 }
 
 body:json {
   {
-    "stages": [
-      {
-        "name": "deploy",
-        "scriptType": "bash",
-        "command": "#!/bin/bash\necho \"Deploying...\""
-      }
-    ]
-  }
+      "name": "Original Pipeline"
+    }
 }

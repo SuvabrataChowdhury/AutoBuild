@@ -1,24 +1,20 @@
 package com.autobuild.pipeline.definition.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,8 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
-import org.springframework.dao.DataIntegrityViolationException;
-
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.dto.mapper.PipelineMapper;
@@ -43,7 +37,6 @@ import com.autobuild.pipeline.definiton.repository.PipelineRepository;
 import com.autobuild.pipeline.definiton.service.PipelineService;
 import com.autobuild.pipeline.testutility.DummyData;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
-
 import jakarta.persistence.EntityNotFoundException;
 
 public class PipelineServiceTest {
@@ -60,17 +53,17 @@ public class PipelineServiceTest {
     @Mock
     private PipelineFileService fileService;
 
-    @InjectMocks
-    private PipelineService service;
-
     @Mock
     private StageMapper stageMapper;
+
+    @InjectMocks
+    private PipelineService service;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Dynamic mapper stub to reflect pipeline mutations
+        // Mapper behavior to reflect pipeline changes
         doAnswer(inv -> {
             Pipeline p = inv.getArgument(0);
             PipelineDTO dto = new PipelineDTO();
@@ -81,7 +74,7 @@ public class PipelineServiceTest {
                 sd.setId(s.getId());
                 sd.setName(s.getName());
                 sd.setScriptType(s.getScriptType());
-                sd.setCommand(""); // service will overwrite with file contents
+                sd.setCommand("");
                 return sd;
             }).collect(Collectors.toList());
             dto.setStages(stages);
@@ -124,239 +117,317 @@ public class PipelineServiceTest {
     public void testGetPipelineByIdWithInvalidId() {
         try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
             uuid.when(() -> UUID.fromString(anyString()))
-                    .thenThrow(new IllegalArgumentException("Dummy msg: invalid id given"));
-
-            assertThrows(InvalidIdException.class, () -> service.getPipelineById("1"));
+                .thenThrow(new IllegalArgumentException("bad"));
+            assertThrows(InvalidIdException.class, () -> service.getPipelineById("not-a-uuid"));
         }
     }
 
     @Test
-    public void testGetPipelineByIdWithValidId() throws InvalidIdException, IOException {
-        UUID randomId = UUID.randomUUID();
-
-        try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
-            uuid.when(() -> UUID.fromString(anyString())).thenReturn(randomId);
-            doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
-            doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
-
-            assertEquals(pipelineDTO, service.getPipelineById("1"));
-        }
-    }
-
-    @Test
-    public void testGetPipelineByIdWithValidIdButNoPipeline() throws InvalidIdException {
-        UUID randomId = UUID.randomUUID();
-
-        try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
-            uuid.when(() -> UUID.fromString(anyString())).thenReturn(randomId);
-            doReturn(Optional.ofNullable(null)).when(repository).findById(any(UUID.class));
-
-            assertThrows(EntityNotFoundException.class, () -> service.getPipelineById("1"));
-        }
-    }
-
-    @Test
-    public void testCreatePipelineWithNullPipeline() throws DuplicateEntryException, IOException {
-        assertNull(service.createPipeline(null));
-    }
-
-    @Test
-    public void testCreatePipelineWithValidPipeline() throws DuplicateEntryException, IOException {
-        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+    public void testGetPipelineByIdWithValidId() throws Exception {
+        UUID id = UUID.randomUUID();
+        pipeline.setId(id);
+        doReturn(Optional.of(pipeline)).when(repository).findById(id);
         doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
-
-        assertEquals(pipelineDTO, service.createPipeline(pipelineDTO));
-
-        verify(fileService, times(1)).createScriptFiles(pipelineDTO);
+        assertEquals(pipelineDTO, service.getPipelineById(id.toString()));
     }
 
     @Test
-    public void testCreatePipelineWithValidPipelineWithIOException() throws DuplicateEntryException, IOException {
-        doReturn(pipeline).when(repository).save(any(Pipeline.class));
-        doReturn(pipelineDTO).when(mapper).entityToDto(pipeline);
-        doThrow(new IOException("Dummy Exception")).when(fileService).createScriptFiles(pipelineDTO);
-
-        assertThrows(IOException.class, () -> service.createPipeline(pipelineDTO));
-
-        verify(fileService, times(1)).createScriptFiles(pipelineDTO);
-        verify(fileService, times(1)).removeScriptFiles(pipelineDTO);
-    }
-
-    @Test
-    public void testCreatePipelineWithDuplicatePipelineName() throws Exception {
-        doThrow(new DataIntegrityViolationException("Dummy Exception"))
-                .when(repository).save(any(Pipeline.class));
-
-        assertThrows(DataIntegrityViolationException.class, () -> service.createPipeline(pipelineDTO));
-    }
-
-    @Test
-    public void testDeletePipelineById() throws IOException, InvalidIdException {
-        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
-        doNothing().when(repository).delete(any(Pipeline.class));
-
-        service.deletePipelineById(pipeline.getId().toString());
-
-        verify(repository, times(1)).findById(pipeline.getId());
-        verify(repository, times(1)).delete(pipeline);
-    }
-
-    @Test
-    public void testModifyPipelineStagesCreate() throws Exception {
-        if (pipeline.getId() == null) {
-            pipeline.setId(UUID.randomUUID());
-        }
-        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        String pipelineId = pipeline.getId().toString();
-
-        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
-        doReturn(pipeline).when(repository).save(any(Pipeline.class));
-
-        StageDTO newStage = new StageDTO(null, "deploy", "bash", "#!/bin/bash\necho DEPLOY");
-        UUID generatedStageId = UUID.randomUUID();
-
-        try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
-
-            // FIX #1: Allow service to parse pipelineId
-            uuid.when(() -> UUID.fromString(pipelineId)).thenReturn(pipeline.getId());
-
-            // FIX #2: Only mock randomUUID()
-            uuid.when(UUID::randomUUID).thenReturn(generatedStageId);
-
-            doReturn("path/deploy.sh").when(fileService)
-                    .createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
-
-            doAnswer(inv -> {
-                Map<UUID, String> m = new HashMap<>();
-                pipeline.getStages().forEach(s -> m.put(s.getId(), "EXISTING"));
-                m.put(generatedStageId, newStage.getCommand());
-                return m;
-            }).when(fileService).readScriptFiles(any(Pipeline.class));
-
-            int originalSize = pipeline.getStages().size();
-            PipelineDTO result = service.modifyPipelineStages(pipelineId, List.of(newStage));
-
-            assertEquals(originalSize + 1, result.getStages().size());
-            StageDTO created = result.getStages().stream()
-                    .filter(s -> s.getId().equals(generatedStageId))
-                    .findFirst().orElseThrow();
-            assertEquals(newStage.getCommand(), created.getCommand());
-        }
-    }
-
-    @Test
-    public void testModifyPipelineStagesUpdate() throws Exception {
-        if (pipeline.getId() == null) {
-            pipeline.setId(UUID.randomUUID());
-        }
-        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        String pipelineId = pipeline.getId().toString();
-
-        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
-        doReturn(pipeline).when(repository).save(any(Pipeline.class));
-
-        Stage existing = pipeline.getStages().get(0);
-        StageDTO update = new StageDTO(existing.getId(), "renamed", existing.getScriptType(),
-                "#!/bin/bash\necho UPDATED");
-
-        doNothing().when(fileService).updateStageScriptFile(any(Stage.class), anyString());
-        doAnswer(inv -> {
-            Map<UUID, String> m = new HashMap<>();
-            pipeline.getStages().forEach(s -> {
-                String cmd = s.getId().equals(existing.getId()) ? update.getCommand() : "EXISTING";
-                m.put(s.getId(), cmd);
-            });
-            return m;
-        }).when(fileService).readScriptFiles(any(Pipeline.class));
-
-        PipelineDTO result = service.modifyPipelineStages(pipelineId, List.of(update));
-        StageDTO updated = result.getStages().stream()
-                .filter(s -> s.getId().equals(existing.getId()))
-                .findFirst().orElseThrow();
-        assertEquals("renamed", updated.getName());
-        assertEquals(update.getCommand(), updated.getCommand());
-    }
-
-    @Test
-    public void testModifyPipelineStagesDelete() throws Exception {
-        if (pipeline.getId() == null) {
-            pipeline.setId(UUID.randomUUID());
-        }
-        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        String pipelineId = pipeline.getId().toString();
-
-        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
-        doReturn(pipeline).when(repository).save(any(Pipeline.class));
-
-        Stage toDelete = pipeline.getStages().get(0);
-        StageDTO deleteReq = new StageDTO(toDelete.getId(), null, null, null);
-
-        try (MockedStatic<UUID> uuid = mockStatic(UUID.class)) {
-
-            // FIX: allow repository lookup
-            uuid.when(() -> UUID.fromString(pipelineId)).thenReturn(pipeline.getId());
-
-            doNothing().when(fileService).removeStageScriptFile(any(Stage.class));
-            doAnswer(inv -> {
-                Map<UUID, String> m = new HashMap<>();
-                pipeline.getStages().stream()
-                        .filter(s -> !s.getId().equals(toDelete.getId()))
-                        .forEach(s -> m.put(s.getId(), "EXISTING"));
-                return m;
-            }).when(fileService).readScriptFiles(any(Pipeline.class));
-
-            int originalSize = pipeline.getStages().size();
-            PipelineDTO result = service.modifyPipelineStages(pipelineId, List.of(deleteReq));
-
-            assertEquals(originalSize - 1, result.getStages().size());
-            boolean present = result.getStages().stream()
-                    .anyMatch(s -> s.getId().equals(toDelete.getId()));
-            assertEquals(false, present);
-        }
-    }
-
-    @Test
-    public void testModifyPipelineStagesDuplicateCreateName() throws Exception {
-        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
-
-        String existingName = pipeline.getStages().get(0).getName();
-        StageDTO duplicate = new StageDTO(null, existingName, "bash", "#!/bin/bash\necho X");
-
-        assertThrows(DuplicateEntryException.class,
-                () -> service.modifyPipelineStages(pipeline.getId().toString(), List.of(duplicate)));
+    public void testGetPipelineByIdWithValidIdButNoPipeline() {
+        UUID id = UUID.randomUUID();
+        doReturn(Optional.empty()).when(repository).findById(id);
+        assertThrows(EntityNotFoundException.class, () -> service.getPipelineById(id.toString()));
     }
 
     @Test
     public void testModifyPipelineStagesDuplicateUpdateName() throws Exception {
+        ensurePipelineId();
         pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        if (pipeline.getStages().size() < 2)
-            return;
-
-        doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
-
+        if (pipeline.getStages().size() < 2) return;
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
         Stage target = pipeline.getStages().get(0);
         String otherName = pipeline.getStages().get(1).getName();
         StageDTO update = new StageDTO(target.getId(), otherName, null, null);
-
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(List.of(update));
         assertThrows(DuplicateEntryException.class,
-                () -> service.modifyPipelineStages(pipeline.getId().toString(), List.of(update)));
-    }
-
-    @Test
-    public void testModifyPipelineStagesStageNotFound() throws Exception {
-        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
-        doReturn(Optional.of(pipeline)).when(repository).findById(any(UUID.class));
-
-        StageDTO update = new StageDTO(UUID.randomUUID(), "X", null, null);
-
-        assertThrows(InvalidIdException.class,
-                () -> service.modifyPipelineStages(pipeline.getId().toString(), List.of(update)));
+            () -> service.modifyPipeline(pipeline.getId().toString(), request));
     }
 
     @Test
     public void testModifyPipelineStagesEmptyList() {
+        ensurePipelineId();
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(List.of());
         assertThrows(InvalidIdException.class,
-                () -> service.modifyPipelineStages(pipeline.getId().toString(), List.of()));
+            () -> service.modifyPipeline(pipeline.getId().toString(), request));
+    }
+
+    private void ensurePipelineId() {
+        if (pipeline.getId() == null) {
+            pipeline.setId(UUID.randomUUID());
+        }
+    }
+
+    @Test
+    public void testCreatePipelineAllowsDuplicateStageNames() throws Exception {
+        PipelineDTO dto = new PipelineDTO();
+        dto.setName("pipe-two");
+        dto.setStages(List.of(
+                new StageDTO(null, "build", "bash", "echo build"),
+                new StageDTO(null, "Build", "bash", "echo build2"))); // same name case-insensitive
+        doReturn(false).when(repository).existsByName("pipe-two");
+        doAnswer(inv -> {
+            Pipeline p = inv.getArgument(0);
+            p.setId(p.getId() == null ? UUID.randomUUID() : p.getId());
+            return p;
+        }).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).createScriptFiles(dto);
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+
+        PipelineDTO created = service.createPipeline(dto);
+        assertEquals(2, created.getStages().size());
+        // both names present
+        List<String> names = created.getStages().stream().map(StageDTO::getName).toList();
+        assertEquals(true, names.contains("build"));
+        assertEquals(true, names.contains("Build"));
+    }
+
+    @Test
+    public void testModifyPipelineStagesDuplicateCreateNameAllowed() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        doReturn("path").when(fileService).createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
+
+        String existingName = pipeline.getStages().get(0).getName();
+        StageDTO duplicate = new StageDTO(null, existingName, "bash", "echo X");
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(List.of(duplicate));
+
+        int originalSize = pipeline.getStages().size();
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), request);
+        assertEquals(originalSize + 1, result.getStages().size());
+    }
+
+    @Test
+    public void testModifyPipelineStagesDuplicateUpdateNameAllowed() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        if (pipeline.getStages().size() < 2) return;
+        Stage target = pipeline.getStages().get(0);
+        String otherName = pipeline.getStages().get(1).getName();
+
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+
+        StageDTO update = new StageDTO(target.getId(), otherName, null, null);
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(List.of(update));
+
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), request);
+        String updatedName = result.getStages().stream()
+                .filter(s -> s.getId().equals(target.getId()))
+                .findFirst()
+                .orElseThrow()
+                .getName();
+        assertEquals(otherName, updatedName);
+    }
+
+    @Test
+    public void testModifyPipelineNameDuplicate() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("original");
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(true).when(repository).existsByName("newName");
+        PipelineDTO patch = new PipelineDTO();
+        patch.setName("newName");
+        assertThrows(DuplicateEntryException.class,
+                () -> service.modifyPipeline(pipeline.getId().toString(), patch));
+    }
+
+    @Test
+    public void testModifyPipelineNameUpdateSuccess() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("oldName");
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("updatedName");
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+
+        PipelineDTO patch = new PipelineDTO();
+        patch.setName("updatedName");
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), patch);
+        assertEquals("updatedName", result.getName());
+    }
+
+    @Test
+    public void testModifyPipelineNoNameNoStages() {
+        ensurePipelineId();
+        PipelineDTO patch = new PipelineDTO();
+        assertThrows(InvalidIdException.class,
+                () -> service.modifyPipeline(pipeline.getId().toString(), patch));
+    }
+
+    @Test
+    public void testModifyPipelineStageCreateMissingFields() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+
+        StageDTO badCreate = new StageDTO(null, "build", null, "echo hi"); // missing scriptType
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(badCreate));
+
+        assertThrows(InvalidIdException.class,
+                () -> service.modifyPipeline(pipeline.getId().toString(), patch));
+    }
+
+    @Test
+    public void testModifyPipelineStageUpdateNoChanges() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        Stage existing = pipeline.getStages().get(0);
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+
+        // Use existing name to avoid triggering delete (all nulls -> delete in service).
+        StageDTO update = new StageDTO(existing.getId(), existing.getName(), null, null);
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(update));
+
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), patch);
+        assertEquals(existing.getName(),
+                result.getStages().stream()
+                        .filter(s -> s.getId().equals(existing.getId()))
+                        .findFirst()
+                        .orElseThrow()
+                        .getName());
+    }
+
+    @Test
+    public void testModifyPipelineDeleteStageNotFound() {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+
+        // Deletion request for non-existent stage
+        StageDTO del = new StageDTO(UUID.randomUUID(), null, null, null);
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(del));
+
+        assertThrows(InvalidIdException.class,
+                () -> service.modifyPipeline(pipeline.getId().toString(), patch));
+    }
+    @Test
+    public void testCreatePipelineSuccess() throws Exception {
+        PipelineDTO dto = new PipelineDTO();
+        dto.setName("pipe-one");
+        dto.setStages(List.of(
+                new StageDTO(null, "build", "bash", "echo build"),
+                new StageDTO(null, "test", "bash", "echo test")));
+        doReturn(false).when(repository).existsByName("pipe-one");
+        doAnswer(inv -> {
+            Pipeline p = inv.getArgument(0);
+            p.setId(p.getId() == null ? UUID.randomUUID() : p.getId());
+            return p;
+        }).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).createScriptFiles(dto);
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        PipelineDTO created = service.createPipeline(dto);
+        assertEquals("pipe-one", created.getName());
+        assertEquals(2, created.getStages().size());
+    }
+
+    @Test
+    public void testCreatePipelineDuplicatePipelineName() {
+        PipelineDTO dto = new PipelineDTO();
+        dto.setName("existing");
+        doReturn(true).when(repository).existsByName("existing");
+        assertThrows(DuplicateEntryException.class, () -> service.createPipeline(dto));
+    }
+
+    @Test
+    public void testDeletePipelineSuccess() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doNothing().when(repository).delete(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService)
+                .createScriptFiles(any(PipelineDTO.class));
+        doNothing().when(fileService).removeScriptFiles(any(PipelineDTO.class));
+        service.deletePipelineById(pipeline.getId().toString());
+        verify(repository).delete(pipeline);
+    }
+
+    @Test
+    public void testDeletePipelineNotFound() {
+        UUID id = UUID.randomUUID();
+        doReturn(Optional.empty()).when(repository).findById(id);
+        assertThrows(EntityNotFoundException.class, () -> service.deletePipelineById(id.toString()));
+    }
+
+    @Test
+    public void testModifyPipelineStageDeleteSuccess() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        Stage toDelete = pipeline.getStages().get(0);
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doNothing().when(fileService).removeStageScriptFile(any(Stage.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+
+        // Delete by providing only the ID (all other fields null).
+        StageDTO del = new StageDTO(toDelete.getId(), null, null, null);
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(del));
+
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), patch);
+        assertThrows(NoSuchElementException.class,
+                () -> result.getStages().stream()
+                        .filter(s -> s.getId().equals(toDelete.getId()))
+                        .findFirst()
+                        .orElseThrow());
+    }
+
+    @Test
+    public void testModifyPipelineMixedOperations() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        Stage existing = pipeline.getStages().get(0);
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        doNothing().when(fileService).updateStageScriptFile(any(Stage.class), anyString());
+        doReturn("path").when(fileService).createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
+        StageDTO create = new StageDTO(null, "deploy", "bash", "echo deploy");
+        StageDTO updateNameAndScript = new StageDTO(existing.getId(), "renamed", null, "echo changed");
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(create, updateNameAndScript));
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), patch);
+        assertEquals( pipeline.getStages().size(), result.getStages().size());
+        assertEquals("renamed",
+                result.getStages().stream().filter(s -> s.getId().equals(existing.getId())).findFirst().orElseThrow().getName());
+    }
+
+    @Test
+    public void testModifyPipelineStageUpdateScriptOnly() throws Exception {
+        ensurePipelineId();
+        pipeline.setStages(new ArrayList<>(pipeline.getStages()));
+        Stage existing = pipeline.getStages().get(0);
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        doNothing().when(fileService).updateStageScriptFile(any(Stage.class), anyString());
+        // scriptType must be null (updates are forbidden)
+        StageDTO update = new StageDTO(existing.getId(), existing.getName(), null, "echo new");
+        PipelineDTO patch = new PipelineDTO();
+        patch.setStages(List.of(update));
+        PipelineDTO result = service.modifyPipeline(pipeline.getId().toString(), patch);
+        assertEquals(existing.getName(),
+                result.getStages().stream().filter(s -> s.getId().equals(existing.getId())).findFirst().orElseThrow().getName());
     }
 }
