@@ -4,6 +4,14 @@ meta {
   seq: 1
 }
 
-get {
-  url: 
+patch {
+  url: {{host}}/{{prefix}}/pipeline/059569af-5bc3-4d69-bbd4-3e5b53669f00
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "name": "Original Pipeline"
+    }
 }
