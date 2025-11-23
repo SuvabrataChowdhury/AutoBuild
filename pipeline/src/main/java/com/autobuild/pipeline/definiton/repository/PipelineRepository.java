@@ -15,5 +15,7 @@ import com.autobuild.pipeline.definiton.entity.Pipeline;
 @Repository
 public interface PipelineRepository extends JpaRepository<Pipeline, UUID> {
 
+    boolean existsByName(String name);
+
     // Optional<Pipeline> getPipelineById(String id);
 }
