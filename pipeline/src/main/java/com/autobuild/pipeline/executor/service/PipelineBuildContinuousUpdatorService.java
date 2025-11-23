@@ -40,16 +40,12 @@ public class PipelineBuildContinuousUpdatorService implements PipelineExecutionO
         
         Optional<PipelineBuild> optionalBuild = repository.findById(pipelineBuild.getId());
 
-        log.info("Found optional");
-
         if(optionalBuild.isEmpty()) {
             throw new EntityNotFoundException("Pipeline build with id " + pipelineBuild.getId() + " does not exist");
         }
 
-        log.info("saving build's status");
         repository.save(pipelineBuild);
 
         log.info("Updated build: " + pipelineBuild.getCurrentState());
     }
-
 }

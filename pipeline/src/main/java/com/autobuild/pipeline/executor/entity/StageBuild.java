@@ -3,13 +3,18 @@ package com.autobuild.pipeline.executor.entity;
 import java.util.UUID;
 
 import com.autobuild.pipeline.definiton.entity.Stage;
+import com.autobuild.pipeline.executor.execution.state.StageExecutionState;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,9 +42,9 @@ public class StageBuild {
     @JoinColumn(name = "stage_id", referencedColumnName = "id", nullable = false)
     private Stage stage;
 
-    //TODO: Add this attribute
-    // @Column(name = "build_status", nullable = false)
-    // private String buildStatus; //TODO: use Enums for strict enforcement
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stage_build_current_state", nullable = false)
+    private StageExecutionState currentState;
 
     //TODO: Add this attribute
     // @Column(name = "log_path", nullable = false)
@@ -47,5 +52,12 @@ public class StageBuild {
 
     public StageBuild(Stage stage) {
         this.stage = stage;
+    }
+
+    @PrePersist
+    public void setDefaultState() {
+        if(null == this.currentState) {
+            this.currentState = StageExecutionState.WAITING;
+        }
     }
 }

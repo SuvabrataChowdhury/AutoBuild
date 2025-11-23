@@ -80,11 +80,13 @@ public class MapperConfig {
         TypeMap<StageBuild, StageBuildDTO> typeMapper = mapper.createTypeMap(StageBuild.class, StageBuildDTO.class);
         typeMapper.addMapping(StageBuild::getId, StageBuildDTO::setId);
         typeMapper.addMapping(stageBuild -> stageBuild.getStage().getId(), StageBuildDTO::setId);
+        typeMapper.addMapping(StageBuild::getCurrentState, StageBuildDTO::setCurrentState);
     }
 
     private void setStageBuildDTOEntityMapping(ModelMapper mapper) {
         TypeMap<StageBuildDTO, StageBuild> typeMapper = mapper.createTypeMap(StageBuildDTO.class, StageBuild.class);
         typeMapper.addMapping(StageBuildDTO::getId, StageBuild::setId);
+        typeMapper.addMapping(StageBuildDTO::getCurrentState, StageBuild::setCurrentState);
     }
 
     private void setPipelineBuildMappings(ModelMapper mapper) {
@@ -97,11 +99,13 @@ public class MapperConfig {
                 PipelineBuildDTO.class);
         typeMapper.addMapping(PipelineBuild::getId, PipelineBuildDTO::setId);
         typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getId(), PipelineBuildDTO::setPipelineId);
+        typeMapper.addMapping(PipelineBuild::getCurrentState, PipelineBuildDTO::setCurrentState);
     }
 
     private void setPipelineBuildDTOEntityMapping(ModelMapper mapper) {
         TypeMap<PipelineBuildDTO, PipelineBuild> typeMapper = mapper.createTypeMap(PipelineBuildDTO.class,
                 PipelineBuild.class);
         typeMapper.addMapping(PipelineBuildDTO::getId, PipelineBuild::setId);
+        typeMapper.addMapping(PipelineBuildDTO::getCurrentState, PipelineBuild::setCurrentState);
     }
 }

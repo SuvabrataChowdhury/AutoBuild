@@ -23,7 +23,7 @@ import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
-import com.autobuild.pipeline.executor.job.PipelineExecutorImpl;
+import com.autobuild.pipeline.executor.job.impl.PipelineExecutorImpl;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -54,6 +54,7 @@ public class PipelineExecutorService {
     @Transactional
     public PipelineBuildDTO executePipeline(PipelineExecuteRequest pipelineRequest) {
         UUID pipelineId = pipelineRequest.getPipelineId();
+
         Optional<Pipeline> optionalPipeline = pipelineRepository.findById(pipelineId);
 
         if (optionalPipeline.isEmpty()) {
@@ -65,7 +66,7 @@ public class PipelineExecutorService {
 
         PipelineBuild savedBuild = buildRepository.save(pipelineBuild);
 
-        //Strictly run it after commit
+        //Strictly run executing pipeline after build is commited
         TransactionSynchronizationManager.registerSynchronization( new TransactionSynchronization() {
             @Override
             public void afterCommit() {
@@ -73,7 +74,6 @@ public class PipelineExecutorService {
             }
         });
         
-
         return mapper.entityToDto(savedBuild);
     }
 

@@ -3,6 +3,8 @@ package com.autobuild.pipeline.executor.dto;
 import java.util.List;
 import java.util.UUID;
 
+import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +27,6 @@ public class PipelineBuildDTO {
     private UUID pipelineId;
     
     private List<StageBuildDTO> stageBuilds;
+
+    private PipelineExecutionState currentState;
 }

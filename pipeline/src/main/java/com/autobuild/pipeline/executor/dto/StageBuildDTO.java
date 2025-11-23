@@ -2,6 +2,8 @@ package com.autobuild.pipeline.executor.dto;
 
 import java.util.UUID;
 
+import com.autobuild.pipeline.executor.execution.state.StageExecutionState;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,4 +24,6 @@ public class StageBuildDTO {
     // private String buildStatus; //TODO: use enums for strict enforcement
 
     private UUID stageId;
+
+    private StageExecutionState currentState;
 }
