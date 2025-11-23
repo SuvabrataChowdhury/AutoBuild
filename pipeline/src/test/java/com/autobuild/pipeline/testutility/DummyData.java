@@ -12,6 +12,7 @@ import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
 import com.autobuild.pipeline.executor.dto.StageBuildDTO;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
+import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 
 public class DummyData {
 
@@ -42,7 +43,7 @@ public class DummyData {
     }
 
     public static PipelineBuild getPipelineBuild() {
-        return new PipelineBuild(UUID.randomUUID(), DummyData.getPipeline(), List.of(DummyData.getStageBuild()));
+        return new PipelineBuild(UUID.randomUUID(), DummyData.getPipeline(), List.of(DummyData.getStageBuild()), PipelineExecutionState.WAITING);
     }
 
     public static StageBuildDTO getStageBuildDTO() {

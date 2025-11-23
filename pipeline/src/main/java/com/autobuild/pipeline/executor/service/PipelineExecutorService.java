@@ -11,6 +11,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.repository.PipelineRepository;
@@ -20,6 +23,7 @@ import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
+import com.autobuild.pipeline.executor.job.PipelineExecutorImpl;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -59,11 +63,18 @@ public class PipelineExecutorService {
         Pipeline pipeline = optionalPipeline.get();
         PipelineBuild pipelineBuild = createBuild(pipeline);
 
-        buildRepository.save(pipelineBuild);
+        PipelineBuild savedBuild = buildRepository.save(pipelineBuild);
 
-        pipelineExecutor.execute(pipelineBuild);
+        //Strictly run it after commit
+        TransactionSynchronizationManager.registerSynchronization( new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                pipelineExecutor.executePipeline(savedBuild);
+            }
+        });
+        
 
-        return mapper.entityToDto(pipelineBuild);
+        return mapper.entityToDto(savedBuild);
     }
 
     //TODO: abstract this logic
