@@ -1,36 +1,34 @@
 package com.autobuild.pipeline.definiton.service;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
+import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.dto.mapper.PipelineMapper;
+import com.autobuild.pipeline.definiton.dto.mapper.StageMapper;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
+import com.autobuild.pipeline.definiton.entity.Stage;
 import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
 import com.autobuild.pipeline.definiton.repository.PipelineRepository;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
+import com.autobuild.pipeline.utility.file.extension.Extensions;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import com.autobuild.pipeline.definiton.dto.StageDTO;
-import com.autobuild.pipeline.definiton.dto.mapper.StageMapper;
-import com.autobuild.pipeline.definiton.entity.Stage;
-
-
 /**
- * Service Layer for all Pipeline CRUD operations.
+ * Service for pipeline CRUD operations.
  * 
- * @author Suvabrata Chowdhury && Baibhab Dey
+ * @author Suvabrata Chowdhury & Baibhab Dey
  */
 @Slf4j
 @Service
@@ -48,15 +46,15 @@ public class PipelineService {
     @Autowired
     private StageMapper stageMapper;
 
-    // REMOVED PipelineValidator
-
-    public PipelineDTO getPipelineById(final String pipelineId) throws InvalidIdException, IOException {
+    public PipelineDTO getPipelineById(final String pipelineId)
+            throws InvalidIdException, IOException {
         validatePipelineId(pipelineId);
         try {
             Pipeline pipeline = getPipelineFromId(pipelineId);
             Map<UUID, String> stageContents = fileService.readScriptFiles(pipeline);
             PipelineDTO pipelineDTO = mapper.entityToDto(pipeline);
-            pipelineDTO.getStages().forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
+            pipelineDTO.getStages()
+                    .forEach(stage -> stage.setCommand(stageContents.get(stage.getId())));
             log.info("Pipeline with id {} successfully obtained", pipelineDTO.getId());
             return pipelineDTO;
         } catch (IllegalArgumentException e) {
@@ -66,32 +64,29 @@ public class PipelineService {
 
     public PipelineDTO createPipeline(final PipelineDTO pipelineDto)
             throws IOException, DuplicateEntryException, InvalidIdException {
-        if (pipelineDto == null) {
-            return null;
-        }
-        if (pipelineDto.getName() != null && repository.existsByName(pipelineDto.getName())) {
-            throw new DuplicateEntryException("Pipeline with name '" + pipelineDto.getName() + "' already exists");
+        if (repository.existsByName(pipelineDto.getName())) {
+            throw new DuplicateEntryException(
+                "Pipeline with name '" + pipelineDto.getName() + "' already exists");
         }
 
-        // Enforce only bash script type for all incoming stages.
-        if (pipelineDto.getStages() != null) {
-            for (StageDTO s : pipelineDto.getStages()) {
-                validateScriptTypeOnCreate(s.getScriptType());
-            }
+        for (StageDTO stage : pipelineDto.getStages()) {
+            validateScriptType(stage.getScriptType());
         }
 
         pipelineDto.setId(UUID.randomUUID());
-        if (pipelineDto.getStages() != null) {
-            pipelineDto.getStages().forEach(stage -> stage.setId(UUID.randomUUID()));
-        }
+        pipelineDto.getStages().forEach(stage -> stage.setId(UUID.randomUUID()));
+
         Pipeline pipeline = mapper.dtoToEntity(pipelineDto);
         Map<UUID, String> scriptLocations = createScriptFiles(pipelineDto);
-        pipeline.getStages().forEach(stage -> stage.setPath(scriptLocations.get(stage.getId())));
+        pipeline.getStages()
+                .forEach(stage -> stage.setPath(scriptLocations.get(stage.getId())));
         Pipeline createdPipeline = repository.save(pipeline);
+        log.info("Pipeline with id {} successfully created", createdPipeline.getId());
         return mapper.entityToDto(createdPipeline);
     }
 
-    public void deletePipelineById(String pipelineId) throws IOException, InvalidIdException {
+    public void deletePipelineById(String pipelineId)
+            throws IOException, InvalidIdException {
         validatePipelineId(pipelineId);
         try {
             Pipeline pipeline = getPipelineFromId(pipelineId);
@@ -110,14 +105,16 @@ public class PipelineService {
 
         Pipeline pipeline = getPipelineFromId(pipelineId);
 
-        boolean nameChange = patchRequest.getName() != null && !patchRequest.getName().isBlank();
-        boolean stagesChange = patchRequest.getStages() != null && !patchRequest.getStages().isEmpty();
+        boolean nameChange = patchRequest.getName() != null
+                && !patchRequest.getName().isBlank();
+        boolean stagesChange = patchRequest.getStages() != null
+                && !patchRequest.getStages().isEmpty();
 
         if (nameChange) {
-            // Optional pre-check; if you prefer DB constraint remove this block.
-            if (!patchRequest.getName().equals(pipeline.getName()) &&
-                    repository.existsByName(patchRequest.getName())) {
-                throw new DuplicateEntryException("Pipeline with name '" + patchRequest.getName() + "' already exists");
+            if (!patchRequest.getName().equals(pipeline.getName())
+                    && repository.existsByName(patchRequest.getName())) {
+                throw new DuplicateEntryException(
+                    "Pipeline with name '" + patchRequest.getName() + "' already exists");
             }
             pipeline.setName(patchRequest.getName());
         }
@@ -149,54 +146,68 @@ public class PipelineService {
         }
     }
 
+    private void validateScriptType(String scriptType) throws InvalidIdException {
+        if (scriptType == null || scriptType.isBlank()) {
+            throw new InvalidIdException("Script type is required");
+        }
+        try {
+            Extensions.nameFor(scriptType);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidIdException("Unsupported script type: " + scriptType);
+        }
+    }
+
     private void processStageChanges(Pipeline pipeline, List<StageDTO> stageRequests)
             throws InvalidIdException, IOException, DuplicateEntryException {
 
         validateStageRequests(stageRequests);
 
         for (StageDTO req : stageRequests) {
-            boolean isCreate = req.getId() == null;
-            boolean isDelete = !isCreate
-                    && req.getName() == null
-                    && req.getScriptType() == null
-                    && req.getCommand() == null;
-
-            if (isCreate) {
+            if (isCreateOperation(req)) {
                 createStage(pipeline, req);
-                continue;
-            }
-            if (isDelete) {
+            } else if (isDeleteOperation(req)) {
                 deleteStage(pipeline, req.getId());
-                continue;
+            } else {
+                updateStage(pipeline, req);
             }
-            updateStage(pipeline, req);
         }
+    }
+
+    private boolean isCreateOperation(StageDTO req) {
+        return req.getId() == null;
+    }
+
+    private boolean isDeleteOperation(StageDTO req) {
+        return req.getId() != null
+                && req.getName() == null
+                && req.getScriptType() == null
+                && req.getCommand() == null;
     }
 
     private void createStage(Pipeline pipeline, StageDTO req)
             throws IOException, InvalidIdException {
-        validateScriptTypeOnCreate(req.getScriptType());
+        validateScriptType(req.getScriptType());
         req.setId(UUID.randomUUID());
         Stage entity = stageMapper.dtoToEntity(req);
         String path = fileService.createStageScriptFile(pipeline, req);
         entity.setPath(path);
         pipeline.getStages().add(entity);
     }
+
     private void updateStage(Pipeline pipeline, StageDTO req)
             throws InvalidIdException, IOException {
 
         Stage toUpdate = findStage(pipeline, req.getId());
 
-        if (!isBlank(req.getName())) {
+        if (req.getName() != null && !req.getName().isBlank()) {
             toUpdate.setName(req.getName());
         }
 
-        // Any attempt to provide scriptType in update request is forbidden.
         if (req.getScriptType() != null) {
             throw new InvalidIdException("Script type updates are not allowed");
         }
 
-        if (!isBlank(req.getCommand())) {
+        if (req.getCommand() != null && !req.getCommand().isBlank()) {
             fileService.updateStageScriptFile(toUpdate, req.getCommand());
         }
     }
@@ -207,25 +218,15 @@ public class PipelineService {
         Set<UUID> ids = new HashSet<>();
 
         for (StageDTO req : requests) {
-            boolean isCreate = req.getId() == null;
-            boolean isDelete = !isCreate
-                    && req.getName() == null
-                    && req.getScriptType() == null
-                    && req.getCommand() == null;
-
-            if (isCreate) {
-                if (isBlank(req.getName()) || isBlank(req.getScriptType()) || isBlank(req.getCommand())) {
-                    throw new InvalidIdException("Create stage requires name, scriptType, and command");
-                }
-                validateScriptTypeOnCreate(req.getScriptType());
+            if (isCreateOperation(req)) {
+                validateScriptType(req.getScriptType());
                 continue;
             }
 
-            if (isDelete) {
+            if (isDeleteOperation(req)) {
                 continue;
             }
 
-            // For update: scriptType must not be present.
             if (req.getScriptType() != null) {
                 throw new InvalidIdException("Script type updates are not allowed");
             }
@@ -236,11 +237,6 @@ public class PipelineService {
         }
     }
 
-    private void validateScriptTypeOnCreate(String scriptType) throws InvalidIdException {
-        if (scriptType == null || !scriptType.equalsIgnoreCase("bash")) {
-            throw new InvalidIdException("Unsupported script type: " + scriptType + ". Only 'bash' is allowed");
-        }
-    }
     private void deleteStage(Pipeline pipeline, UUID stageId)
             throws InvalidIdException, IOException {
         Stage toDelete = findStage(pipeline, stageId);
@@ -256,9 +252,11 @@ public class PipelineService {
     }
 
     private Pipeline getPipelineFromId(final String pipelineId) {
-        Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
+        Optional<Pipeline> optionalPipeline =
+                repository.findById(UUID.fromString(pipelineId));
         if (!optionalPipeline.isPresent()) {
-            throw new EntityNotFoundException("Pipeline with id " + pipelineId + " not found");
+            throw new EntityNotFoundException(
+                    "Pipeline with id " + pipelineId + " not found");
         }
         return optionalPipeline.get();
     }
@@ -275,9 +273,5 @@ public class PipelineService {
     private void deletePipeline(Pipeline pipeline) throws IOException {
         fileService.removeScriptFiles(mapper.entityToDto(pipeline));
         repository.delete(pipeline);
-    }
-
-    private boolean isBlank(String v) {
-        return v == null || v.isBlank();
     }
 }
