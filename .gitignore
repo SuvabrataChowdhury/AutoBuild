@@ -1,1 +1,3 @@
 pipeline_scripts/*
+pipeline_ui/package-lock.json
+pipeline_ui/node_modules/*
