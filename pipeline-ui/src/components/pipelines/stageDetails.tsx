@@ -21,8 +21,7 @@ export default function StageDetails({
     );
   }
   // Helper for updating fields safely
-  // @ts-ignore
-  function updateField(key: keyof Stage, value: any) {
+  function updateField(key: keyof Stage, value: string) {
     onChangeStage({ ...stage, [key]: value });
   }
 

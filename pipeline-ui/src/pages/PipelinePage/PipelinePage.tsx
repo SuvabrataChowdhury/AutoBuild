@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
 import { PipelinesTable } from "../../components/pipelines/pipelinesTable";
-// @ts-ignore
 import { Button } from "../../components/ui/button";
-
 import type { Pipeline } from "../../types/pipeline.types";
 import { getPipelines } from "../../services/pipelines.api";
 import "./PipelinePage.css";
