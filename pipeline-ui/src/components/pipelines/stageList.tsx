@@ -1,5 +1,7 @@
+import type { Stage } from "../../types/pipeline.types";
+
 interface Props {
-  stages: any[];
+  stages: Stage[];
   selectedId: number;
   onSelect: (id: number) => void;
   canEdit: boolean;

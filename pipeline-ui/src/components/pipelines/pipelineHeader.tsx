@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function PipelineHeader({ name }: { name: string }) {
   return (
     <div className="mb-4">

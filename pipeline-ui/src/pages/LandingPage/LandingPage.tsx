@@ -1,4 +1,3 @@
-import React from "react";
 import "./LandingPage.css";
 import { Button } from "../../components/ui/button";
 import { Workflow, Settings } from "lucide-react";

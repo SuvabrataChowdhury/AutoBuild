@@ -1,4 +1,3 @@
-import React from "react";
 import type { Stage } from "../../types/pipeline.types";
 import StageCommandsEditor from "./stageCommandsEditor";
 
@@ -22,6 +21,7 @@ export default function StageDetails({
     );
   }
   // Helper for updating fields safely
+  // @ts-ignore
   function updateField(key: keyof Stage, value: any) {
     onChangeStage({ ...stage, [key]: value });
   }

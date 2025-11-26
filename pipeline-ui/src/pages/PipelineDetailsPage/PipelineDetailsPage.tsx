@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import PipelineHeader from "../../components/pipelines/pipelineHeader";
@@ -48,8 +48,8 @@ export default function PipelineDetailPage() {
   // While loading
   if (!pipeline) return <div>Loading...</div>;
 
-  // Current displayed stage (from real pipeline)
-  const selectedStage = pipeline.stages.find((s) => s.id === selectedStageId);
+  //   // Current displayed stage (from real pipeline)
+  //   const selectedStage = pipeline.stages.find((s) => s.id === selectedStageId);
 
   // Begin editing -> clone pipeline
   function handleEdit() {
