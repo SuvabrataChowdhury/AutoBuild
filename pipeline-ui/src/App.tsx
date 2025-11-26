@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import LandingPage from "./components/LandingPage";
-import PipelinePage from "./components/PipelinePage";
-import LoginPage from "./components/LoginPage";
+import { Routes, Route, RouterProvider } from "react-router-dom";
+import { router } from "./router/router";
+// import LoginPage from "./components/LoginPage";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
-  function handleLogin(credentials) {
+  function handleLogin(credentials: any) {
     if (
       credentials.username === "demo" &&
       credentials.password === "password"
@@ -33,15 +33,10 @@ function App() {
   }
 
   if (!loggedIn) {
-    return <LoginPage onLogin={handleLogin} />;
+    // return <LoginPage onLogin={handleLogin} />;
   }
 
-  return (
-    <div>
-      {page === "landing" && <LandingPage goToPipeline={goToPipeline} logout={logout} />}
-      {page === "pipeline" && <PipelinePage goToLanding={goToLanding} logout={logout} />}
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
