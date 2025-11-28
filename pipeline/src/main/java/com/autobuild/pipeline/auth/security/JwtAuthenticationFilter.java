@@ -18,6 +18,7 @@ import java.io.IOException;
 
 /**
  *  Authentication Filter that processes JWT tokens from incoming requests.
+ * @author Baibhab Dey
  */
 
 @Component

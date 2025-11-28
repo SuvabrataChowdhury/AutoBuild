@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Security Configuration.
+ * @author Baibhab Dey
  */
 @Configuration
 @EnableWebSecurity

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service class handling authentication logic such as user registration and login.
+ * @author Baibhab Dey
  */
 
 @Service

@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * Response DTO for user profile information.
+ * @author Baibhab Dey
  */
 
 @Data

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Custom authentication entry point for REST API.
+ * @author Baibhab Dey
  */
 @RestController
 @RequestMapping("/auth")

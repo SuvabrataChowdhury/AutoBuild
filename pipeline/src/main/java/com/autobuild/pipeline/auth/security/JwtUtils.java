@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * Utility class for JWT token operations.
+ * @author Baibhab Dey
  */
 
 @Component

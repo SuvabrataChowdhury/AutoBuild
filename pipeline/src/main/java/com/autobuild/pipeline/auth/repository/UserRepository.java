@@ -8,6 +8,7 @@ import java.util.Optional;
 
 /**
  * Repository interface for User entity operations.
+ * @author Baibhab Dey
  */
 
 @Repository

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entity representing a User in the authentication system.
+ * @author Baibhab Dey
  */
 
 @Entity

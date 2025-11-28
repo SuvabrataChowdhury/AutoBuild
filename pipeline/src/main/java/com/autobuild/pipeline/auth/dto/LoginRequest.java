@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * Data Transfer Object for user login request.
+ * @author Baibhab Dey
  */
 
 @Data

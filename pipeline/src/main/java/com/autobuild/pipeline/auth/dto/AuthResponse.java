@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  *  Response DTO for authentication containing JWT token and user info.
+ * @author Baibhab Dey
  */
 
 @Data

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 /**
  * EntryPoint for used for Authentication.
+ * @author Baibhab Dey
  */
 @Component
 public class RestAuthEntryPoint implements AuthenticationEntryPoint {

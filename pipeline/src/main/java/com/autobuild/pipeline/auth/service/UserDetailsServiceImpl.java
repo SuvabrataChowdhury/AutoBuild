@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Implementation class for User Details.
+ * @author Baibhab Dey
  */
 
 @Service
