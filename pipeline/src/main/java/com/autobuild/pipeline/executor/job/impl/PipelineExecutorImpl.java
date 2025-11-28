@@ -15,7 +15,6 @@ import com.autobuild.pipeline.executor.job.PipelineExecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
-//TODO: Ugly design for now.
 @Slf4j
 public class PipelineExecutorImpl implements PipelineExecutor{
 
@@ -39,10 +38,17 @@ public class PipelineExecutorImpl implements PipelineExecutor{
         }
     }
 
-    //TODO: abstract this logic
     private void startBuild(PipelineBuild pipelineBuild) throws IOException, InterruptedException {
         Pipeline pipeline = pipelineBuild.getPipeline();
         log.info("Starting Build for: " + pipeline.getId());
+
+        startPipelineStageBuilds(pipelineBuild);
+
+        pipelineExecutionObservable.notify(pipelineBuild);
+    }
+    
+    //TODO: Ugly design for now. Refactor later.
+    private void startPipelineStageBuilds(PipelineBuild pipelineBuild) throws IOException, InterruptedException {
 
         //TODO: with state manager. Finite State Machine
         pipelineBuild.setCurrentState(PipelineExecutionState.RUNNING);
@@ -85,7 +91,5 @@ public class PipelineExecutorImpl implements PipelineExecutor{
         if (pipelineBuild.getCurrentState() != PipelineExecutionState.FAILED) {
             pipelineBuild.setCurrentState(PipelineExecutionState.SUCCESS);
         }
-
-        pipelineExecutionObservable.notify(pipelineBuild);
     }
 }
