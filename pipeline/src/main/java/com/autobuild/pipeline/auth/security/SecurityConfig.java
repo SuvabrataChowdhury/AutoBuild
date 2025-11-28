@@ -14,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security Configuration.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -39,17 +42,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
+            .cors(cors -> cors.disable())
             .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions().disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
+            .headers(headers -> headers.frameOptions(frame -> frame.disable())) 
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/**", "/h2-console/**", "/error").permitAll()
+                .requestMatchers("/auth/login").permitAll()
+                .requestMatchers("/auth/register").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/error").permitAll()            
                 .anyRequest().authenticated()
             )
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+            .userDetailsService(userDetailsService)
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 }

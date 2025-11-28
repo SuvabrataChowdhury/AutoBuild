@@ -7,6 +7,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 
+/**
+ * EntryPoint for used for Authentication.
+ */
 @Component
 public class RestAuthEntryPoint implements AuthenticationEntryPoint {
     @Override
