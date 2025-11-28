@@ -15,8 +15,14 @@ import com.autobuild.pipeline.executor.job.PipelineExecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Implementation for asynchronously start executing pipeline build.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
-public class PipelineExecutorImpl implements PipelineExecutor{
+public class PipelineExecutorImpl implements PipelineExecutor {
 
     @Autowired
     private PipelineExecutionObservable pipelineExecutionObservable;
@@ -43,53 +49,65 @@ public class PipelineExecutorImpl implements PipelineExecutor{
         log.info("Starting Build for: " + pipeline.getId());
 
         startPipelineStageBuilds(pipelineBuild);
-
-        pipelineExecutionObservable.notify(pipelineBuild);
     }
-    
-    //TODO: Ugly design for now. Refactor later.
+
+    // TODO: Ugly design for now. Refactor later.
     private void startPipelineStageBuilds(PipelineBuild pipelineBuild) throws IOException, InterruptedException {
 
-        //TODO: with state manager. Finite State Machine
-        pipelineBuild.setCurrentState(PipelineExecutionState.RUNNING);
-        pipelineExecutionObservable.notify(pipelineBuild);
+        // TODO: with state manager. Finite State Machine
+        setPipelineBuildState(pipelineBuild, PipelineExecutionState.RUNNING);
 
         boolean anyStageBuildFailed = false;
 
-        for(final StageBuild stageBuild : pipelineBuild.getStageBuilds()) {
+        for (final StageBuild stageBuild : pipelineBuild.getStageBuilds()) {
 
             if (anyStageBuildFailed) {
                 stageBuild.setCurrentState(StageExecutionState.STOPPED);
-                pipelineExecutionObservable.notify(pipelineBuild);
 
                 continue;
             }
 
-            ProcessBuilder stageProcessBuilder = new ProcessBuilder(stageBuild.getStage().getPath());
-            Process stageProcess = stageProcessBuilder.start();
+            Process stageProcess = startStageProcess(stageBuild);
 
-            stageBuild.setCurrentState(StageExecutionState.RUNNING);
-            pipelineExecutionObservable.notify(pipelineBuild);
+            setStageBuildState(pipelineBuild, stageBuild, StageExecutionState.RUNNING);
 
             log.info("process started with id: " + stageProcess.pid());
 
-            //TODO: attach observer which will be used to live broadcast 
             int processExitCode = stageProcess.waitFor();
             if (processExitCode != 0) {
                 anyStageBuildFailed = true;
                 stageBuild.setCurrentState(StageExecutionState.FAILED);
 
                 log.error("process exited with id: " + stageProcess.pid());
-                pipelineBuild.setCurrentState(PipelineExecutionState.FAILED);
                 continue;
             }
 
-            stageBuild.setCurrentState(StageExecutionState.SUCCESS);
-            pipelineExecutionObservable.notify(pipelineBuild);
+            setStageBuildState(pipelineBuild, stageBuild, StageExecutionState.SUCCESS);
         }
 
-        if (pipelineBuild.getCurrentState() != PipelineExecutionState.FAILED) {
+        if (anyStageBuildFailed) {
+            pipelineBuild.setCurrentState(PipelineExecutionState.FAILED);
+        } else {
             pipelineBuild.setCurrentState(PipelineExecutionState.SUCCESS);
         }
+
+        pipelineExecutionObservable.notify(pipelineBuild);
+    }
+
+    private Process startStageProcess(final StageBuild stageBuild) throws IOException {
+        ProcessBuilder stageProcessBuilder = new ProcessBuilder(stageBuild.getStage().getPath());
+        Process stageProcess = stageProcessBuilder.start();
+        return stageProcess;
+    }
+
+    private void setStageBuildState(PipelineBuild pipelineBuild, final StageBuild stageBuild,
+            final StageExecutionState stageExecutionState) {
+        stageBuild.setCurrentState(stageExecutionState);
+        pipelineExecutionObservable.notify(pipelineBuild);
+    }
+
+    private void setPipelineBuildState(PipelineBuild pipelineBuild, PipelineExecutionState pipelineExecutionState) {
+        pipelineBuild.setCurrentState(pipelineExecutionState);
+        pipelineExecutionObservable.notify(pipelineBuild);
     }
 }

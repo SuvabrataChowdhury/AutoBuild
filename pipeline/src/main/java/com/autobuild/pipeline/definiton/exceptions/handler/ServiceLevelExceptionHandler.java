@@ -49,13 +49,12 @@ public class ServiceLevelExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         List<String> errorMessages = exception.getConstraintViolations()
-                                                .stream().map(
-                                                                constraintViolation -> constraintViolation
-                                                                                        .getPropertyPath() 
-                                                                                        + " " + 
-                                                                                        constraintViolation.getMessage()
-                                                            )
-                                                .toList();
+                .stream().map(
+                        constraintViolation -> constraintViolation
+                                .getPropertyPath()
+                                + " " +
+                                constraintViolation.getMessage())
+                .toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
@@ -66,13 +65,13 @@ public class ServiceLevelExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         List<String> errorMessages = exception.getBindingResult()
-                                                .getFieldErrors()
-                                                .stream()
-                                                .map(
-                                                    fieldError -> fieldError.getField() 
-                                                                    + ": " 
-                                                                    + fieldError.getDefaultMessage()
-                                                ).toList();
+                .getFieldErrors()
+                .stream()
+                .map(
+                        fieldError -> fieldError.getField()
+                                + ": "
+                                + fieldError.getDefaultMessage())
+                .toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
@@ -89,6 +88,8 @@ public class ServiceLevelExceptionHandler {
     public ErrorResponse handleInvalidFormatException(InvalidFormatException exception) {
         log.error(exception.getMessage(), exception);
 
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, Arrays.asList(exception.getMessage().split(":")).get(1)).build();
+        return ErrorResponse
+                .builder(exception, HttpStatus.BAD_REQUEST, Arrays.asList(exception.getMessage().split(":")).get(1))
+                .build();
     }
 }

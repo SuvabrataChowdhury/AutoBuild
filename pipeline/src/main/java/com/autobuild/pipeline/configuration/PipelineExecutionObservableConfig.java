@@ -6,6 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
 import com.autobuild.pipeline.executor.execution.observer.impl.PipelineExecutionObservableImpl;
 
+/**
+ * Pipeline Observable config for observer pattern.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Configuration
 public class PipelineExecutionObservableConfig {
     @Bean

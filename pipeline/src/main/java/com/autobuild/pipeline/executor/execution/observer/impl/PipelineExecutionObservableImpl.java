@@ -10,14 +10,20 @@ import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObserver;
 
-public class PipelineExecutionObservableImpl implements PipelineExecutionObservable{
+/**
+ * Pipeline ongoing execution observer implementation.
+ * 
+ * @author Suvabrata Chowdhury
+ */
 
-    private Map<UUID,List<PipelineExecutionObserver>> specificSubscribers = new HashMap<>();
+public class PipelineExecutionObservableImpl implements PipelineExecutionObservable {
+
+    private Map<UUID, List<PipelineExecutionObserver>> specificSubscribers = new HashMap<>();
     private List<PipelineExecutionObserver> allSubscribers = new ArrayList<>();
 
     @Override
     public void attachExecutionForObservation(PipelineBuild pipelineBuild) {
-        if(specificSubscribers.containsKey(pipelineBuild.getId())) {
+        if (specificSubscribers.containsKey(pipelineBuild.getId())) {
             throw new IllegalArgumentException("Build is already being observed");
         }
 
@@ -26,7 +32,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
 
     @Override
     public void removeExecutionForObservation(PipelineBuild pipelineBuild) {
-        if(!specificSubscribers.containsKey(pipelineBuild.getId())) {
+        if (!specificSubscribers.containsKey(pipelineBuild.getId())) {
             throw new IllegalArgumentException("Build has not been added for removal");
         }
 
@@ -37,7 +43,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
     public void subscribe(PipelineBuild pipelineBuild, PipelineExecutionObserver subscriber) {
         List<PipelineExecutionObserver> currentObserversForBuild = specificSubscribers.get(pipelineBuild.getId());
 
-        if ( null == currentObserversForBuild ) {
+        if (null == currentObserversForBuild) {
             currentObserversForBuild = new ArrayList<>();
         }
 
@@ -48,8 +54,9 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
     public void unsubscribe(PipelineBuild pipelineBuild, PipelineExecutionObserver unsubscriber) {
         List<PipelineExecutionObserver> currentObserversForBuild = specificSubscribers.get(pipelineBuild.getId());
 
-        if ( null == currentObserversForBuild ) {
-            throw new IllegalArgumentException("Can not unsubscribe as no subscriber for build " + pipelineBuild.getId());
+        if (null == currentObserversForBuild) {
+            throw new IllegalArgumentException(
+                    "Can not unsubscribe as no subscriber for build " + pipelineBuild.getId());
         }
 
         currentObserversForBuild.remove(unsubscriber);
@@ -57,7 +64,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
 
     @Override
     public void subscribe(PipelineExecutionObserver subscriber) {
-        if(null == subscriber) {
+        if (null == subscriber) {
             throw new IllegalArgumentException("Null subscriber given");
         }
 
@@ -66,7 +73,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
 
     @Override
     public void unsubscribe(PipelineExecutionObserver unsubscriber) {
-        if(null == unsubscriber) {
+        if (null == unsubscriber) {
             throw new IllegalArgumentException("Null unsubscriber given");
         }
 

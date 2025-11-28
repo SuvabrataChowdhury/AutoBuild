@@ -1,8 +1,5 @@
 package com.autobuild.pipeline.configuration;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -10,6 +7,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
 import com.autobuild.pipeline.executor.job.impl.PipelineExecutorImpl;
+
+/**
+ * Spring executor thread pool configuration.
+ * 
+ * @author Suvabrata Chowdhury
+ */
 
 @Configuration
 @EnableAsync

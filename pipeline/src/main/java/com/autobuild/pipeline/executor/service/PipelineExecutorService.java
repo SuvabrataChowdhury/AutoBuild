@@ -1,9 +1,5 @@
 package com.autobuild.pipeline.executor.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.autobuild.pipeline.definiton.entity.Pipeline;
@@ -23,7 +18,6 @@ import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
-import com.autobuild.pipeline.executor.job.impl.PipelineExecutorImpl;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 
 import jakarta.persistence.EntityNotFoundException;

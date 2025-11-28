@@ -14,6 +14,12 @@ import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Service for continuously updating pipeline on it's stage change. Implementated as an observer.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
 @Service
 public class PipelineBuildContinuousUpdatorService implements PipelineExecutionObserver{
@@ -40,7 +46,7 @@ public class PipelineBuildContinuousUpdatorService implements PipelineExecutionO
         
         Optional<PipelineBuild> optionalBuild = repository.findById(pipelineBuild.getId());
 
-        if(optionalBuild.isEmpty()) {
+        if (optionalBuild.isEmpty()) {
             throw new EntityNotFoundException("Pipeline build with id " + pipelineBuild.getId() + " does not exist");
         }
 

@@ -3,6 +3,12 @@ package com.autobuild.pipeline.executor.execution.state;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Stage ongoing build (execution) stages.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @AllArgsConstructor
 @Getter
 public enum StageExecutionState {

@@ -22,9 +22,16 @@ import jakarta.annotation.PreDestroy;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Service for sending SSE on change of pipeline or it's stages. Implemented as
+ * an Observer.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
 @Service
-public class PipelineBuildService implements PipelineExecutionObserver{
+public class PipelineBuildService implements PipelineExecutionObserver {
 
     private static final int MAX_LIVE_SUBSCRIBERS = 5;
 
@@ -43,13 +50,15 @@ public class PipelineBuildService implements PipelineExecutionObserver{
         Optional<PipelineBuild> optionalPipelineBuild = repository.findById(pipelineBuildId);
 
         if (optionalPipelineBuild.isEmpty()) {
-            EntityNotFoundException entityNotFoundException = new EntityNotFoundException("Pipeline Build with id: " + pipelineBuildId + " does not exist");
+            EntityNotFoundException entityNotFoundException = new EntityNotFoundException(
+                    "Pipeline Build with id: " + pipelineBuildId + " does not exist");
             newSubscriber.completeWithError(entityNotFoundException);
             throw entityNotFoundException;
         }
 
-        if(MAX_LIVE_SUBSCRIBERS == subscriberEmitters.size()) {
-            UnsupportedOperationException exception = new UnsupportedOperationException("Maximum number of subscribers exceeded");
+        if (MAX_LIVE_SUBSCRIBERS == subscriberEmitters.size()) {
+            UnsupportedOperationException exception = new UnsupportedOperationException(
+                    "Maximum number of subscribers exceeded");
             newSubscriber.completeWithError(exception);
             throw exception;
         }
@@ -62,7 +71,7 @@ public class PipelineBuildService implements PipelineExecutionObserver{
         });
 
         newSubscriber.onError(throwable -> {
-            log.error(throwable.getMessage(),throwable);
+            log.error(throwable.getMessage(), throwable);
             subscriberEmitters.remove(newSubscriber);
             executionObservable.unsubscribe(optionalPipelineBuild.get(), this);
         });
@@ -82,11 +91,13 @@ public class PipelineBuildService implements PipelineExecutionObserver{
             try {
                 subscriberEmitter.send(SseEmitter.event().data(mapper.entityToDto(pipelineBuild)));
 
-                if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.SUCCESS)) {
+                if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.SUCCESS)
+                        || pipelineBuild.getCurrentState().equals(PipelineExecutionState.FAILED)) {
                     subscriberEmitter.complete();
                 }
+
             } catch (IOException e) {
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
             }
         }
     }

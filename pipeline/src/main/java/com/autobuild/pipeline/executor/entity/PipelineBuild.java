@@ -72,7 +72,7 @@ public class PipelineBuild {
 
     @PrePersist
     public void setDefaultState() {
-        if(null == this.currentState) {
+        if (null == this.currentState) {
             this.currentState = PipelineExecutionState.WAITING;
         }
     }

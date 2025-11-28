@@ -4,6 +4,12 @@ import org.springframework.stereotype.Component;
 
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 
+/**
+ * Pipeline ongoing build (or execution) observable interface.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Component
 public interface PipelineExecutionObservable {
     public void attachExecutionForObservation(PipelineBuild pipelineBuild);

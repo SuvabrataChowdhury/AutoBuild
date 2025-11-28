@@ -56,7 +56,7 @@ public class StageBuild {
 
     @PrePersist
     public void setDefaultState() {
-        if(null == this.currentState) {
+        if (null == this.currentState) {
             this.currentState = StageExecutionState.WAITING;
         }
     }

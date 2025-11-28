@@ -13,6 +13,12 @@ import com.autobuild.pipeline.executor.service.PipelineBuildService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Controller for Pipeline Build.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/pipeline/build")
@@ -26,7 +32,7 @@ public class PipelineBuildController {
         log.info("Subscription requested");
         SseEmitter emitter = new SseEmitter(600000L);
 
-        service.addSubscriber(emitter,pipelineBuildId);
+        service.addSubscriber(emitter, pipelineBuildId);
 
         log.info("Subscription done. returning emitter");
 

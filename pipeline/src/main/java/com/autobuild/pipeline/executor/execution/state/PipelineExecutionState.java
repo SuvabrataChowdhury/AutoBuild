@@ -3,6 +3,12 @@ package com.autobuild.pipeline.executor.execution.state;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Pipeline Build / execution state.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @AllArgsConstructor
 @Getter
 public enum PipelineExecutionState {
