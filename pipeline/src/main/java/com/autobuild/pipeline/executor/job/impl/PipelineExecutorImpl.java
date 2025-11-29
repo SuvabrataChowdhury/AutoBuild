@@ -1,6 +1,8 @@
 package com.autobuild.pipeline.executor.job.impl;
 
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
+import java.nio.file.Path;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +14,7 @@ import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObser
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 import com.autobuild.pipeline.executor.execution.state.StageExecutionState;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,6 +70,7 @@ public class PipelineExecutorImpl implements PipelineExecutor {
                 continue;
             }
 
+            // String logPath = pipelineFileService.createLogFile(pipelineBuild.getId(), stageBuild.getId());
             Process stageProcess = startStageProcess(stageBuild);
 
             setStageBuildState(pipelineBuild, stageBuild, StageExecutionState.RUNNING);
@@ -96,6 +100,10 @@ public class PipelineExecutorImpl implements PipelineExecutor {
 
     private Process startStageProcess(final StageBuild stageBuild) throws IOException {
         ProcessBuilder stageProcessBuilder = new ProcessBuilder(stageBuild.getStage().getPath());
+
+        stageProcessBuilder.redirectOutput(Redirect.to(Path.of(stageBuild.getLogPath()).toFile()));
+        stageProcessBuilder.redirectErrorStream(true);
+
         Process stageProcess = stageProcessBuilder.start();
         return stageProcess;
     }

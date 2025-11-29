@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Stage ongoing build (execution) stages.
+ * Stage ongoing build (execution) steps.
  * 
  * @author Suvabrata Chowdhury
  */

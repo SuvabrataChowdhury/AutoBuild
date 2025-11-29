@@ -8,6 +8,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -32,14 +34,14 @@ public class PipelineExecutorControllerTest {
     private PipelineBuildDTO pipelineBuildDTO = DummyData.getPipelineBuildDTO(executeRequest.getPipelineId());
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
 
         doReturn(pipelineBuildDTO).when(service).executePipeline(executeRequest);
     }
 
     @Test
-    public void testExecutePipeline() {
+    public void testExecutePipeline() throws IOException {
         ResponseEntity<PipelineBuildDTO> response = controller.executePipeline(executeRequest);
         
         assertNotNull(response);
@@ -55,7 +57,7 @@ public class PipelineExecutorControllerTest {
     }
 
     @Test
-    public void testExecutePipelineRuntimeError() {
+    public void testExecutePipelineRuntimeError() throws IOException {
         doThrow(new RuntimeException("Something runtime exception")).when(service).executePipeline(any(PipelineExecuteRequest.class));
 
         assertThrows(RuntimeException.class,() -> controller.executePipeline(executeRequest));

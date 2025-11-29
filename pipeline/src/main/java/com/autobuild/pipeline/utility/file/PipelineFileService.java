@@ -24,4 +24,6 @@ public interface PipelineFileService {
     public void updateStageScriptFile(final Stage stage, final String command) throws IOException;
     public void removeStageScriptFile(final Stage stage) throws IOException;
     String readStageScriptFile(final Stage stage) throws IOException;
+
+    public String createLogFile(final UUID pipelineBuildId, final UUID stageBuildId) throws IOException;
 }

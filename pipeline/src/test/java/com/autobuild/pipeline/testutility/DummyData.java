@@ -40,7 +40,7 @@ public class DummyData {
     }
 
     public static StageBuild getStageBuild() {
-        return new StageBuild(UUID.randomUUID(), DummyData.getStage(), StageExecutionState.WAITING);
+        return new StageBuild(UUID.randomUUID(), DummyData.getStage(), StageExecutionState.WAITING, "./dummyFolder/");
     }
 
     public static PipelineBuild getPipelineBuild() {

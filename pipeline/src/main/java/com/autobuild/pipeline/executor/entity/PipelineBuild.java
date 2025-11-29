@@ -45,7 +45,7 @@ import lombok.Setter;
 //     })
 public class PipelineBuild {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

@@ -27,7 +27,6 @@ import lombok.Setter;
  */
 
 //TODO: Add timestamps
-//TODO: Add status like BUILDING, SUCCESS, FAILURE etc.
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -35,7 +34,7 @@ import lombok.Setter;
 @Entity
 public class StageBuild {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
@@ -47,8 +46,8 @@ public class StageBuild {
     private StageExecutionState currentState;
 
     //TODO: Add this attribute
-    // @Column(name = "log_path", nullable = false)
-    // private String logPath; //Points to stored log file for reading purpose
+    @Column(name = "log_path", nullable = false)
+    private String logPath; //Points to stored log file for reading purpose
 
     public StageBuild(Stage stage) {
         this.stage = stage;

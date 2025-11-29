@@ -34,12 +34,21 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
  * @author Suvabrata Chowdhury
  */
 
+ //TODO: Refactor it. for now its an ugly design
 @Component
 public class LocalPipelineFileServiceImpl implements PipelineFileService {
     private static final Path DEFAULT_SCRIPT_PATH = Path.of("..", "pipeline_scripts");
+    private static final Path DEFAULT_SCRIPT_LOG_PATH = Path.of("..", "pipeline_build_logs");
+    
     private static final FileAttribute<Set<PosixFilePermission>> PERMISSIONS = PosixFilePermissions.asFileAttribute(
             Set.of(
                     PosixFilePermission.OWNER_EXECUTE,
+                    PosixFilePermission.OWNER_WRITE,
+                    PosixFilePermission.OWNER_READ));
+
+    private static final FileAttribute<Set<PosixFilePermission>> LOG_FILE_PERMISSIONS = PosixFilePermissions.asFileAttribute(
+            Set.of(
+                    // PosixFilePermission.OWNER_EXECUTE,
                     PosixFilePermission.OWNER_WRITE,
                     PosixFilePermission.OWNER_READ));
 
@@ -155,6 +164,36 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
             return "";
         }
         return String.join("\n", Files.readAllLines(Path.of(stage.getPath())));
+    }
+
+    @Override
+    public String createLogFile(UUID pipelineBuildId, UUID stageBuildId) throws IOException {
+        createLogsParentDirectory();
+
+        Path buildLogsDirectoryPath = getBuildLogsDirectoryPath(pipelineBuildId.toString());
+        if(!Files.exists(buildLogsDirectoryPath)) {
+            Files.createDirectories(buildLogsDirectoryPath, PERMISSIONS);
+        }
+
+        return createStageLogFile(buildLogsDirectoryPath, stageBuildId.toString());
+    }
+
+    private String createStageLogFile(Path buildLogsDirectoryPath, String stageBuildId) throws IOException {
+        String logFileName = stageBuildId + Extensions.nameFor("log");
+        Path logFilePath = buildLogsDirectoryPath.resolve(logFileName);
+
+        Files.createFile(logFilePath, LOG_FILE_PERMISSIONS);
+        return logFilePath.toString();
+    }
+
+    private Path getBuildLogsDirectoryPath(String pipelineBuildId) {
+        return DEFAULT_SCRIPT_LOG_PATH.resolve(pipelineBuildId);
+    }
+
+    private void createLogsParentDirectory() throws IOException {
+        if (!Files.exists(DEFAULT_SCRIPT_LOG_PATH)) {
+            Files.createDirectories(DEFAULT_SCRIPT_LOG_PATH, PERMISSIONS);
+        }
     }
 
     private void createParentDirectory() throws IOException {

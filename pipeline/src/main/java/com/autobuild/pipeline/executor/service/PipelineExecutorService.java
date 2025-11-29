@@ -1,5 +1,6 @@
 package com.autobuild.pipeline.executor.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +47,11 @@ public class PipelineExecutorService {
     @Autowired
     private PipelineBuildMapper mapper;
 
+    @Autowired
+    private PipelineFileService pipelineFileService;
+
     @Transactional
-    public PipelineBuildDTO executePipeline(PipelineExecuteRequest pipelineRequest) {
+    public PipelineBuildDTO executePipeline(PipelineExecuteRequest pipelineRequest) throws IOException {
         UUID pipelineId = pipelineRequest.getPipelineId();
 
         Optional<Pipeline> optionalPipeline = pipelineRepository.findById(pipelineId);
@@ -58,23 +63,43 @@ public class PipelineExecutorService {
         Pipeline pipeline = optionalPipeline.get();
         PipelineBuild pipelineBuild = createBuild(pipeline);
 
+        createEmptyLogFiles(pipelineBuild);
+
         PipelineBuild savedBuild = buildRepository.save(pipelineBuild);
 
-        //Strictly run executing pipeline after build is commited
-        TransactionSynchronizationManager.registerSynchronization( new TransactionSynchronization() {
+        // Strictly run executing pipeline after build is commited
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
                 pipelineExecutor.executePipeline(savedBuild);
             }
         });
-        
+
         return mapper.entityToDto(savedBuild);
     }
 
-    //TODO: abstract this logic
+    private void createEmptyLogFiles(PipelineBuild pipelineBuild) throws IOException {
+
+        for (StageBuild stageBuild : pipelineBuild.getStageBuilds()) {
+            stageBuild.setLogPath(pipelineFileService.createLogFile(pipelineBuild.getId(), stageBuild.getId()));
+        }
+
+        //TODO: rollback created files if error occurs
+    }
+
+    // TODO: abstract this logic
     private PipelineBuild createBuild(final Pipeline pipeline) {
-        List<StageBuild> stageBuilds = pipeline.getStages().stream().map(stage -> new StageBuild(stage)).toList();
+        List<StageBuild> stageBuilds = pipeline.getStages()
+                                                .stream()
+                                                .map(stage -> {
+                                                    StageBuild stageBuild = new StageBuild(stage);
+                                                    stageBuild.setId(UUID.randomUUID());
+
+                                                    return stageBuild;
+                                                }).toList();
+
         PipelineBuild pipelineBuild = new PipelineBuild(pipeline, stageBuilds);
+        pipelineBuild.setId(UUID.randomUUID());
 
         return pipelineBuild;
     }
