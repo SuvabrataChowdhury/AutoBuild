@@ -14,6 +14,12 @@ import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * Service layer for stage build.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Service
 public class StageBuildService {
 
@@ -23,10 +29,10 @@ public class StageBuildService {
     @Autowired
     private StageBuildRepository repository;
 
-    public Map<String,String> getStageBuildLogs(UUID stageBuildId) throws IOException {
+    public Map<String, String> getStageBuildLogs(UUID stageBuildId) throws IOException {
         Optional<StageBuild> optionalStageBuild = repository.findById(stageBuildId);
 
-        if(optionalStageBuild.isEmpty()) {
+        if (optionalStageBuild.isEmpty()) {
             throw new EntityNotFoundException(
                     "Stage Build with id: " + stageBuildId + " does not exist");
         }

@@ -30,6 +30,10 @@ public class DummyData {
         return new Pipeline(UUID.randomUUID(), "my pipeline",List.of(getStage()));
     }
 
+    public static  Pipeline getPipeline(UUID pipelineId) {
+        return new Pipeline(pipelineId, "my pipeline",List.of(getStage()));
+    }
+
     public static PipelineDTO getPipelineDTO() {
         return new PipelineDTO(UUID.randomUUID(), "my pipeline", List.of(getStageDTO()));
     }
@@ -45,6 +49,10 @@ public class DummyData {
 
     public static PipelineBuild getPipelineBuild() {
         return new PipelineBuild(UUID.randomUUID(), DummyData.getPipeline(), List.of(DummyData.getStageBuild()), PipelineExecutionState.WAITING);
+    }
+
+    public static PipelineBuild getPipelineBuild(UUID pipelineUuid) {
+        return new PipelineBuild(UUID.randomUUID(), DummyData.getPipeline(pipelineUuid), List.of(DummyData.getStageBuild()), PipelineExecutionState.WAITING);
     }
 
     public static StageBuildDTO getStageBuildDTO() {

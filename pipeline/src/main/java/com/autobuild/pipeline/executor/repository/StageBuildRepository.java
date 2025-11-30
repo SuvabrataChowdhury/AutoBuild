@@ -7,6 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import com.autobuild.pipeline.executor.entity.StageBuild;
 
+/**
+ * Repository for Stage Builds.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Repository
 public interface StageBuildRepository extends JpaRepository<StageBuild, UUID>{
 

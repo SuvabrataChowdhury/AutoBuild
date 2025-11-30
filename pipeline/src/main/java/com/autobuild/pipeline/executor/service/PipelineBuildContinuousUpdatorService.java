@@ -29,6 +29,7 @@ public class PipelineBuildContinuousUpdatorService implements PipelineExecutionO
 
     private PipelineExecutionObservable pipelineExecutionObservable;
 
+    //TODO: check this dependency injection
     @Autowired
     public PipelineBuildContinuousUpdatorService(PipelineExecutionObservable pipelineExecutionObservable) {
         this.pipelineExecutionObservable = pipelineExecutionObservable;
@@ -54,4 +55,6 @@ public class PipelineBuildContinuousUpdatorService implements PipelineExecutionO
 
         log.info("Updated build: " + pipelineBuild.getCurrentState());
     }
+
+    //TODO: check for predestroy unsubscribe inclusion
 }

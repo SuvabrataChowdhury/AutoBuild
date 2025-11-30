@@ -36,23 +36,23 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
  * @author Suvabrata Chowdhury
  */
 
- //TODO: Refactor it. for now its an ugly design
+// TODO: Refactor it. for now its an ugly design
 @Component
 public class LocalPipelineFileServiceImpl implements PipelineFileService {
     private static final Path DEFAULT_SCRIPT_PATH = Path.of("..", "pipeline_scripts");
     private static final Path DEFAULT_SCRIPT_LOG_PATH = Path.of("..", "pipeline_build_logs");
-    
+
     private static final FileAttribute<Set<PosixFilePermission>> PERMISSIONS = PosixFilePermissions.asFileAttribute(
             Set.of(
                     PosixFilePermission.OWNER_EXECUTE,
                     PosixFilePermission.OWNER_WRITE,
                     PosixFilePermission.OWNER_READ));
 
-    private static final FileAttribute<Set<PosixFilePermission>> LOG_FILE_PERMISSIONS = PosixFilePermissions.asFileAttribute(
-            Set.of(
-                    // PosixFilePermission.OWNER_EXECUTE,
-                    PosixFilePermission.OWNER_WRITE,
-                    PosixFilePermission.OWNER_READ));
+    private static final FileAttribute<Set<PosixFilePermission>> LOG_FILE_PERMISSIONS = PosixFilePermissions
+            .asFileAttribute(Set.of(
+                            // PosixFilePermission.OWNER_EXECUTE,
+                            PosixFilePermission.OWNER_WRITE,
+                            PosixFilePermission.OWNER_READ));
 
     @Override
     public Map<UUID, String> readScriptFiles(final Pipeline pipeline) throws IOException {
@@ -64,9 +64,8 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
                             stage -> {
                                 try {
                                     String content = StringUtils.join(
-                                                        Files.readAllLines(Path.of(stage.getPath())),
-                                                         "\n"
-                                                    );
+                                            Files.readAllLines(Path.of(stage.getPath())),
+                                            "\n");
                                     scriptContents.put(stage.getId(), content);
                                 } catch (IOException e) {
                                     throw new UncheckedIOException(e);
@@ -140,12 +139,12 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
     @Override
     public String createStageScriptFile(Pipeline pipeline, StageDTO stage) throws IOException {
         createParentDirectory();
-        
+
         Path pipelineDirectoryPath = getPipelineDirectoryPath(pipeline.getId().toString());
         if (!Files.exists(pipelineDirectoryPath)) {
             Files.createDirectories(pipelineDirectoryPath, PERMISSIONS);
         }
-        
+
         return createStageFile(pipelineDirectoryPath, stage);
     }
 
@@ -173,7 +172,7 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
         createLogsParentDirectory();
 
         Path buildLogsDirectoryPath = getBuildLogsDirectoryPath(pipelineBuildId.toString());
-        if(!Files.exists(buildLogsDirectoryPath)) {
+        if (!Files.exists(buildLogsDirectoryPath)) {
             Files.createDirectories(buildLogsDirectoryPath, PERMISSIONS);
         }
 

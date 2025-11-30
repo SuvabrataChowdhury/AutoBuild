@@ -29,7 +29,8 @@ public class PipelineExecutorController {
     private PipelineExecutorService service;
 
     @PostMapping("/pipeline")
-    public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request) throws IOException {
+    public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request)
+            throws IOException {
         PipelineBuildDTO build = service.executePipeline(request);
 
         return ResponseEntity.accepted().body(build);

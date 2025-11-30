@@ -14,7 +14,6 @@ import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObser
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 import com.autobuild.pipeline.executor.execution.state.StageExecutionState;
 import com.autobuild.pipeline.executor.job.PipelineExecutor;
-import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,8 +41,7 @@ public class PipelineExecutorImpl implements PipelineExecutor {
 
             pipelineExecutionObservable.removeExecutionForObservation(pipelineBuild);
         } catch (IOException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

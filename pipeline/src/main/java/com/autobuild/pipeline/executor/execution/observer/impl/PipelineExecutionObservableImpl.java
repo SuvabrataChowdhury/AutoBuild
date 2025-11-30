@@ -21,6 +21,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
     private Map<UUID, List<PipelineExecutionObserver>> specificSubscribers = new HashMap<>();
     private List<PipelineExecutionObserver> allSubscribers = new ArrayList<>();
 
+    // Todo: may not be required
     @Override
     public void attachExecutionForObservation(PipelineBuild pipelineBuild) {
         if (specificSubscribers.containsKey(pipelineBuild.getId())) {
@@ -30,6 +31,7 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
         specificSubscribers.put(pipelineBuild.getId(), new ArrayList<>());
     }
 
+    //todo: may not be required
     @Override
     public void removeExecutionForObservation(PipelineBuild pipelineBuild) {
         if (!specificSubscribers.containsKey(pipelineBuild.getId())) {
@@ -40,11 +42,22 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
     }
 
     @Override
+    public List<UUID> getAllAttachedExecutions() {
+        return specificSubscribers.keySet().stream().toList();
+    }
+
+    @Override
     public void subscribe(PipelineBuild pipelineBuild, PipelineExecutionObserver subscriber) {
+        if (null == subscriber || null == pipelineBuild) {
+            throw new IllegalArgumentException("Null arguments given");
+        }
+
         List<PipelineExecutionObserver> currentObserversForBuild = specificSubscribers.get(pipelineBuild.getId());
 
+        //TODO: check if this should be allowed
         if (null == currentObserversForBuild) {
             currentObserversForBuild = new ArrayList<>();
+            specificSubscribers.put(pipelineBuild.getId(), currentObserversForBuild);
         }
 
         currentObserversForBuild.add(subscriber);
@@ -52,6 +65,10 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
 
     @Override
     public void unsubscribe(PipelineBuild pipelineBuild, PipelineExecutionObserver unsubscriber) {
+        if (null == unsubscriber || null == pipelineBuild) {
+            throw new IllegalArgumentException("Null arguments given");
+        }
+
         List<PipelineExecutionObserver> currentObserversForBuild = specificSubscribers.get(pipelineBuild.getId());
 
         if (null == currentObserversForBuild) {
@@ -60,6 +77,11 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
         }
 
         currentObserversForBuild.remove(unsubscriber);
+    }
+
+    @Override
+    public List<PipelineExecutionObserver> getAllSpecificSubscribedObservers(PipelineBuild pipelineBuild) {
+        return specificSubscribers.get(pipelineBuild.getId());
     }
 
     @Override
@@ -81,7 +103,16 @@ public class PipelineExecutionObservableImpl implements PipelineExecutionObserva
     }
 
     @Override
+    public List<PipelineExecutionObserver> getAllGeneralSubscribedObservers() {
+        return List.copyOf(allSubscribers);
+    }
+
+    @Override
     public void notify(PipelineBuild pipelineBuild) {
+        if (null == pipelineBuild) {
+            throw new IllegalArgumentException("Null pipeline build given");
+        }
+
         List<PipelineExecutionObserver> specificObserversForPipeline = specificSubscribers.get(pipelineBuild.getId());
 
         if (specificObserversForPipeline != null) {

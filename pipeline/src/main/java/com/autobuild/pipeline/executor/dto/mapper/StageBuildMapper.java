@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.autobuild.pipeline.definiton.dto.mapper.Mapper;
-import com.autobuild.pipeline.definiton.entity.Stage;
 import com.autobuild.pipeline.executor.dto.StageBuildDTO;
 import com.autobuild.pipeline.executor.entity.StageBuild;
 
@@ -23,19 +22,7 @@ public class StageBuildMapper implements Mapper<StageBuildDTO, StageBuild>{
 
     @Override
     public StageBuild dtoToEntity(StageBuildDTO stageBuildDTO) {
-        if (null == stageBuildDTO) {
-            throw new IllegalArgumentException("Given null object can not be mapped");
-        }
-
-        StageBuild stageBuild = modelMapper.map(stageBuildDTO, StageBuild.class);
-
-        //TODO: make sure it contains actual stage info
-        Stage dummyStage = new Stage();
-        dummyStage.setId(stageBuildDTO.getStageId());
-
-        stageBuild.setStage(dummyStage);
-
-        return stageBuild;
+        throw new UnsupportedOperationException("DTO is not persistable");
     }
 
     @Override

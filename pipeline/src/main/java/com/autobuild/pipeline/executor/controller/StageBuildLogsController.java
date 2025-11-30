@@ -16,6 +16,12 @@ import com.autobuild.pipeline.executor.service.StageBuildService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Controllers for stage build logs.
+ * 
+ * @author Suvabrata Chowdhury
+ */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/stage/build/logs")
@@ -34,7 +40,7 @@ public class StageBuildLogsController {
     // }
 
     @GetMapping("/{stageBuildId}")
-    public ResponseEntity<Map<String,String>> getStageBuildLogs(@PathVariable UUID stageBuildId) throws IOException {
+    public ResponseEntity<Map<String, String>> getStageBuildLogs(@PathVariable UUID stageBuildId) throws IOException {
         return ResponseEntity.ok(service.getStageBuildLogs(stageBuildId));
     }
 }

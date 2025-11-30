@@ -11,8 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -38,11 +36,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-//TODO: Add it back with build number
-// @Table(
-//     uniqueConstraints = {
-//         @UniqueConstraint(name = "UK_PIPELINEBUILD_BUILDNO", columnNames = { "build_number" })
-//     })
 public class PipelineBuild {
     @Id
     // @GeneratedValue(strategy = GenerationType.UUID)

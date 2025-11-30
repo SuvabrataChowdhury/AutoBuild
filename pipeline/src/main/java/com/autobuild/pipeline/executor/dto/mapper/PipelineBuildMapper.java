@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.autobuild.pipeline.definiton.dto.mapper.Mapper;
-import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 
@@ -23,19 +22,7 @@ public class PipelineBuildMapper implements Mapper<PipelineBuildDTO, PipelineBui
 
     @Override
     public PipelineBuild dtoToEntity(PipelineBuildDTO pipelineBuildDTO) {
-        if (null == pipelineBuildDTO) {
-            throw new IllegalArgumentException("Given null object can not be mapped");
-        }
-
-        PipelineBuild pipelineBuild = this.mapper.map(pipelineBuildDTO, PipelineBuild.class);
-
-        //TODO: make sure it contains actual stage info
-        Pipeline dummyPipeline = new Pipeline();
-        dummyPipeline.setId(pipelineBuildDTO.getPipelineId());
-
-        pipelineBuild.setPipeline(dummyPipeline);
-
-        return pipelineBuild;
+        throw new UnsupportedOperationException("DTO is not persistable");
     }
 
     @Override
