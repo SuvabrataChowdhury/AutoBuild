@@ -52,10 +52,10 @@ public class DummyData {
     }
 
     public static PipelineBuildDTO getPipelineBuildDTO() {
-        return new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), List.of(DummyData.getStageBuildDTO()), PipelineExecutionState.WAITING);
+        return new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
     }
 
     public static PipelineBuildDTO getPipelineBuildDTO(UUID pipelineId) {
-        return new PipelineBuildDTO(UUID.randomUUID(), pipelineId, List.of(DummyData.getStageBuildDTO()), PipelineExecutionState.WAITING);
+        return new PipelineBuildDTO(UUID.randomUUID(), pipelineId, PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
     }
 }

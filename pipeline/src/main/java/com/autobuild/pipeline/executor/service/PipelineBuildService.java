@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
@@ -63,6 +64,13 @@ public class PipelineBuildService implements PipelineExecutionObserver {
             throw exception;
         }
 
+        if (!optionalPipelineBuild.get().getCurrentState().equals(PipelineExecutionState.RUNNING)) {
+            UnsupportedOperationException exception = new UnsupportedOperationException(
+                    "Live broadcast is not suppoerted as build is not in running state");
+            newSubscriber.completeWithError(exception);
+            throw exception;
+        }
+
         subscriberEmitters.add(newSubscriber);
 
         newSubscriber.onCompletion(() -> {
@@ -102,6 +110,7 @@ public class PipelineBuildService implements PipelineExecutionObserver {
         }
     }
 
+    //TODO: Better implementation as this method is executed unconditionally
     @Scheduled(fixedRate = 15000)
     public void sentHeartBeat() {
         for (SseEmitter sseEmitter : subscriberEmitters) {
@@ -122,5 +131,17 @@ public class PipelineBuildService implements PipelineExecutionObserver {
         }
 
         subscriberEmitters.clear();
+    }
+
+    public PipelineBuildDTO getPipelineBuild(UUID pipelineBuildId) {
+        Optional<PipelineBuild> optionalPipelineBuild = repository.findById(pipelineBuildId);
+
+        if (optionalPipelineBuild.isEmpty()) {
+            EntityNotFoundException entityNotFoundException = new EntityNotFoundException(
+                    "Pipeline Build with id: " + pipelineBuildId + " does not exist");
+            throw entityNotFoundException;
+        }
+
+        return mapper.entityToDto(optionalPipelineBuild.get());
     }
 }

@@ -17,7 +17,7 @@ import com.autobuild.pipeline.executor.job.impl.PipelineExecutorImpl;
 @Configuration
 @EnableAsync
 public class ExecutorConfig {
-    private static final int MAX_THREAD_COUNT = 5;
+    private static final int MAX_THREAD_COUNT = 20;
 
     @Bean(name = "executorService")
     public ThreadPoolTaskExecutor getExecutorService() {
@@ -25,7 +25,7 @@ public class ExecutorConfig {
 
         executor.setCorePoolSize(MAX_THREAD_COUNT);
         executor.setMaxPoolSize(MAX_THREAD_COUNT);
-        executor.setQueueCapacity(Integer.MAX_VALUE); // like Executors.newFixedThreadPool
+        executor.setQueueCapacity(Integer.MAX_VALUE);
         executor.setThreadNamePrefix("executorService-");
 
         executor.initialize();

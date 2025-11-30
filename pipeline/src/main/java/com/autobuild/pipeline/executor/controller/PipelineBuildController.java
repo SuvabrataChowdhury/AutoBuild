@@ -3,12 +3,14 @@ package com.autobuild.pipeline.executor.controller;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.service.PipelineBuildService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,5 +39,10 @@ public class PipelineBuildController {
         log.info("Subscription done. returning emitter");
 
         return emitter;
+    }
+
+    @GetMapping("/{pipelineBuildId}")
+    public ResponseEntity<PipelineBuildDTO> getPipelineBuild(@PathVariable UUID pipelineBuildId) {
+        return ResponseEntity.ok(service.getPipelineBuild(pipelineBuildId));
     }
 }

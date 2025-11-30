@@ -25,8 +25,8 @@ public class PipelineBuildDTO {
     // private int buildNo;
 
     private UUID pipelineId;
-    
-    private List<StageBuildDTO> stageBuilds;
 
     private PipelineExecutionState currentState;
+    
+    private List<StageBuildDTO> stageBuilds;
 }

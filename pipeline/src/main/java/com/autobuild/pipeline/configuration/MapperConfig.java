@@ -79,7 +79,7 @@ public class MapperConfig {
     private void setStageBuildEntityDTOMapping(ModelMapper mapper) {
         TypeMap<StageBuild, StageBuildDTO> typeMapper = mapper.createTypeMap(StageBuild.class, StageBuildDTO.class);
         typeMapper.addMapping(StageBuild::getId, StageBuildDTO::setId);
-        typeMapper.addMapping(stageBuild -> stageBuild.getStage().getId(), StageBuildDTO::setId);
+        typeMapper.addMapping(stageBuild -> stageBuild.getStage().getId(), StageBuildDTO::setStageId);
         typeMapper.addMapping(StageBuild::getCurrentState, StageBuildDTO::setCurrentState);
     }
 

@@ -79,12 +79,13 @@ public class PipelineExecutorService {
     }
 
     private void createEmptyLogFiles(PipelineBuild pipelineBuild) throws IOException {
-
         for (StageBuild stageBuild : pipelineBuild.getStageBuilds()) {
-            stageBuild.setLogPath(pipelineFileService.createLogFile(pipelineBuild.getId(), stageBuild.getId()));
+            try {
+                stageBuild.setLogPath(pipelineFileService.createLogFile(pipelineBuild.getId(), stageBuild.getId()));
+            } catch (IOException e) {
+                pipelineFileService.removeLogFiles(pipelineBuild);
+            }
         }
-
-        //TODO: rollback created files if error occurs
     }
 
     // TODO: abstract this logic

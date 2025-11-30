@@ -21,6 +21,8 @@ import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.entity.Stage;
+import com.autobuild.pipeline.executor.entity.PipelineBuild;
+import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.utility.file.extension.Extensions;
 
@@ -176,6 +178,24 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
         }
 
         return createStageLogFile(buildLogsDirectoryPath, stageBuildId.toString());
+    }
+
+    @Override
+    public void removeLogFiles(final PipelineBuild pipelineBuid) throws IOException {
+        for (StageBuild stageBuild : pipelineBuid.getStageBuilds()) {
+            Files.deleteIfExists(Path.of(stageBuild.getLogPath()));
+        }
+
+        Files.deleteIfExists(DEFAULT_SCRIPT_LOG_PATH.resolve(pipelineBuid.getId().toString()));
+    }
+
+    @Override
+    public String readStageBuildLogFile(StageBuild stageBuild) throws IOException {
+        if (stageBuild == null || StringUtils.isBlank(stageBuild.getLogPath())) {
+            throw new IllegalArgumentException("Invalid stageBuild given for log reading");
+        }
+
+        return String.join("\n", Files.readAllLines(Path.of(stageBuild.getLogPath())));
     }
 
     private String createStageLogFile(Path buildLogsDirectoryPath, String stageBuildId) throws IOException {
