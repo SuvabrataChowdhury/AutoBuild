@@ -4,7 +4,6 @@ import { getBuildData } from "../../services/pipelines.api";
 import PipelineHeader from "../../components/pipelines/pipelineHeader";
 import PipelineDescription from "../../components/pipelines/pipelineDescription";
 import BuildStageList from "../../components/builds/buildsStageList";
-import StageDetails from "../../components/pipelines/stageDetails";
 import BuildStageDetails from "../../components/builds/buildsStageDetails";
 
 function BuildsPage() {

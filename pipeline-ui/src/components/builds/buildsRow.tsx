@@ -1,6 +1,6 @@
 import { TableCell, TableRow } from "../ui/table";
 import { CheckCircle, XCircle } from "lucide-react";
-import type { Build, Pipeline } from "../../types/pipeline.types";
+import type { Build } from "../../types/pipeline.types";
 
 export function BuildsRow({ build }: { build: Build }) {
   const success = build.status === "success";
