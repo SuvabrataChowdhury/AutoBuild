@@ -79,7 +79,7 @@ export default function PipelineDetailPage() {
   }
 
   function handleStartBuild() {
-    alert("Start Build - Feature coming soon!");
+    window.location.href = `/builds/start/${(pipeline as Pipeline).id}`;
   }
 
   // Helper: update a stage inside editablePipeline
