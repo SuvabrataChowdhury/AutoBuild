@@ -25,7 +25,7 @@ function LandingPage() {
           variant="tile"
           size="lg"
           className="w-64 h-40 flex flex-col items-center justify-center gap-3"
-          onClick={() => console.log("Builds clicked")}
+          onClick={() => (window.location.href = "/builds")}
         >
           <Settings className="w-10 h-10 text-green-500" />
           <span className="text-xl font-semibold">Builds</span>
