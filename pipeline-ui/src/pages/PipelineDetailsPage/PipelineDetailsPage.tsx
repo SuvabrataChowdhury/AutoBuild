@@ -20,6 +20,7 @@ import {
 } from "../../services/pipelines.api";
 
 import { Pencil, Play, Trash } from "lucide-react";
+import NavBar from "../../components/common/navBar";
 
 export default function PipelineDetailPage() {
   const { id } = useParams();
@@ -235,100 +236,103 @@ export default function PipelineDetailPage() {
   const activePipeline = isEditing ? editablePipeline! : pipeline;
 
   return (
-    <div className="p-20 min-h-screen">
-      {/* --- HEADER AREA (Name + Action Buttons) --- */}
-      <div className="w-full flex items-center justify-between">
-        {/* Pipeline Name — text or input */}
-        {isEditing ? (
-          <input
-            className="text-3xl font-bold border px-3 py-2 rounded-lg w-1/2"
-            value={editablePipeline?.name ?? ""}
-            onChange={(e) =>
-              setEditablePipeline((prev) =>
-                prev ? { ...prev, name: e.target.value } : prev
-              )
-            }
-          />
-        ) : (
-          <PipelineHeader name={pipeline.name} />
-        )}
+    <>
+      <NavBar></NavBar>
+      <div className="p-20 min-h-screen">
+        {/* --- HEADER AREA (Name + Action Buttons) --- */}
+        <div className="w-full flex items-center justify-between">
+          {/* Pipeline Name — text or input */}
+          {isEditing ? (
+            <input
+              className="text-3xl font-bold border px-3 py-2 rounded-lg w-1/2"
+              value={editablePipeline?.name ?? ""}
+              onChange={(e) =>
+                setEditablePipeline((prev) =>
+                  prev ? { ...prev, name: e.target.value } : prev
+                )
+              }
+            />
+          ) : (
+            <PipelineHeader name={pipeline.name} />
+          )}
 
-        {/* ACTION BUTTONS */}
-        <div className="flex items-center gap-4">
-          {!isEditing ? (
-            <>
-              {/* Delete button */}
-              <div className="relative group inline-block">
-                <button
-                  onClick={isDeleteVisible ? handleDelete : undefined}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all shadow-sm
+          {/* ACTION BUTTONS */}
+          <div className="flex items-center gap-4">
+            {!isEditing ? (
+              <>
+                {/* Delete button */}
+                <div className="relative group inline-block">
+                  <button
+                    onClick={isDeleteVisible ? handleDelete : undefined}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all shadow-sm
       ${
         isDeleteVisible
           ? "bg-red-400 text-white hover:bg-red-500 cursor-pointer"
           : "bg-gray-300 text-gray-500 cursor-not-allowed"
       }`}
-                >
-                  <Trash size={18} />
-                  Delete
-                </button>
+                  >
+                    <Trash size={18} />
+                    Delete
+                  </button>
 
-                {/* Tooltip */}
-                {!isDeleteVisible && (
-                  <div
-                    className="absolute left-1/2 -translate-x-1/2 mt-2 w-max px-3 py-1 
+                  {/* Tooltip */}
+                  {!isDeleteVisible && (
+                    <div
+                      className="absolute left-1/2 -translate-x-1/2 mt-2 w-max px-3 py-1 
       rounded-md bg-black text-white text-xs opacity-0 group-hover:opacity-100 
       transition-opacity pointer-events-none shadow-lg"
-                  >
-                    This stage cannot be deleted because it is used in a build.
-                  </div>
-                )}
-              </div>
+                    >
+                      This stage cannot be deleted because it is used in a
+                      build.
+                    </div>
+                  )}
+                </div>
 
-              {/* Edit Button */}
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 
+                {/* Edit Button */}
+                <button
+                  onClick={handleEdit}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 
                   rounded-xl hover:bg-gray-300 transition-all shadow-sm"
-              >
-                <Pencil size={18} />
-                Edit
-              </button>
+                >
+                  <Pencil size={18} />
+                  Edit
+                </button>
 
-              {/* Start Build */}
-              <button
-                onClick={handleStartBuild}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white 
+                {/* Start Build */}
+                <button
+                  onClick={handleStartBuild}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white 
                   rounded-xl hover:bg-blue-700 transition-all shadow shadow-blue-300"
-              >
-                <Play size={18} />
-                Start Build
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Save Or Create*/}
-              <button
-                onClick={handleSave}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white 
+                >
+                  <Play size={18} />
+                  Start Build
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Save Or Create*/}
+                <button
+                  onClick={handleSave}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white 
                   rounded-xl hover:bg-green-700 transition-all shadow shadow-green-300"
-              >
-                {saveOrCreate}
-              </button>
+                >
+                  {saveOrCreate}
+                </button>
 
-              {/* Cancel */}
-              <button
-                onClick={handleCancel}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 
+                {/* Cancel */}
+                <button
+                  onClick={handleCancel}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 
                   rounded-xl hover:bg-gray-400 transition-all"
-              >
-                Cancel
-              </button>
-            </>
-          )}
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* --- DESCRIPTION ---
+        {/* --- DESCRIPTION ---
       {isEditing ? (
         <textarea
           className="mt-4 w-full border px-3 py-2 rounded-lg"
@@ -344,25 +348,26 @@ export default function PipelineDetailPage() {
         <PipelineDescription text={pipeline.description} />
       )} */}
 
-      {/* --- STAGES + RIGHT PANEL --- */}
-      <div className="flex flex-row mt-10">
-        <StageList
-          stages={isEditing ? editablePipeline!.stages : pipeline.stages}
-          selectedId={selectedStageId}
-          onSelect={setSelectedStageId}
-          canEdit={isEditing}
-          onAddStage={handleAddStage}
-          onDeleteStage={handleDeleteStage}
-          onMoveStageUp={(id: number) => moveStage(id, "up")}
-          onMoveStageDown={(id: number) => moveStage(id, "down")}
-        />
+        {/* --- STAGES + RIGHT PANEL --- */}
+        <div className="flex flex-row mt-10">
+          <StageList
+            stages={isEditing ? editablePipeline!.stages : pipeline.stages}
+            selectedId={selectedStageId}
+            onSelect={setSelectedStageId}
+            canEdit={isEditing}
+            onAddStage={handleAddStage}
+            onDeleteStage={handleDeleteStage}
+            onMoveStageUp={(id: number) => moveStage(id, "up")}
+            onMoveStageDown={(id: number) => moveStage(id, "down")}
+          />
 
-        <StageDetails
-          stage={activePipeline.stages.find((s) => s.id === selectedStageId)!}
-          isEditing={isEditing}
-          onChangeStage={updateStage}
-        />
+          <StageDetails
+            stage={activePipeline.stages.find((s) => s.id === selectedStageId)!}
+            isEditing={isEditing}
+            onChangeStage={updateStage}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

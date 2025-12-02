@@ -5,6 +5,7 @@ import PipelineHeader from "../../components/pipelines/pipelineHeader";
 import BuildStageList from "../../components/builds/buildsStageList";
 import BuildStageDetails from "../../components/builds/buildsStageDetails";
 import { useParams } from "react-router-dom";
+import NavBar from "../../components/common/navBar";
 
 function BuildsPage() {
   const [pipeline, setPipeline] = useState<Pipeline | null>(null);
@@ -32,23 +33,26 @@ function BuildsPage() {
   const selectedStage = pipeline.stages.find((s) => s.id === selectedStageId);
 
   return (
-    <div className="min-h-screen p-10 ml-10">
-      {/* Header */}
-      <div className="justify-center mb-10 mt-10">
-        <PipelineHeader name={pipeline.name} />
-      </div>
+    <>
+      <NavBar></NavBar>
+      <div className="min-h-screen p-10 ml-10">
+        {/* Header */}
+        <div className="justify-center mb-10 mt-10">
+          <PipelineHeader name={pipeline.name} />
+        </div>
 
-      {/* Body */}
-      <div className="flex flex-row mt-10 gap-10">
-        {/* Stages List */}
-        <BuildStageList
-          stages={pipeline.stages}
-          selectedId={selectedStageId}
-          onSelect={setSelectedStageId}
-        />
-        {selectedStage && <BuildStageDetails stage={selectedStage} />}
+        {/* Body */}
+        <div className="flex flex-row mt-10 gap-10">
+          {/* Stages List */}
+          <BuildStageList
+            stages={pipeline.stages}
+            selectedId={selectedStageId}
+            onSelect={setSelectedStageId}
+          />
+          {selectedStage && <BuildStageDetails stage={selectedStage} />}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
