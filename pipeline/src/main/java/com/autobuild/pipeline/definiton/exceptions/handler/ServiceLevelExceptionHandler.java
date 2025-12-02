@@ -1,6 +1,7 @@
 package com.autobuild.pipeline.definiton.exceptions.handler;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponse;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,13 +49,12 @@ public class ServiceLevelExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         List<String> errorMessages = exception.getConstraintViolations()
-                                                .stream().map(
-                                                                constraintViolation -> constraintViolation
-                                                                                        .getPropertyPath() 
-                                                                                        + " " + 
-                                                                                        constraintViolation.getMessage()
-                                                            )
-                                                .toList();
+                .stream().map(
+                        constraintViolation -> constraintViolation
+                                .getPropertyPath()
+                                + " " +
+                                constraintViolation.getMessage())
+                .toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
@@ -64,13 +65,13 @@ public class ServiceLevelExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         List<String> errorMessages = exception.getBindingResult()
-                                                .getFieldErrors()
-                                                .stream()
-                                                .map(
-                                                    fieldError -> fieldError.getField() 
-                                                                    + ": " 
-                                                                    + fieldError.getDefaultMessage()
-                                                ).toList();
+                .getFieldErrors()
+                .stream()
+                .map(
+                        fieldError -> fieldError.getField()
+                                + ": "
+                                + fieldError.getDefaultMessage())
+                .toList();
 
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, errorMessages.toString())
                 .property("errorCategory", "Client Error").build();
@@ -81,5 +82,14 @@ public class ServiceLevelExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         return ErrorResponse.builder(exception, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage()).build();
+    }
+
+    @ExceptionHandler(InvalidFormatException.class)
+    public ErrorResponse handleInvalidFormatException(InvalidFormatException exception) {
+        log.error(exception.getMessage(), exception);
+
+        return ErrorResponse
+                .builder(exception, HttpStatus.BAD_REQUEST, Arrays.asList(exception.getMessage().split(":")).get(1))
+                .build();
     }
 }

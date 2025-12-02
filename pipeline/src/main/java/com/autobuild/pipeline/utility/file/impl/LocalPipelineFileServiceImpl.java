@@ -21,6 +21,8 @@ import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
 import com.autobuild.pipeline.definiton.entity.Pipeline;
 import com.autobuild.pipeline.definiton.entity.Stage;
+import com.autobuild.pipeline.executor.entity.PipelineBuild;
+import com.autobuild.pipeline.executor.entity.StageBuild;
 import com.autobuild.pipeline.utility.file.PipelineFileService;
 import com.autobuild.pipeline.utility.file.extension.Extensions;
 
@@ -34,14 +36,23 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
  * @author Suvabrata Chowdhury
  */
 
+// TODO: Refactor it. for now its an ugly design
 @Component
 public class LocalPipelineFileServiceImpl implements PipelineFileService {
     private static final Path DEFAULT_SCRIPT_PATH = Path.of("..", "pipeline_scripts");
+    private static final Path DEFAULT_SCRIPT_LOG_PATH = Path.of("..", "pipeline_build_logs");
+
     private static final FileAttribute<Set<PosixFilePermission>> PERMISSIONS = PosixFilePermissions.asFileAttribute(
             Set.of(
                     PosixFilePermission.OWNER_EXECUTE,
                     PosixFilePermission.OWNER_WRITE,
                     PosixFilePermission.OWNER_READ));
+
+    private static final FileAttribute<Set<PosixFilePermission>> LOG_FILE_PERMISSIONS = PosixFilePermissions
+            .asFileAttribute(Set.of(
+                            // PosixFilePermission.OWNER_EXECUTE,
+                            PosixFilePermission.OWNER_WRITE,
+                            PosixFilePermission.OWNER_READ));
 
     @Override
     public Map<UUID, String> readScriptFiles(final Pipeline pipeline) throws IOException {
@@ -53,9 +64,8 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
                             stage -> {
                                 try {
                                     String content = StringUtils.join(
-                                                        Files.readAllLines(Path.of(stage.getPath())),
-                                                         "\n"
-                                                    );
+                                            Files.readAllLines(Path.of(stage.getPath())),
+                                            "\n");
                                     scriptContents.put(stage.getId(), content);
                                 } catch (IOException e) {
                                     throw new UncheckedIOException(e);
@@ -129,12 +139,12 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
     @Override
     public String createStageScriptFile(Pipeline pipeline, StageDTO stage) throws IOException {
         createParentDirectory();
-        
+
         Path pipelineDirectoryPath = getPipelineDirectoryPath(pipeline.getId().toString());
         if (!Files.exists(pipelineDirectoryPath)) {
             Files.createDirectories(pipelineDirectoryPath, PERMISSIONS);
         }
-        
+
         return createStageFile(pipelineDirectoryPath, stage);
     }
 
@@ -155,6 +165,54 @@ public class LocalPipelineFileServiceImpl implements PipelineFileService {
             return "";
         }
         return String.join("\n", Files.readAllLines(Path.of(stage.getPath())));
+    }
+
+    @Override
+    public String createLogFile(UUID pipelineBuildId, UUID stageBuildId) throws IOException {
+        createLogsParentDirectory();
+
+        Path buildLogsDirectoryPath = getBuildLogsDirectoryPath(pipelineBuildId.toString());
+        if (!Files.exists(buildLogsDirectoryPath)) {
+            Files.createDirectories(buildLogsDirectoryPath, PERMISSIONS);
+        }
+
+        return createStageLogFile(buildLogsDirectoryPath, stageBuildId.toString());
+    }
+
+    @Override
+    public void removeLogFiles(final PipelineBuild pipelineBuid) throws IOException {
+        for (StageBuild stageBuild : pipelineBuid.getStageBuilds()) {
+            Files.deleteIfExists(Path.of(stageBuild.getLogPath()));
+        }
+
+        Files.deleteIfExists(DEFAULT_SCRIPT_LOG_PATH.resolve(pipelineBuid.getId().toString()));
+    }
+
+    @Override
+    public String readStageBuildLogFile(StageBuild stageBuild) throws IOException {
+        if (stageBuild == null || StringUtils.isBlank(stageBuild.getLogPath())) {
+            throw new IllegalArgumentException("Invalid stageBuild given for log reading");
+        }
+
+        return String.join("\n", Files.readAllLines(Path.of(stageBuild.getLogPath())));
+    }
+
+    private String createStageLogFile(Path buildLogsDirectoryPath, String stageBuildId) throws IOException {
+        String logFileName = stageBuildId + Extensions.nameFor("log");
+        Path logFilePath = buildLogsDirectoryPath.resolve(logFileName);
+
+        Files.createFile(logFilePath, LOG_FILE_PERMISSIONS);
+        return logFilePath.toString();
+    }
+
+    private Path getBuildLogsDirectoryPath(String pipelineBuildId) {
+        return DEFAULT_SCRIPT_LOG_PATH.resolve(pipelineBuildId);
+    }
+
+    private void createLogsParentDirectory() throws IOException {
+        if (!Files.exists(DEFAULT_SCRIPT_LOG_PATH)) {
+            Files.createDirectories(DEFAULT_SCRIPT_LOG_PATH, PERMISSIONS);
+        }
     }
 
     private void createParentDirectory() throws IOException {
