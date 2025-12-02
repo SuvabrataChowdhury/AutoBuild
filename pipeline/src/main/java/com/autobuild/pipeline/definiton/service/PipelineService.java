@@ -25,6 +25,7 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+
 /**
  * Service for pipeline CRUD operations.
  * 
@@ -66,7 +67,7 @@ public class PipelineService {
             throws IOException, DuplicateEntryException, InvalidIdException {
         if (repository.existsByName(pipelineDto.getName())) {
             throw new DuplicateEntryException(
-                "Pipeline with name '" + pipelineDto.getName() + "' already exists");
+                    "Pipeline with name '" + pipelineDto.getName() + "' already exists");
         }
 
         for (StageDTO stage : pipelineDto.getStages()) {
@@ -114,7 +115,7 @@ public class PipelineService {
             if (!patchRequest.getName().equals(pipeline.getName())
                     && repository.existsByName(patchRequest.getName())) {
                 throw new DuplicateEntryException(
-                    "Pipeline with name '" + patchRequest.getName() + "' already exists");
+                        "Pipeline with name '" + patchRequest.getName() + "' already exists");
             }
             pipeline.setName(patchRequest.getName());
         }
@@ -141,8 +142,9 @@ public class PipelineService {
     private void validateModifyRequest(PipelineDTO request) throws InvalidIdException {
         boolean hasName = request.getName() != null && !request.getName().isBlank();
         boolean hasStages = request.getStages() != null && !request.getStages().isEmpty();
+
         if (!hasName && !hasStages) {
-            throw new InvalidIdException("Request must contain either name or stages");
+            throw new InvalidIdException("At least name or stages must be provided");
         }
     }
 
@@ -252,8 +254,7 @@ public class PipelineService {
     }
 
     private Pipeline getPipelineFromId(final String pipelineId) {
-        Optional<Pipeline> optionalPipeline =
-                repository.findById(UUID.fromString(pipelineId));
+        Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
         if (!optionalPipeline.isPresent()) {
             throw new EntityNotFoundException(
                     "Pipeline with id " + pipelineId + " not found");
@@ -268,6 +269,57 @@ public class PipelineService {
             fileService.removeScriptFiles(pipeline);
             throw e;
         }
+    }
+
+    public PipelineDTO replacePipeline(String pipelineId, PipelineDTO putRequest)
+            throws InvalidIdException, IOException, DuplicateEntryException {
+
+        validatePipelineId(pipelineId);
+
+        // Modified validation - allow empty stages for PUT
+        boolean hasName = putRequest.getName() != null && !putRequest.getName().isBlank();
+        boolean hasStages = putRequest.getStages() != null; // Just check not null, allow empty
+
+        if (!hasName && putRequest.getStages() == null) {
+            throw new InvalidIdException("At least name or stages must be provided");
+        }
+
+        Pipeline pipeline = getPipelineFromId(pipelineId);
+
+        if (hasName) {
+            if (!putRequest.getName().equals(pipeline.getName())
+                    && repository.existsByName(putRequest.getName())) {
+                throw new DuplicateEntryException(
+                        "Pipeline with name '" + putRequest.getName() + "' already exists");
+            }
+            pipeline.setName(putRequest.getName());
+        }
+
+        if (hasStages) {
+            // Delete all existing stages and their files
+            for (Stage existingStage : pipeline.getStages()) {
+                fileService.removeStageScriptFile(existingStage);
+            }
+            pipeline.getStages().clear();
+
+            // Create new stages from request (if any)
+            for (StageDTO stageDTO : putRequest.getStages()) {
+                validateScriptType(stageDTO.getScriptType());
+                stageDTO.setId(UUID.randomUUID());
+                String path = fileService.createStageScriptFile(pipeline, stageDTO);
+                Stage newStage = stageMapper.dtoToEntity(stageDTO);
+                newStage.setPath(path);
+                pipeline.getStages().add(newStage);
+            }
+        }
+
+        repository.save(pipeline);
+
+        Map<UUID, String> finalScripts = fileService.readScriptFiles(pipeline);
+        PipelineDTO response = mapper.entityToDto(pipeline);
+        response.getStages().forEach(s -> s.setCommand(finalScripts.get(s.getId())));
+        log.info("Pipeline with id {} successfully replaced", pipelineId);
+        return response;
     }
 
     private void deletePipeline(Pipeline pipeline) throws IOException {
