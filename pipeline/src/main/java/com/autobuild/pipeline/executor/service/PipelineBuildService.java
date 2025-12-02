@@ -160,7 +160,7 @@ public class PipelineBuildService implements PipelineExecutionObserver {
         PipelineBuild pipelineBuild = optionalPipelineBuild.get();
         if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.RUNNING)
                 || pipelineBuild.getCurrentState().equals(PipelineExecutionState.WAITING)) {
-            throw new IllegalStateException("Can not delete build as it's not finished");
+            throw new IllegalStateException("Running or Waiting Pipelines can not be deleted");
         }
 
         pipelineFileService.removeLogFiles(pipelineBuild);

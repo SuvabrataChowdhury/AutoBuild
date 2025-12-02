@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,5 +85,13 @@ public class PipelineBuildControllerTest {
         doThrow(new UnsupportedOperationException("Dummy exception")).when(service).addSubscriber(any(SseEmitter.class), any(UUID.class));
 
         assertThrows(UnsupportedOperationException.class, () -> controller.getLivePipelineBuild(UUID.randomUUID()));
+    }
+
+    @Test
+    public void deletePipelineBuild() throws IOException {
+        UUID pipelineBuildId = UUID.randomUUID();
+
+        controller.deletePipelineBuild(pipelineBuildId);
+        verify(service, times(1)).deletePipelineBuild(pipelineBuildId);
     }
 }
