@@ -1,85 +1,163 @@
 package com.autobuild.pipeline.auth.controller;
 
+import com.autobuild.pipeline.auth.dto.AuthResponse;
 import com.autobuild.pipeline.auth.dto.LoginRequest;
 import com.autobuild.pipeline.auth.dto.RegisterRequest;
-import com.autobuild.pipeline.auth.dto.AuthResponse;
-import com.autobuild.pipeline.auth.entity.User;
-import com.autobuild.pipeline.auth.repository.UserRepository;
+import com.autobuild.pipeline.auth.dto.UserResponse;
 import com.autobuild.pipeline.auth.service.AuthService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+/**
+ * Test class for AuthController.
+ * Uses @WebMvcTest for lightweight controller testing with mocked dependencies.
+ * Includes a minimal security configuration for testing.
+ * 
+ * @author Baibhab Dey
+ */
+@WebMvcTest(AuthController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = {AuthController.class, AuthControllerTest.TestSecurityConfig.class})
 class AuthControllerTest {
+
+    /**
+     * Minimal security configuration for testing that permits all requests.
+     */
+    @Configuration
+    @EnableWebSecurity
+    static class TestSecurityConfig {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+            return http.build();
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
     private AuthService authService;
 
-    @MockitoBean
-    private UserRepository userRepository;
-
     @Test
-    void testRegister() throws Exception {
-        AuthResponse resp = new AuthResponse();
-        resp.setToken("jwt-token");
-        resp.setUsername("john");
+    void testRegister_Success() throws Exception {
+        // Arrange
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("john");
+        request.setEmail("john@example.com");
+        request.setPassword("password123");
 
-        when(authService.register(any(RegisterRequest.class))).thenReturn(resp);
+        AuthResponse response = new AuthResponse();
+        response.setUsername("john");
+        response.setToken("jwt-token-12345");
 
-        mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"john\",\"email\":\"john@example.com\",\"password\":\"password\"}"))
+        when(authService.register(any(RegisterRequest.class))).thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/user/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username").value("john"))
-                .andExpect(jsonPath("$.token").value("jwt-token"));
+                .andExpect(jsonPath("$.token").value("jwt-token-12345"));
     }
 
     @Test
-    void testLogin() throws Exception {
-        AuthResponse resp = new AuthResponse();
-        resp.setUsername("john");
-        resp.setToken("jwt-token");
+    void testRegister_InvalidInput() throws Exception {
+        // Arrange - Missing required fields
+        String invalidJson = "{\"username\":\"\"}";
 
-        when(authService.login(any(LoginRequest.class))).thenReturn(resp);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"john\",\"password\":\"password\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("john"))
-                .andExpect(jsonPath("$.token").value("jwt-token"));
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/user/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidJson))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    @WithMockUser(username = "john")
-    void testMe() throws Exception {
-        User user = new User();
-        user.setUsername("john");
-        user.setEmail("john@example.com");
+    void testLogin_Success() throws Exception {
+        // Arrange
+        LoginRequest request = new LoginRequest();
+        request.setUsername("john");
+        request.setPassword("password123");
 
-        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
+        AuthResponse response = new AuthResponse();
+        response.setUsername("john");
+        response.setToken("jwt-token-67890");
 
-        mockMvc.perform(get("/auth/me"))
+        when(authService.login(any(LoginRequest.class))).thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/user/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.username").value("john"))
+                .andExpect(jsonPath("$.token").value("jwt-token-67890"));
+    }
+
+    @Test
+    void testGetCurrentUser_Success() throws Exception {
+        // Arrange
+        UserResponse userResponse = new UserResponse("john", "john@example.com");
+        when(authService.getCurrentUser(eq("john"))).thenReturn(userResponse);
+
+        // Create a mock Authentication object
+        Authentication mockAuth = mock(Authentication.class);
+        when(mockAuth.getName()).thenReturn("john");
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/user/auth/currentuser")
+                .principal(mockAuth))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username").value("john"))
                 .andExpect(jsonPath("$.email").value("john@example.com"));
+    }
+
+    @Test
+    void testGetCurrentUser_DifferentUser() throws Exception {
+        // Arrange
+        UserResponse userResponse = new UserResponse("jane", "jane@example.com");
+        when(authService.getCurrentUser(eq("jane"))).thenReturn(userResponse);
+
+        // Create a mock Authentication object
+        Authentication mockAuth = mock(Authentication.class);
+        when(mockAuth.getName()).thenReturn("jane");
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/user/auth/currentuser")
+                .principal(mockAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("jane"))
+                .andExpect(jsonPath("$.email").value("jane@example.com"));
     }
 }

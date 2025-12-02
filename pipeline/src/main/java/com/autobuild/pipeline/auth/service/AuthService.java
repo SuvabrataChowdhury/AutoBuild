@@ -3,6 +3,7 @@ package com.autobuild.pipeline.auth.service;
 import com.autobuild.pipeline.auth.dto.RegisterRequest;
 import com.autobuild.pipeline.auth.dto.LoginRequest;
 import com.autobuild.pipeline.auth.dto.AuthResponse;
+import com.autobuild.pipeline.auth.dto.UserResponse;
 import com.autobuild.pipeline.auth.entity.User;
 import com.autobuild.pipeline.auth.repository.UserRepository;
 import com.autobuild.pipeline.auth.security.JwtUtils;
@@ -10,33 +11,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * Service class handling authentication logic such as user registration and login.
- * @author Baibhab Dey
  */
-
 @Service
 public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
     @Autowired
     private JwtUtils jwtUtils;
 
     public AuthResponse register(RegisterRequest req) {
         if (userRepository.existsByUsername(req.getUsername())) {
-            throw new IllegalArgumentException("Username already taken");
+            throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new IllegalArgumentException("Email already taken");
+            throw new IllegalArgumentException("Email already exists");
         }
 
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUsername(req.getUsername());
         user.setEmail(req.getEmail());
         user.setPasswordHash(passwordEncoder.encode(req.getPassword()));
+
         userRepository.save(user);
 
         String token = jwtUtils.generateToken(user.getUsername());
@@ -53,5 +58,11 @@ public class AuthService {
 
         String token = jwtUtils.generateToken(user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getEmail());
+    }
+
+    public UserResponse getCurrentUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return new UserResponse(user.getUsername(), user.getEmail());
     }
 }
