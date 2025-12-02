@@ -14,11 +14,8 @@ export default function BuildsTable({ data }: { data: Build[] }) {
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-200">
+            <TableHead className="w-[30%] font-semibold">Build ID</TableHead>
             <TableHead className="w-[20%] font-semibold">Name</TableHead>
-            <TableHead className="w-[50%] font-semibold">Description</TableHead>
-            <TableHead className="w-[15%] font-semibold">
-              Date Created
-            </TableHead>
             <TableHead className="w-[15%] font-semibold">Status</TableHead>
           </TableRow>
         </TableHeader>

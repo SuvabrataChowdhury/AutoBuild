@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.dto.mapper.PipelineBuildMapper;
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
@@ -110,7 +111,7 @@ public class PipelineBuildService implements PipelineExecutionObserver {
         }
     }
 
-    //TODO: Better implementation as this method is executed unconditionally
+    // TODO: Better implementation as this method is executed unconditionally
     @Scheduled(fixedRate = 15000)
     public void sentHeartBeat() {
         for (SseEmitter sseEmitter : subscriberEmitters) {
@@ -143,5 +144,16 @@ public class PipelineBuildService implements PipelineExecutionObserver {
         }
 
         return mapper.entityToDto(optionalPipelineBuild.get());
+    }
+
+    public List<PipelineBuildDTO> getAllBuilds() {
+        List<PipelineBuild> builds = repository.findAll();
+        log.info("Fetched all pipelines, count: {}", builds.size());
+        return builds.stream()
+                .map(pipeline -> {
+                    PipelineBuildDTO dto = mapper.entityToDto(pipeline);
+                    return dto;
+                })
+                .toList();
     }
 }

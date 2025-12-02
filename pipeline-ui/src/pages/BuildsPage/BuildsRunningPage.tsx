@@ -2,22 +2,18 @@ import { useEffect, useState } from "react";
 import type { Pipeline } from "../../types/pipeline.types";
 import { getBuildData } from "../../services/pipelines.api";
 import PipelineHeader from "../../components/pipelines/pipelineHeader";
-import PipelineDescription from "../../components/pipelines/pipelineDescription";
 import BuildStageList from "../../components/builds/buildsStageList";
 import BuildStageDetails from "../../components/builds/buildsStageDetails";
+import { useParams } from "react-router-dom";
 
 function BuildsPage() {
   const [pipeline, setPipeline] = useState<Pipeline | null>(null);
   const [selectedStageId, setSelectedStageId] = useState<number>(0);
 
-  const id = window.location.pathname.split("/").pop();
+  const { id } = useParams();
 
   useEffect(() => {
     async function fetchData() {
-      if (!id || isNaN(Number(id))) return;
-
-      //TODO fetch build data instead of pipeline data
-      // For now, we use getBuildData which is same as getPipeline in api file to mock response
       const data = await getBuildData(Number(id));
       setPipeline(data);
 
@@ -40,7 +36,6 @@ function BuildsPage() {
       {/* Header */}
       <div className="justify-center mb-10 mt-10">
         <PipelineHeader name={pipeline.name} />
-        <PipelineDescription text={pipeline.description} />
       </div>
 
       {/* Body */}

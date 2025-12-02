@@ -11,9 +11,15 @@ import type {
   Stage,
   StageAPIModel,
 } from "../../types/pipeline.types";
-import { getPipeline, savePipeline } from "../../services/pipelines.api";
+import {
+  deletePipeline,
+  executeBuild,
+  getBuildsList,
+  getPipeline,
+  savePipeline,
+} from "../../services/pipelines.api";
 
-import { Pencil, Play } from "lucide-react";
+import { Pencil, Play, Trash } from "lucide-react";
 
 export default function PipelineDetailPage() {
   const { id } = useParams();
@@ -35,6 +41,7 @@ export default function PipelineDetailPage() {
   const [editablePipeline, setEditablePipeline] = useState<Pipeline | null>(
     null
   );
+  const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   // Load pipeline on mount / when ID changes
   useEffect(() => {
@@ -55,6 +62,8 @@ export default function PipelineDetailPage() {
       const data = await getPipeline(id as unknown as number);
       setPipeline(data);
 
+      setIsDeleteVisible(await checkDelete(id as unknown as number));
+
       // Auto-select first stage on load
       if (data.stages.length > 0) {
         setSelectedStageId(data.stages[0].id);
@@ -63,6 +72,19 @@ export default function PipelineDetailPage() {
 
     fetchData();
   }, [id]);
+
+  async function checkDelete(id: number) {
+    const response = await getBuildsList();
+    let flag = true;
+    //checking if pipeline id exists in the builds list
+    response.forEach((build) => {
+      if (build.pipelineId === id) {
+        flag = false;
+      }
+    });
+
+    return flag;
+  }
 
   // While loading
   if (!pipeline) return <div>Loading...</div>;
@@ -76,6 +98,14 @@ export default function PipelineDetailPage() {
     setEditablePipeline(JSON.parse(JSON.stringify(pipeline)));
     setIsEditing(true);
     console.log("Editing pipeline:", pipeline);
+  }
+
+  async function handleDelete() {
+    const response = await deletePipeline(id as unknown as number);
+    if (response) {
+      console.log("Pipeline deleted");
+      window.location.href = "/pipelines";
+    }
   }
 
   function removeOrderFromStages(stages: Stage[]): StageAPIModel[] {
@@ -119,8 +149,9 @@ export default function PipelineDetailPage() {
     setIsEditing(false);
   }
 
-  function handleStartBuild() {
-    window.location.href = `/builds/start/${(pipeline as Pipeline).id}`;
+  async function handleStartBuild() {
+    const data = await executeBuild(id as unknown as number);
+    window.location.href = `/builds/${data.id}`;
   }
 
   // Helper: update a stage inside editablePipeline
@@ -226,6 +257,33 @@ export default function PipelineDetailPage() {
         <div className="flex items-center gap-4">
           {!isEditing ? (
             <>
+              {/* Delete button */}
+              <div className="relative group inline-block">
+                <button
+                  onClick={isDeleteVisible ? handleDelete : undefined}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all shadow-sm
+      ${
+        isDeleteVisible
+          ? "bg-red-400 text-white hover:bg-red-500 cursor-pointer"
+          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+      }`}
+                >
+                  <Trash size={18} />
+                  Delete
+                </button>
+
+                {/* Tooltip */}
+                {!isDeleteVisible && (
+                  <div
+                    className="absolute left-1/2 -translate-x-1/2 mt-2 w-max px-3 py-1 
+      rounded-md bg-black text-white text-xs opacity-0 group-hover:opacity-100 
+      transition-opacity pointer-events-none shadow-lg"
+                  >
+                    This stage cannot be deleted because it is used in a build.
+                  </div>
+                )}
+              </div>
+
               {/* Edit Button */}
               <button
                 onClick={handleEdit}

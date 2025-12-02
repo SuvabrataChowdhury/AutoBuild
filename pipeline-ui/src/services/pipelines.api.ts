@@ -40,15 +40,47 @@ export async function updatePipeline(id: number, pipeline: PipelineAPIModel): Pr
     return {} as Pipeline;
 }
 
+export async function deletePipeline(id: number) : Promise<Boolean> {
+    try {
+        await axios.delete(`${API_BASE_URL}/pipeline/${id}`)
+        return true
+    }
+    catch(error) {
+        console.error("Error while deleting Pipeline", error)
+        throw error;
+    }
+}
+
 //build will be a different entity in future with logs, status, etc.
 export async function getBuildData(pipelineId: number): Promise<Pipeline> {
     return getPipeline(pipelineId);
 }
 
+export async function executeBuild(pipelineId: number): Promise<Build> {
+    try {
+        const req = {
+            pipelineId: pipelineId
+        }
+        const response = await axios.post(`${API_BASE_URL}/execute/pipeline`, req)
+        return response.data as Build;
+    } catch(error) {
+        console.error("Error executing Build:", error)
+        throw error;
+    }
+}
+
 // On Changing the getting builds iomplementation here, we will change the build type to incorporate the chages
 export async function getBuildsList(): Promise<Build[]> {
-    return null as any;
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pipeline/build`)
+        return response.data as Build[];
+    } catch (error) {
+        console.error("Error fetching pipeline:", error)
+        throw error;
+    }
 }
+
+
 
 //TODO : on start build, send an execute call to backend
 
