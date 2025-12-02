@@ -25,6 +25,7 @@ import com.autobuild.pipeline.utility.file.extension.Extensions;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+
 /**
  * Service for pipeline CRUD operations.
  * 
@@ -62,11 +63,22 @@ public class PipelineService {
         }
     }
 
+    public List<PipelineDTO> getAllPipelines() {
+        List<Pipeline> pipelines = repository.findAll();
+        log.info("Fetched all pipelines, count: {}", pipelines.size());
+        return pipelines.stream()
+                .map(pipeline -> {
+                    PipelineDTO dto = mapper.entityToDto(pipeline); // converting each fetched pipeline into PiplineDTO
+                    return dto;
+                })
+                .toList();
+    }
+
     public PipelineDTO createPipeline(final PipelineDTO pipelineDto)
             throws IOException, DuplicateEntryException, InvalidIdException {
         if (repository.existsByName(pipelineDto.getName())) {
             throw new DuplicateEntryException(
-                "Pipeline with name '" + pipelineDto.getName() + "' already exists");
+                    "Pipeline with name '" + pipelineDto.getName() + "' already exists");
         }
 
         for (StageDTO stage : pipelineDto.getStages()) {
@@ -114,7 +126,7 @@ public class PipelineService {
             if (!patchRequest.getName().equals(pipeline.getName())
                     && repository.existsByName(patchRequest.getName())) {
                 throw new DuplicateEntryException(
-                    "Pipeline with name '" + patchRequest.getName() + "' already exists");
+                        "Pipeline with name '" + patchRequest.getName() + "' already exists");
             }
             pipeline.setName(patchRequest.getName());
         }
@@ -252,8 +264,7 @@ public class PipelineService {
     }
 
     private Pipeline getPipelineFromId(final String pipelineId) {
-        Optional<Pipeline> optionalPipeline =
-                repository.findById(UUID.fromString(pipelineId));
+        Optional<Pipeline> optionalPipeline = repository.findById(UUID.fromString(pipelineId));
         if (!optionalPipeline.isPresent()) {
             throw new EntityNotFoundException(
                     "Pipeline with id " + pipelineId + " not found");

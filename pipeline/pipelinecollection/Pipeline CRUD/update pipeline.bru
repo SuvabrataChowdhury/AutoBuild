@@ -4,14 +4,31 @@ meta {
   seq: 1
 }
 
-patch {
-  url: {{host}}/{{prefix}}/pipeline/059569af-5bc3-4d69-bbd4-3e5b53669f00
+put {
+  url: {{host}}/{{prefix}}/pipeline/1751ce83-8bdb-44b5-9261-ef2920e3776e
   body: json
   auth: none
 }
 
 body:json {
   {
-      "name": "Original Pipeline"
+      "stages": [
+        {
+          "id": "a8d2a42f-a86c-46e2-8ef1-dfa4f4e0f0e7",
+          "name": "init"
+        },
+        {
+          "id": "84958693-7fbc-49f1-9776-face17eb321a",
+          "name": "init2"
+        },
+        {
+          "id": "6bd8089d-95f2-455c-be5f-22cf476f7b52",
+          "name": "init3"
+        },
+        {
+          "id": "cefac691-4cd2-47b5-baf9-0dd9ceb783f4",
+          "name": "init4"
+        }
+      ]
     }
 }

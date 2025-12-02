@@ -5,18 +5,26 @@ export type PipelineStatus = "success" | "failed" | "running" | "queued"
 export interface Pipeline {
   id: number
   name: string
-  description: string
-  dateCreated?: string
-  status?: PipelineStatus
   stages: Stage[]
 }
 
 export interface Stage {
   id: number;
   name: string;
-  description: string;
-  commands: string;
-  order: number;
+  scriptType: string
+  command: string;
+  order : number;
+}
+
+export interface StageAPIModel {
+  name: string;
+  scriptType: string
+  command: string;
+}
+
+export interface PipelineAPIModel {
+  name: string
+  stages: StageAPIModel[]
 }
 
 export interface Build {

@@ -23,6 +23,10 @@ export default function PipelinePage() {
     fetchData();
   }, []);
 
+  function onCreate(): void {
+    window.location.href = "/pipelines/0";
+  }
+
   return (
     <div className="main-container min-h-screen justify-center display-flex">
       <div className="container p-20 text-center">
@@ -31,7 +35,11 @@ export default function PipelinePage() {
         <div className="flex justify-between items-center mt-10">
           <SearchBar value={search} onChange={setSearch} />
 
-          <Button variant="outline" className="rounded-full px-6">
+          <Button
+            variant="outline"
+            className="rounded-full px-6"
+            onClick={onCreate}
+          >
             Create
           </Button>
         </div>

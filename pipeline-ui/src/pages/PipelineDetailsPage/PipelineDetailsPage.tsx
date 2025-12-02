@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import PipelineHeader from "../../components/pipelines/pipelineHeader";
-import PipelineDescription from "../../components/pipelines/pipelineDescription";
 import StageList from "../../components/pipelines/stageList";
 import StageDetails from "../../components/pipelines/stageDetails";
 
-import type { Pipeline, Stage } from "../../types/pipeline.types";
-import { getPipeline } from "../../services/pipelines.api";
+import type {
+  Pipeline,
+  PipelineAPIModel,
+  Stage,
+  StageAPIModel,
+} from "../../types/pipeline.types";
+import { getPipeline, savePipeline } from "../../services/pipelines.api";
 
 import { Pencil, Play } from "lucide-react";
 
@@ -23,6 +27,10 @@ export default function PipelineDetailPage() {
   // Whether the user is editing or just viewing
   const [isEditing, setIsEditing] = useState(false);
 
+  //Create flow
+  const [isCreateMode, setIsCreateMode] = useState(false);
+  const saveOrCreate = isCreateMode ? "Create" : "Save";
+
   // Editable clone (we do not modify the real pipeline until Save)
   const [editablePipeline, setEditablePipeline] = useState<Pipeline | null>(
     null
@@ -31,9 +39,20 @@ export default function PipelineDetailPage() {
   // Load pipeline on mount / when ID changes
   useEffect(() => {
     async function fetchData() {
-      if (!id || isNaN(Number(id))) return;
-
-      const data = await getPipeline(Number(id));
+      if (id === "0") {
+        // New pipeline template
+        const newPipeline: Pipeline = {
+          id: 0,
+          name: "New Pipeline",
+          stages: [],
+        };
+        setEditablePipeline(newPipeline);
+        setIsEditing(true);
+        setPipeline(newPipeline);
+        setIsCreateMode(true);
+        return;
+      }
+      const data = await getPipeline(id as unknown as number);
       setPipeline(data);
 
       // Auto-select first stage on load
@@ -59,8 +78,27 @@ export default function PipelineDetailPage() {
     console.log("Editing pipeline:", pipeline);
   }
 
+  function removeOrderFromStages(stages: Stage[]): StageAPIModel[] {
+    return stages.map((stage) => ({
+      name: stage.name,
+      scriptType: stage.scriptType,
+      command: stage.command,
+    }));
+  }
+
   // Save changes and exit edit mode
   async function handleSave() {
+    if (isCreateMode) {
+      setIsCreateMode(false);
+      const pipelineToSave = {
+        name: editablePipeline!.name,
+        stages: removeOrderFromStages(editablePipeline!.stages),
+      } as unknown as PipelineAPIModel;
+      const data = await savePipeline(pipelineToSave as PipelineAPIModel);
+      window.location.href = `/pipelines/${data.id}`;
+      return;
+    }
+
     if (!editablePipeline) return;
 
     // TODO: API PUT call (updatePipeline)
@@ -74,6 +112,9 @@ export default function PipelineDetailPage() {
 
   // Cancel editing -> discard clone
   function handleCancel() {
+    if (isCreateMode) {
+      window.location.href = "/pipelines";
+    }
     setEditablePipeline(null);
     setIsEditing(false);
   }
@@ -99,26 +140,64 @@ export default function PipelineDetailPage() {
   function handleAddStage() {
     if (!editablePipeline) return;
 
-    // Create new stage with default values
+    const nextId =
+      editablePipeline.stages.length === 0
+        ? 1
+        : Math.max(...editablePipeline.stages.map((s) => s.id)) + 1;
+
     const newStage: Stage = {
-      id: Math.max(0, ...editablePipeline.stages.map((s) => s.id)) + 1, // next ID
+      id: nextId,
       name: "New Stage",
-      description: "",
-      commands: "",
+      scriptType: "bash",
+      command: "",
       order: editablePipeline.stages.length + 1,
     };
 
-    // Add to editable pipeline
-    setEditablePipeline((prev) => {
-      if (!prev) return prev;
+    setEditablePipeline((prev) => ({
+      ...prev!,
+      stages: [...prev!.stages, newStage],
+    }));
 
-      return {
-        ...prev,
-        stages: [...prev.stages, newStage],
-      };
-    });
-    // Select the new stage
-    setSelectedStageId(newStage.id);
+    setSelectedStageId(nextId);
+  }
+
+  function handleDeleteStage(stageId: number) {
+    if (!editablePipeline) return;
+
+    let stages = editablePipeline.stages
+      .filter((s) => s.id !== stageId)
+      .map((s, i) => ({ ...s, order: i + 1 }));
+
+    setEditablePipeline((prev) => ({ ...prev!, stages }));
+
+    // ensure valid selection
+    if (stages.length === 0) {
+      setSelectedStageId(0);
+    } else if (!stages.some((s) => s.id === selectedStageId)) {
+      setSelectedStageId(stages[0].id);
+    }
+  }
+
+  function moveStage(stageId: number, direction: "up" | "down") {
+    if (!editablePipeline) return;
+
+    const stages = [...editablePipeline.stages].sort(
+      (a, b) => a.order - b.order
+    );
+    const index = stages.findIndex((s) => s.id === stageId);
+
+    if (direction === "up" && index > 0) {
+      [stages[index - 1], stages[index]] = [stages[index], stages[index - 1]];
+    }
+    if (direction === "down" && index < stages.length - 1) {
+      [stages[index], stages[index + 1]] = [stages[index + 1], stages[index]];
+    }
+
+    const reordered = stages.map((s, i) => ({ ...s, order: i + 1 }));
+
+    setEditablePipeline((prev) =>
+      prev ? { ...prev, stages: reordered } : prev
+    );
   }
 
   // The pipeline used for rendering (depends on edit mode)
@@ -169,13 +248,13 @@ export default function PipelineDetailPage() {
             </>
           ) : (
             <>
-              {/* Save */}
+              {/* Save Or Create*/}
               <button
                 onClick={handleSave}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white 
                   rounded-xl hover:bg-green-700 transition-all shadow shadow-green-300"
               >
-                Save
+                {saveOrCreate}
               </button>
 
               {/* Cancel */}
@@ -191,7 +270,7 @@ export default function PipelineDetailPage() {
         </div>
       </div>
 
-      {/* --- DESCRIPTION --- */}
+      {/* --- DESCRIPTION ---
       {isEditing ? (
         <textarea
           className="mt-4 w-full border px-3 py-2 rounded-lg"
@@ -205,7 +284,7 @@ export default function PipelineDetailPage() {
         />
       ) : (
         <PipelineDescription text={pipeline.description} />
-      )}
+      )} */}
 
       {/* --- STAGES + RIGHT PANEL --- */}
       <div className="flex flex-row mt-10">
@@ -215,6 +294,9 @@ export default function PipelineDetailPage() {
           onSelect={setSelectedStageId}
           canEdit={isEditing}
           onAddStage={handleAddStage}
+          onDeleteStage={handleDeleteStage}
+          onMoveStageUp={(id: number) => moveStage(id, "up")}
+          onMoveStageDown={(id: number) => moveStage(id, "down")}
         />
 
         <StageDetails
