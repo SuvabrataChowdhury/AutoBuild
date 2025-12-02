@@ -5,6 +5,7 @@ package com.autobuild.pipeline.definiton.dto.mapper;
  * 
  * @author Suvabrata Chowdhury
  */
+//TODO: move it to global scope of project as it's also used in executor
 public interface Mapper<T, R> {
     public R dtoToEntity(T dto);
     public T entityToDto(R entity);
