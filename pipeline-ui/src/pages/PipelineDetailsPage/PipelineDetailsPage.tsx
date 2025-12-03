@@ -152,7 +152,7 @@ export default function PipelineDetailPage() {
 
   async function handleStartBuild() {
     const data = await executeBuild(id as unknown as number);
-    window.location.href = `/builds/${data.id}`;
+    window.location.href = `/builds`;
   }
 
   // Helper: update a stage inside editablePipeline
