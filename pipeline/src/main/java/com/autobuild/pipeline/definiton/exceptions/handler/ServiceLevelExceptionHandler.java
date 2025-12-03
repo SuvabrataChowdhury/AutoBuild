@@ -92,4 +92,13 @@ public class ServiceLevelExceptionHandler {
                 .builder(exception, HttpStatus.BAD_REQUEST, Arrays.asList(exception.getMessage().split(":")).get(1))
                 .build();
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ErrorResponse illegalStateException(IllegalStateException exception) {
+        log.error(exception.getMessage(), exception);
+
+        return ErrorResponse
+                .builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .build();
+    }
 }

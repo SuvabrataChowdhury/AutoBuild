@@ -19,6 +19,7 @@ import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObser
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObserver;
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
+import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,6 +48,9 @@ public class PipelineBuildService implements PipelineExecutionObserver {
 
     @Autowired
     private PipelineBuildMapper mapper;
+
+    @Autowired
+    private PipelineFileService pipelineFileService;
 
     public void addSubscriber(SseEmitter newSubscriber, UUID pipelineBuildId) {
         Optional<PipelineBuild> optionalPipelineBuild = repository.findById(pipelineBuildId);
@@ -155,5 +159,23 @@ public class PipelineBuildService implements PipelineExecutionObserver {
                     return dto;
                 })
                 .toList();
+    }
+
+    public void deletePipelineBuild(UUID pipelineBuildId) throws IOException {
+        Optional<PipelineBuild> optionalPipelineBuild = repository.findById(pipelineBuildId);
+
+        if (optionalPipelineBuild.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "Pipeline Build with id: " + pipelineBuildId + " does not exist");
+        }
+
+        PipelineBuild pipelineBuild = optionalPipelineBuild.get();
+        if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.RUNNING)
+                || pipelineBuild.getCurrentState().equals(PipelineExecutionState.WAITING)) {
+            throw new IllegalStateException("Running or Waiting Pipelines can not be deleted");
+        }
+
+        pipelineFileService.removeLogFiles(pipelineBuild);
+        repository.deleteById(pipelineBuildId);
     }
 }
