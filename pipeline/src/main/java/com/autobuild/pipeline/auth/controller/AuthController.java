@@ -3,7 +3,7 @@ package com.autobuild.pipeline.auth.controller;
 import com.autobuild.pipeline.auth.dto.RegisterRequest;
 import com.autobuild.pipeline.auth.dto.LoginRequest;
 import com.autobuild.pipeline.auth.dto.AuthResponse;
-import com.autobuild.pipeline.auth.dto.UserResponse;
+import com.autobuild.pipeline.auth.dto.CurrentUserResponse;
 import com.autobuild.pipeline.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class AuthController {
     }
 
     @GetMapping("/currentuser")
-    public ResponseEntity<UserResponse> me(Authentication authentication) {
+    public ResponseEntity<CurrentUserResponse> me(Authentication authentication) {
         return ResponseEntity.ok(authService.getCurrentUser(authentication.getName()));
     }
 }

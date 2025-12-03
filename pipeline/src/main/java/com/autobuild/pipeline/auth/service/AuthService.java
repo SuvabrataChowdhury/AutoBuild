@@ -3,7 +3,7 @@ package com.autobuild.pipeline.auth.service;
 import com.autobuild.pipeline.auth.dto.RegisterRequest;
 import com.autobuild.pipeline.auth.dto.LoginRequest;
 import com.autobuild.pipeline.auth.dto.AuthResponse;
-import com.autobuild.pipeline.auth.dto.UserResponse;
+import com.autobuild.pipeline.auth.dto.CurrentUserResponse;
 import com.autobuild.pipeline.auth.entity.User;
 import com.autobuild.pipeline.auth.repository.UserRepository;
 import com.autobuild.pipeline.auth.security.JwtUtils;
@@ -60,9 +60,9 @@ public class AuthService {
         return new AuthResponse(token, user.getUsername(), user.getEmail());
     }
 
-    public UserResponse getCurrentUser(String username) {
+    public CurrentUserResponse getCurrentUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return new UserResponse(user.getUsername(), user.getEmail());
+        return new CurrentUserResponse(user.getUsername(), user.getEmail());
     }
 }

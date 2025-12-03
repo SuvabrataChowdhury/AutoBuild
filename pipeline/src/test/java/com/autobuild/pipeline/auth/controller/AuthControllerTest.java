@@ -3,7 +3,7 @@ package com.autobuild.pipeline.auth.controller;
 import com.autobuild.pipeline.auth.dto.AuthResponse;
 import com.autobuild.pipeline.auth.dto.LoginRequest;
 import com.autobuild.pipeline.auth.dto.RegisterRequest;
-import com.autobuild.pipeline.auth.dto.UserResponse;
+import com.autobuild.pipeline.auth.dto.CurrentUserResponse;
 import com.autobuild.pipeline.auth.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -127,7 +127,7 @@ class AuthControllerTest {
     @Test
     void testGetCurrentUser_Success() throws Exception {
         // Arrange
-        UserResponse userResponse = new UserResponse("john", "john@example.com");
+        CurrentUserResponse userResponse = new CurrentUserResponse("john", "john@example.com");
         when(authService.getCurrentUser(eq("john"))).thenReturn(userResponse);
 
         // Create a mock Authentication object
@@ -146,7 +146,7 @@ class AuthControllerTest {
     @Test
     void testGetCurrentUser_DifferentUser() throws Exception {
         // Arrange
-        UserResponse userResponse = new UserResponse("jane", "jane@example.com");
+        CurrentUserResponse userResponse = new CurrentUserResponse("jane", "jane@example.com");
         when(authService.getCurrentUser(eq("jane"))).thenReturn(userResponse);
 
         // Create a mock Authentication object

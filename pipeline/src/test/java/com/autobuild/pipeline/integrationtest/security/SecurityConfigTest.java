@@ -1,7 +1,9 @@
-package com.autobuild.pipeline.auth.security;
+package com.autobuild.pipeline.integrationtest.security;
 
 import com.autobuild.pipeline.auth.service.AuthService;
 import com.autobuild.pipeline.auth.repository.UserRepository;
+import com.autobuild.pipeline.auth.security.JwtAuthenticationFilter;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
