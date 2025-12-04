@@ -44,6 +44,19 @@ export default function PipelineDetailPage() {
   );
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
+  async function checkDelete(id: number) {
+    const response = await getBuildsList();
+    let flag = true;
+    //checking if pipeline id exists in the builds list
+    response.forEach((build) => {
+      if (build.pipelineId === id) {
+        flag = false;
+      }
+    });
+
+    return flag;
+  }
+
   // Load pipeline on mount / when ID changes
   useEffect(() => {
     async function fetchData() {
@@ -73,19 +86,6 @@ export default function PipelineDetailPage() {
 
     fetchData();
   }, [id]);
-
-  async function checkDelete(id: number) {
-    const response = await getBuildsList();
-    let flag = true;
-    //checking if pipeline id exists in the builds list
-    response.forEach((build) => {
-      if (build.pipelineId === id) {
-        flag = false;
-      }
-    });
-
-    return flag;
-  }
 
   // While loading
   if (!pipeline) return <div>Loading...</div>;
@@ -152,7 +152,7 @@ export default function PipelineDetailPage() {
 
   async function handleStartBuild() {
     const data = await executeBuild(id as unknown as number);
-    window.location.href = `/builds`;
+    window.location.href = `/builds/${data.id}`;
   }
 
   // Helper: update a stage inside editablePipeline
@@ -196,7 +196,7 @@ export default function PipelineDetailPage() {
   function handleDeleteStage(stageId: number) {
     if (!editablePipeline) return;
 
-    let stages = editablePipeline.stages
+    const stages = editablePipeline.stages
       .filter((s) => s.id !== stageId)
       .map((s, i) => ({ ...s, order: i + 1 }));
 

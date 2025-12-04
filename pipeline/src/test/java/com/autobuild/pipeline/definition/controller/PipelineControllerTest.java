@@ -63,6 +63,15 @@ public class PipelineControllerTest {
     }
 
     @Test
+    public void testGetAllPipelines() {
+        List<PipelineDTO> pipelines = List.of(pipelineDTO);
+        doReturn(pipelines).when(pipelineService).getAllPipelines();
+        ResponseEntity<List<PipelineDTO>> response = controller.getAllPipelines();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(pipelines, response.getBody());
+    }
+
+    @Test
     public void testGetPipelineWithInvalidId() throws InvalidIdException, IOException {
         doThrow(new InvalidIdException("Dummy Exception")).when(pipelineService).getPipelineById(anyString());
         assertThrows(InvalidIdException.class, () -> controller.getPipelineById("1"));
@@ -89,7 +98,7 @@ public class PipelineControllerTest {
         StageDTO newStage = new StageDTO(null, "deploy", "bash", "#!/bin/bash\necho DEPLOY");
         PipelineDTO modified = DummyData.getPipelineDTO();
         modified.setStages(new ArrayList<>(modified.getStages()));
-        StageDTO createdStage = new StageDTO(UUID.randomUUID(), newStage.getName(), 
+        StageDTO createdStage = new StageDTO(UUID.randomUUID(), newStage.getName(),
                 newStage.getScriptType(), newStage.getCommand());
         modified.getStages().add(createdStage);
 
@@ -110,7 +119,7 @@ public class PipelineControllerTest {
         PipelineDTO base = DummyData.getPipelineDTO();
         base.setStages(new ArrayList<>(base.getStages()));
         StageDTO existing = base.getStages().get(0);
-        StageDTO updateReq = new StageDTO(existing.getId(), "renamed", 
+        StageDTO updateReq = new StageDTO(existing.getId(), "renamed",
                 existing.getScriptType(), "#!/bin/bash\necho UPDATED");
 
         existing.setName("renamed");
@@ -195,7 +204,7 @@ public class PipelineControllerTest {
     @Test
     public void testModifyPipelineBadRequestNoNameOrStages() throws Exception {
         PipelineDTO request = new PipelineDTO();
-        
+
         doThrow(new InvalidIdException("Request must contain either name or stages"))
                 .when(pipelineService).modifyPipeline(eq("pid"), any(PipelineDTO.class));
 
@@ -206,12 +215,13 @@ public class PipelineControllerTest {
     public void testModifyPipelineStagesBadRequestEmpty() throws Exception {
         PipelineDTO request = new PipelineDTO();
         request.setStages(new ArrayList<>());
-        
+
         doThrow(new InvalidIdException("Request must contain either name or stages"))
                 .when(pipelineService).modifyPipeline(eq("pid"), any(PipelineDTO.class));
 
         assertThrows(InvalidIdException.class, () -> controller.modifyPipeline("pid", request));
     }
+
     @Test
     public void testCreatePipelineWithDuplicateStages() throws Exception {
         PipelineDTO dto = new PipelineDTO();

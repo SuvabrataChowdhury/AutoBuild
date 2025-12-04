@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,11 +38,11 @@ public class PipelineBuildServiceTest {
     @InjectMocks
     private PipelineBuildService pipelineBuildService;
 
-     @BeforeEach
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
     }
-    
+
     @Test
     public void deletePipelineBuildTest() throws IOException {
         UUID buildId = UUID.randomUUID();
@@ -51,9 +52,9 @@ public class PipelineBuildServiceTest {
         doReturn(Optional.of(pipelineBuild)).when(repository).findById(any(UUID.class));
 
         pipelineBuildService.deletePipelineBuild(buildId);
-        
-        verify(pipelineFileService,times(1)).removeLogFiles(eq(pipelineBuild));
-        verify(repository,times(1)).deleteById(eq(buildId));
+
+        verify(pipelineFileService, times(1)).removeLogFiles(eq(pipelineBuild));
+        verify(repository, times(1)).deleteById(eq(buildId));
 
     }
 
@@ -69,5 +70,15 @@ public class PipelineBuildServiceTest {
         pipelineBuild.setCurrentState(PipelineExecutionState.WAITING);
 
         assertThrows(IllegalStateException.class, () -> pipelineBuildService.deletePipelineBuild(buildId));
+    }
+
+    @Test
+    public void getAllBuildsTest() {
+        doReturn(List.of(DummyData.getPipelineBuild(UUID.randomUUID()),
+                DummyData.getPipelineBuild(UUID.randomUUID()))).when(repository).findAll();
+
+        pipelineBuildService.getAllBuilds();
+
+        verify(mapper, times(2)).entityToDto(any(PipelineBuild.class));
     }
 }

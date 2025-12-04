@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { useEffect, useState } from "react";
 import type { Pipeline, StageBuilds } from "../../types/pipeline.types";
 import { getBuildStagesLogs } from "../../services/pipelines.api";

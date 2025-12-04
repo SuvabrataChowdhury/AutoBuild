@@ -37,10 +37,11 @@ export async function savePipeline(pipeline: PipelineAPIModel): Promise<Pipeline
 
 export async function updatePipeline(id: number, pipeline: PipelineAPIModel): Promise<Pipeline> {
     //TODO: Implement update pipeline
-    return {} as Pipeline;
+    console.log("Updating pipeline:", id, pipeline);
+    return {id} as Pipeline;
 }
 
-export async function deletePipeline(id: number) : Promise<Boolean> {
+export async function deletePipeline(id: number) : Promise<boolean> {
     try {
         await axios.delete(`${API_BASE_URL}/pipeline/${id}`)
         return true
