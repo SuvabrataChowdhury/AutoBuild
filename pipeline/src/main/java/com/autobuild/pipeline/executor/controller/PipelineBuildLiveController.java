@@ -29,7 +29,7 @@ public class PipelineBuildLiveController {
     @Autowired
     private PipelineBuildLiveService service;
 
-    @GetMapping("/sse/subscribe/{pipelineBuildId}")
+    @GetMapping(value = "/sse/subscribe/{pipelineBuildId}", produces = "text/event-stream")
     public SseEmitter getLivePipelineBuild(@PathVariable UUID pipelineBuildId) {
         log.info("Subscription requested");
         SseEmitter emitter = new SseEmitter(600000L);
