@@ -434,24 +434,43 @@ public class PipelineServiceTest {
     @Test
     public void testReplacePipelineStagesCompletely() throws Exception {
         ensurePipelineId();
+        pipeline.setName("existing-name"); // Add this line
         pipeline.setStages(new ArrayList<>(List.of(
             createStage("build", "bash"),
             createStage("test", "bash")
         )));
         
         doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("existing-name"); // Add this line
         doReturn(pipeline).when(repository).save(any(Pipeline.class));
         doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
         doReturn("path").when(fileService).createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
         doNothing().when(fileService).removeStageScriptFile(any(Stage.class));
 
         PipelineDTO request = new PipelineDTO();
+        request.setName("existing-name"); // Add this line - PUT requires name
         request.setStages(List.of(new StageDTO(null, "deploy", "bash", "echo deploy")));
 
         PipelineDTO result = service.replacePipeline(pipeline.getId().toString(), request);
         
         assertEquals(1, result.getStages().size());
         assertEquals("deploy", result.getStages().get(0).getName());
+    }
+
+    @Test
+    public void testReplacePipelineMissingScriptType() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("test-pipeline"); // Add this line
+        pipeline.setStages(new ArrayList<>());
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("test-pipeline"); // Add this line
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("test-pipeline"); // Add this line - PUT requires name
+        request.setStages(List.of(new StageDTO(null, "stage", null, "echo test")));
+
+        assertThrows(InvalidIdException.class,
+                () -> service.replacePipeline(pipeline.getId().toString(), request));
     }
 
     @Test
@@ -492,20 +511,6 @@ public class PipelineServiceTest {
         assertThrows(DuplicateEntryException.class,
                 () -> service.replacePipeline(pipeline.getId().toString(), request));
     }
-
-    @Test
-    public void testReplacePipelineMissingScriptType() throws Exception {
-        ensurePipelineId();
-        pipeline.setStages(new ArrayList<>());
-        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
-
-        PipelineDTO request = new PipelineDTO();
-        request.setStages(List.of(new StageDTO(null, "stage", null, "echo test")));
-
-        assertThrows(InvalidIdException.class,
-                () -> service.replacePipeline(pipeline.getId().toString(), request));
-    }
-
     private Stage createStage(String name, String scriptType) {
         Stage stage = new Stage();
         stage.setId(UUID.randomUUID());

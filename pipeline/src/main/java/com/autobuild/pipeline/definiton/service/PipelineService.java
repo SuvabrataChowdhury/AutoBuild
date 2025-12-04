@@ -275,42 +275,32 @@ public class PipelineService {
             throws InvalidIdException, IOException, DuplicateEntryException {
 
         validatePipelineId(pipelineId);
-
-        // Modified validation - allow empty stages for PUT
-        boolean hasName = putRequest.getName() != null && !putRequest.getName().isBlank();
-        boolean hasStages = putRequest.getStages() != null; // Just check not null, allow empty
-
-        if (!hasName && putRequest.getStages() == null) {
-            throw new InvalidIdException("At least name or stages must be provided");
-        }
-
         Pipeline pipeline = getPipelineFromId(pipelineId);
 
-        if (hasName) {
-            if (!putRequest.getName().equals(pipeline.getName())
-                    && repository.existsByName(putRequest.getName())) {
-                throw new DuplicateEntryException(
-                        "Pipeline with name '" + putRequest.getName() + "' already exists");
-            }
-            pipeline.setName(putRequest.getName());
+        // Check for duplicate name
+        if (!putRequest.getName().equals(pipeline.getName())
+                && repository.existsByName(putRequest.getName())) {
+            throw new DuplicateEntryException(
+                    "Pipeline with name '" + putRequest.getName() + "' already exists");
         }
 
-        if (hasStages) {
-            // Delete all existing stages and their files
-            for (Stage existingStage : pipeline.getStages()) {
-                fileService.removeStageScriptFile(existingStage);
-            }
-            pipeline.getStages().clear();
+        // Replace name
+        pipeline.setName(putRequest.getName());
 
-            // Create new stages from request (if any)
-            for (StageDTO stageDTO : putRequest.getStages()) {
-                validateScriptType(stageDTO.getScriptType());
-                stageDTO.setId(UUID.randomUUID());
-                String path = fileService.createStageScriptFile(pipeline, stageDTO);
-                Stage newStage = stageMapper.dtoToEntity(stageDTO);
-                newStage.setPath(path);
-                pipeline.getStages().add(newStage);
-            }
+        // Delete all existing stages and their files
+        for (Stage existingStage : pipeline.getStages()) {
+            fileService.removeStageScriptFile(existingStage);
+        }
+        pipeline.getStages().clear();
+
+        // Create new stages from request
+        for (StageDTO stageDTO : putRequest.getStages()) {
+            validateScriptType(stageDTO.getScriptType());
+            stageDTO.setId(UUID.randomUUID());
+            String path = fileService.createStageScriptFile(pipeline, stageDTO);
+            Stage newStage = stageMapper.dtoToEntity(stageDTO);
+            newStage.setPath(path);
+            pipeline.getStages().add(newStage);
         }
 
         repository.save(pipeline);

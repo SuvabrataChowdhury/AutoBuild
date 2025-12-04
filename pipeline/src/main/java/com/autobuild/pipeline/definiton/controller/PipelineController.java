@@ -65,7 +65,7 @@ public class PipelineController {
     @PutMapping("/{pipelineId}")
     public ResponseEntity<PipelineDTO> updatePipeline(
             @PathVariable String pipelineId,
-            @RequestBody PipelineDTO putRequest)
+            @RequestBody @Valid PipelineDTO putRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
         return ResponseEntity.ok(pipelineService.replacePipeline(pipelineId, putRequest));
     }
