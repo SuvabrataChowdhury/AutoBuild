@@ -30,7 +30,6 @@ import lombok.Setter;
  */
 
 //TODO: Add timestamps
-//TODO: Add status like BUILDING, SUCCESS, FAILURE etc.
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -38,7 +37,6 @@ import lombok.Setter;
 @Entity
 public class PipelineBuild {
     @Id
-    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

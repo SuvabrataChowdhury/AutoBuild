@@ -1,3 +1,3 @@
 export const booleanFlags = {
-    ENABLE_SSE : false
+    ENABLE_SSE : true
 }
