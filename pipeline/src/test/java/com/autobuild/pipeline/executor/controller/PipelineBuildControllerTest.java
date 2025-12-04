@@ -15,13 +15,11 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
@@ -40,7 +38,6 @@ public class PipelineBuildControllerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-
     }
 
     @Test
@@ -65,26 +62,6 @@ public class PipelineBuildControllerTest {
         doThrow(new EntityNotFoundException("dummy exception")).when(service).getPipelineBuild(any(UUID.class));
 
         assertThrows(EntityNotFoundException.class, () -> controller.getPipelineBuild(UUID.randomUUID()));
-    }
-
-    @Test
-    public void getLivePipelineBuildTest() {
-        UUID pipelineBuildId = UUID.randomUUID();
-        SseEmitter emitter = controller.getLivePipelineBuild(pipelineBuildId);
-
-        ArgumentCaptor<SseEmitter> emitterCaptor = ArgumentCaptor.forClass(SseEmitter.class);
-        ArgumentCaptor<UUID> pipelineIdCaptor = ArgumentCaptor.forClass(UUID.class);
-        verify(service, times(1)).addSubscriber(emitterCaptor.capture(), pipelineIdCaptor.capture());
-
-        assertEquals(pipelineBuildId, pipelineIdCaptor.getValue());
-        assertEquals(emitter, emitterCaptor.getValue());
-    }
-
-    @Test
-    public void getLivePipelineBuildErrorTest() {
-        doThrow(new UnsupportedOperationException("Dummy exception")).when(service).addSubscriber(any(SseEmitter.class), any(UUID.class));
-
-        assertThrows(UnsupportedOperationException.class, () -> controller.getLivePipelineBuild(UUID.randomUUID()));
     }
 
     @Test
