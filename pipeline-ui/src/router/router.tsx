@@ -10,7 +10,7 @@ export const router = createBrowserRouter([
   { path: "/pipelines", element: <PipelinePage /> },
   { path: "/pipelines/:id", element: <PipelineDetailsPage /> },
   {
-    path: "/builds/start/:id",
+    path: "/builds/:id",
     element: <BuildsRunningPage />,
   },
   { path: "/builds", element: <BuildsListPage /> },

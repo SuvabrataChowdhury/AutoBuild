@@ -14,12 +14,8 @@ export function PipelinesTable({ data }: { data: Pipeline[] }) {
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-200">
-            <TableHead className="w-[20%] font-semibold">Name</TableHead>
-            <TableHead className="w-[50%] font-semibold">Description</TableHead>
-            <TableHead className="w-[15%] font-semibold">
-              Date Created
-            </TableHead>
-            <TableHead className="w-[15%] font-semibold">Status</TableHead>
+            <TableHead className="w-[20%] text-left">ID</TableHead>
+            <TableHead className="w-[80%] font-semibold">Name</TableHead>
           </TableRow>
         </TableHeader>
 
