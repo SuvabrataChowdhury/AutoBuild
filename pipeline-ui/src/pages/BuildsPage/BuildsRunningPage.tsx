@@ -14,6 +14,7 @@ import PipelineHeader from "../../components/pipelines/pipelineHeader";
 import BuildStageList from "../../components/builds/buildsStageList";
 import BuildStageDetails from "../../components/builds/buildsStageDetails";
 import { CheckCircle, Loader, Trash, XCircle } from "lucide-react";
+import { booleanFlags } from "../../flags/booleanFlags";
 
 export default function BuildsRunningPage() {
   const { id } = useParams();
@@ -23,6 +24,7 @@ export default function BuildsRunningPage() {
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
     const buildId = id as unknown as number;
 
     let eventSource: EventSource;
@@ -41,7 +43,7 @@ export default function BuildsRunningPage() {
       setPipeline(pipelineData);
 
       // Only open SSE if running
-      if (data.currentState === "RUNNING") {
+      if (data.currentState === "RUNNING" && booleanFlags.ENABLE_SSE) {
         const url = await getLiveBuildUpdates(buildId);
         eventSource = new EventSource(url);
 
@@ -70,7 +72,10 @@ export default function BuildsRunningPage() {
 
     fetchData();
 
+    intervalId = setInterval(fetchData, 10000);
+
     return () => {
+      if (intervalId) clearInterval(intervalId);
       eventSource?.close();
     };
   }, [id]);
