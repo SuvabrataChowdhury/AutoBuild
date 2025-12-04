@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Build, Pipeline, PipelineAPIModel } from "../types/pipeline.types";
+import type { Build, BuildStageLogs, Pipeline, PipelineAPIModel } from "../types/pipeline.types";
 
 // Temporary API base URL, this needs to be configured properly
 // TODO: Move to environment variable
@@ -52,8 +52,14 @@ export async function deletePipeline(id: number) : Promise<Boolean> {
 }
 
 //build will be a different entity in future with logs, status, etc.
-export async function getBuildData(pipelineId: number): Promise<Pipeline> {
-    return getPipeline(pipelineId);
+export async function getBuildData(pipelineId: number): Promise<Build> {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pipeline/build/${pipelineId}`);
+        return response.data as Build;
+    } catch (error) {
+        console.error("Error fetching build data:", error);
+        throw error;
+    }
 }
 
 export async function executeBuild(pipelineId: number): Promise<Build> {
@@ -79,6 +85,31 @@ export async function getBuildsList(): Promise<Build[]> {
         throw error;
     }
 }
+
+export async function getBuildStagesLogs(id: number): Promise<BuildStageLogs> {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/stage/build/logs/${id}`);
+        return response.data as BuildStageLogs;
+    } catch (error) {
+        console.error("Error fetching build stage logs:", error);
+        throw error;
+    }
+}
+
+export async function getLiveBuildUpdates(id: number): Promise<string> {
+    return `${API_BASE_URL}/pipeline/build/sse/subscribe/${id}`
+}
+
+export async function deleteBuild(id: number) : Promise<void> {
+    try {
+        await axios.delete(`${API_BASE_URL}/pipeline/build/${id}`)
+    }
+    catch(error) {
+        console.error("Error while deleting Build", error)
+        throw error;
+    }
+}
+
 
 
 

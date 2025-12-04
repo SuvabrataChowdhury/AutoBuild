@@ -39,3 +39,7 @@ export interface Build {
   currentState: PipelineStatus
   stageBuilds: StageBuilds[]
 }
+
+export interface BuildStageLogs {
+  log: string
+}
