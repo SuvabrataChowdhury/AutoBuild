@@ -45,7 +45,7 @@ public class Pipeline {
     private String name;
 
     @NotEmpty
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
         name = "pipeline_stages", 
         joinColumns = @JoinColumn(name = "pipeline_id"),

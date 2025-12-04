@@ -445,4 +445,92 @@ public class PipelineServiceTest {
                 result.getStages().stream().filter(s -> s.getId().equals(existing.getId())).findFirst().orElseThrow()
                         .getName());
     }
+
+    @Test
+    public void testReplacePipelineStagesCompletely() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("existing-name"); // Add this line
+        pipeline.setStages(new ArrayList<>(List.of(
+            createStage("build", "bash"),
+            createStage("test", "bash")
+        )));
+        
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("existing-name"); // Add this line
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        doReturn("path").when(fileService).createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
+        doNothing().when(fileService).removeStageScriptFile(any(Stage.class));
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("existing-name"); // Add this line - PUT requires name
+        request.setStages(List.of(new StageDTO(null, "deploy", "bash", "echo deploy")));
+
+        PipelineDTO result = service.replacePipeline(pipeline.getId().toString(), request);
+        
+        assertEquals(1, result.getStages().size());
+        assertEquals("deploy", result.getStages().get(0).getName());
+    }
+
+    @Test
+    public void testReplacePipelineMissingScriptType() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("test-pipeline"); // Add this line
+        pipeline.setStages(new ArrayList<>());
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("test-pipeline"); // Add this line
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("test-pipeline"); // Add this line - PUT requires name
+        request.setStages(List.of(new StageDTO(null, "stage", null, "echo test")));
+
+        assertThrows(InvalidIdException.class,
+                () -> service.replacePipeline(pipeline.getId().toString(), request));
+    }
+
+    @Test
+    public void testReplacePipelineNameAndStages() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("oldName");
+        pipeline.setStages(new ArrayList<>(List.of(createStage("old", "bash"))));
+        
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(false).when(repository).existsByName("newName");
+        doReturn(pipeline).when(repository).save(any(Pipeline.class));
+        doReturn(new HashMap<UUID,String>()).when(fileService).readScriptFiles(any(Pipeline.class));
+        doReturn("path").when(fileService).createStageScriptFile(any(Pipeline.class), any(StageDTO.class));
+        doNothing().when(fileService).removeStageScriptFile(any(Stage.class));
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("newName");
+        request.setStages(List.of(
+            new StageDTO(null, "stage2", "bash", "echo world")
+        ));
+
+        PipelineDTO result = service.replacePipeline(pipeline.getId().toString(), request);
+        
+        assertEquals("newName", result.getName());
+        assertEquals(1, result.getStages().size());
+    }
+
+    @Test
+    public void testReplacePipelineDuplicateName() throws Exception {
+        ensurePipelineId();
+        pipeline.setName("original");
+        doReturn(Optional.of(pipeline)).when(repository).findById(pipeline.getId());
+        doReturn(true).when(repository).existsByName("existingName");
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("existingName");
+
+        assertThrows(DuplicateEntryException.class,
+                () -> service.replacePipeline(pipeline.getId().toString(), request));
+    }
+    private Stage createStage(String name, String scriptType) {
+        Stage stage = new Stage();
+        stage.setId(UUID.randomUUID());
+        stage.setName(name);
+        stage.setScriptType(scriptType);
+        return stage;
+    }
 }

@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: test # Change to 'demo' for demo environment
+
   application:
     name: pipeline
   datasource:
@@ -20,6 +23,7 @@ app:
   jwt:
     secret: changeThisSecretKeyForProd12345678901234567890
     expiration: 86400000
+
 # logging:
 #   level:
 #     root: DEBUG
