@@ -24,7 +24,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/execute")
-@CrossOrigin(origins = "http://localhost:5173")
 public class PipelineExecutorController {
 
     @Autowired

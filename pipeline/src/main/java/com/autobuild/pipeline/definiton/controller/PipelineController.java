@@ -29,7 +29,6 @@ import jakarta.validation.Valid;
  * @author Suvabrata Chowdhury & Baibhab Dey
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
 
