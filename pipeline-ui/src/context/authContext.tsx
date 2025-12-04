@@ -8,6 +8,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function AuthProvider({ children }: any) {
   const [token, setToken] = useState(localStorage.getItem("token"));
 

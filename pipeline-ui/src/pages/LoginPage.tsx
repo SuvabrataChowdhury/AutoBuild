@@ -15,6 +15,7 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     try {
       const { token } = await loginApi(username, password);
       login(token);

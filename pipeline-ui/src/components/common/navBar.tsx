@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../services/auth.api";
+import type { UserInfo } from "../../types/user.types";
 
 export default function NavBar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserInfo>();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
