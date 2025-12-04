@@ -15,13 +15,11 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
@@ -40,14 +38,14 @@ public class PipelineBuildControllerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-
     }
 
     @Test
     public void getPipelineBuildTest() {
         UUID pipelineBuildId = UUID.randomUUID();
 
-        PipelineBuildDTO dummyPipelineDTO = new PipelineBuildDTO(pipelineBuildId,UUID.randomUUID(),PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
+        PipelineBuildDTO dummyPipelineDTO = new PipelineBuildDTO(pipelineBuildId, UUID.randomUUID(),
+                PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
 
         doReturn(dummyPipelineDTO).when(service).getPipelineBuild(pipelineBuildId);
 
@@ -57,7 +55,7 @@ public class PipelineBuildControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        assertEquals(pipelineBuildId,response.getBody().getId());
+        assertEquals(pipelineBuildId, response.getBody().getId());
     }
 
     @Test
@@ -68,23 +66,18 @@ public class PipelineBuildControllerTest {
     }
 
     @Test
-    public void getLivePipelineBuildTest() {
-        UUID pipelineBuildId = UUID.randomUUID();
-        SseEmitter emitter = controller.getLivePipelineBuild(pipelineBuildId);
-
-        ArgumentCaptor<SseEmitter> emitterCaptor = ArgumentCaptor.forClass(SseEmitter.class);
-        ArgumentCaptor<UUID> pipelineIdCaptor = ArgumentCaptor.forClass(UUID.class);
-        verify(service, times(1)).addSubscriber(emitterCaptor.capture(), pipelineIdCaptor.capture());
-
-        assertEquals(pipelineBuildId, pipelineIdCaptor.getValue());
-        assertEquals(emitter, emitterCaptor.getValue());
-    }
-
-    @Test
-    public void getLivePipelineBuildErrorTest() {
-        doThrow(new UnsupportedOperationException("Dummy exception")).when(service).addSubscriber(any(SseEmitter.class), any(UUID.class));
-
-        assertThrows(UnsupportedOperationException.class, () -> controller.getLivePipelineBuild(UUID.randomUUID()));
+    public void getAllBuildsTest() {
+        List<PipelineBuildDTO> dummyBuilds = List.of(
+                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.WAITING,
+                        List.of(DummyData.getStageBuildDTO())),
+                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.SUCCESS,
+                        List.of(DummyData.getStageBuildDTO())));
+        doReturn(dummyBuilds).when(service).getAllBuilds();
+        ResponseEntity<List<PipelineBuildDTO>> response = controller.getAllBuilds();
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().size());
     }
 
     @Test

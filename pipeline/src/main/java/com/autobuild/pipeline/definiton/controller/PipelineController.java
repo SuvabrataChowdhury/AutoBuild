@@ -2,9 +2,11 @@ package com.autobuild.pipeline.definiton.controller;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,6 +30,7 @@ import jakarta.validation.Valid;
  * @author Suvabrata Chowdhury & Baibhab Dey
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
 
@@ -38,6 +41,11 @@ public class PipelineController {
     public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId)
             throws InvalidIdException, IOException {
         return ResponseEntity.ok(pipelineService.getPipelineById(pipelineId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PipelineDTO>> getAllPipelines() {
+        return ResponseEntity.ok(pipelineService.getAllPipelines());
     }
 
     @PostMapping

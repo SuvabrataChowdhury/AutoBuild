@@ -63,6 +63,17 @@ public class PipelineService {
         }
     }
 
+    public List<PipelineDTO> getAllPipelines() {
+        List<Pipeline> pipelines = repository.findAll();
+        log.info("Fetched all pipelines, count: {}", pipelines.size());
+        return pipelines.stream()
+                .map(pipeline -> {
+                    PipelineDTO dto = mapper.entityToDto(pipeline); // converting each fetched pipeline into PiplineDTO
+                    return dto;
+                })
+                .toList();
+    }
+
     public PipelineDTO createPipeline(final PipelineDTO pipelineDto)
             throws IOException, DuplicateEntryException, InvalidIdException {
         if (repository.existsByName(pipelineDto.getName())) {

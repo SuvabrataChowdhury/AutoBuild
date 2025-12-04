@@ -1,104 +1,118 @@
-import type { Build, Pipeline } from "../types/pipeline.types";
+import axios from "axios";
+import type { Build, BuildStageLogs, Pipeline, PipelineAPIModel } from "../types/pipeline.types";
+
+// Temporary API base URL, this needs to be configured properly
+// TODO: Move to environment variable
+const API_BASE_URL = "http://localhost:8080/api/v1";
 
 export async function getPipeline(id: number): Promise<Pipeline> {
-    const data: Pipeline = await getPipelines().then(pipelines => pipelines.find(p => p.id === id)!);
-    return data;
-};
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pipeline/${id}`);
+        return response.data as Pipeline;
+    } catch (error) {
+        console.error("Error fetching pipeline:", error);
+        throw error;
+    }
+}
+
+export async function getPipelines(): Promise<Pipeline[]> {
+    try {
+    const response = await axios.get(`${API_BASE_URL}/pipeline`);
+    return response.data as Pipeline[];
+  } catch (error) {
+    console.error("Error fetching pipelines:", error);
+    return [];
+  }
+}
+
+export async function savePipeline(pipeline: PipelineAPIModel): Promise<Pipeline> {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/pipeline`, pipeline);
+        return response.data as Pipeline;
+    } catch (error) {
+        console.error("Error saving pipeline:", error);
+        throw error;
+    }
+}
+
+export async function updatePipeline(id: number, pipeline: PipelineAPIModel): Promise<Pipeline> {
+    //TODO: Implement update pipeline
+    console.log("Updating pipeline:", id, pipeline);
+    return {id} as Pipeline;
+}
+
+export async function deletePipeline(id: number) : Promise<boolean> {
+    try {
+        await axios.delete(`${API_BASE_URL}/pipeline/${id}`)
+        return true
+    }
+    catch(error) {
+        console.error("Error while deleting Pipeline", error)
+        throw error;
+    }
+}
 
 //build will be a different entity in future with logs, status, etc.
-export async function getBuildData(pipelineId: number): Promise<Pipeline> {
-    return getPipeline(pipelineId);
+export async function getBuildData(pipelineId: number): Promise<Build> {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pipeline/build/${pipelineId}`);
+        return response.data as Build;
+    } catch (error) {
+        console.error("Error fetching build data:", error);
+        throw error;
+    }
+}
+
+export async function executeBuild(pipelineId: number): Promise<Build> {
+    try {
+        const req = {
+            pipelineId: pipelineId
+        }
+        const response = await axios.post(`${API_BASE_URL}/execute/pipeline`, req)
+        return response.data as Build;
+    } catch(error) {
+        console.error("Error executing Build:", error)
+        throw error;
+    }
 }
 
 // On Changing the getting builds iomplementation here, we will change the build type to incorporate the chages
 export async function getBuildsList(): Promise<Build[]> {
-    return [
-        {
-            id: 1,
-            name: "Build 1",
-            description: "First build description",
-            dateCreated: "12/25/2025",
-            status: "success",
-            stages: [
-                {
-                    id: 1,
-                    name: "Build Stage",
-                    description: "This stage handles the build process.",
-                    commands: "npm install && npm run build",
-                    order: 1
-                }
-            ],
-            pipelineId: 0
-        },
-        {
-            id: 2,
-            name: "Build 2",
-            description: "Second build description",
-            dateCreated: "01/05/2026",
-            status: "failed",
-            stages: [
-                {
-                    id: 1,
-                    name: "Test Stage",
-                    description: "This stage runs all unit and integration tests.",
-                    commands: "npm test",
-                    order: 1
-                }
-            ],
-            pipelineId: 0
-        }
-    ]
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pipeline/build`)
+        return response.data as Build[];
+    } catch (error) {
+        console.error("Error fetching pipeline:", error)
+        throw error;
+    }
 }
+
+export async function getBuildStagesLogs(id: number): Promise<BuildStageLogs> {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/stage/build/logs/${id}`);
+        return response.data as BuildStageLogs;
+    } catch (error) {
+        console.error("Error fetching build stage logs:", error);
+        throw error;
+    }
+}
+
+export async function getLiveBuildUpdates(id: number): Promise<string> {
+    return `${API_BASE_URL}/pipeline/build/sse/subscribe/${id}`
+}
+
+export async function deleteBuild(id: number) : Promise<void> {
+    try {
+        await axios.delete(`${API_BASE_URL}/pipeline/build/${id}`)
+    }
+    catch(error) {
+        console.error("Error while deleting Build", error)
+        throw error;
+    }
+}
+
+
+
 
 //TODO : on start build, send an execute call to backend
 
-export async function getPipelines(): Promise<Pipeline[]> {
-    return [
-        {
-            id: 1,
-            name: "Lorem Ipsum Pipeline",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-            dateCreated: "12/23/2025",
-            status: "success",
-            stages: []
-        },
-        {
-            id: 2,
-            name: "Dolor Sit Amet Pipeline",
-            description: "Contrary to popular belief, Lorem Ipsum is not simply random text.",
-            dateCreated: "01/15/2026",
-            status: "failed",
-            stages: []
-        },
-        {
-            id: 3,
-            name: "Consectetur Adipiscing Pipeline",
-            description: "It has roots in a piece of classical Latin literature from 45 BC.",
-            dateCreated: "02/10/2026",
-            status: "running",
-            stages: [
-                {
-                    id: 1,
-                    name: "Build Stage",
-                    description: "This stage handles the build process.",
-                    commands: "npm install && npm run build",
-                    order: 1
-                },
-                {
-                    id: 2,
-                    name: "Test Stage",
-                    description: "This stage runs all unit and integration tests.",
-                    commands: "npm test",
-                    order: 2
-                },
-                {
-                    id: 3,
-                    name: "Deploy Stage",
-                    description: "This stage deploys the application to the production environment.",
-                    commands: "npm run deploy",
-                    order: 3
-                }
-            ]
-        }
-    ];
-}

@@ -38,7 +38,7 @@ export default function StageDetails({
         <h2 className="text-xl font-semibold">{stage.name}</h2>
       )}
 
-      {/* ----- DESCRIPTION -------- */}
+      {/* ----- DESCRIPTION --------
       <div className="mt-4">
         <h3 className="font-semibold text-gray-700">Description</h3>
 
@@ -54,7 +54,7 @@ export default function StageDetails({
             {stage.description}
           </p>
         )}
-      </div>
+      </div> */}
 
       {/* ------ COMMANDS ------- */}
       <div className="mt-6">
@@ -62,13 +62,13 @@ export default function StageDetails({
 
         {isEditing ? (
           <StageCommandsEditor
-            commands={stage.commands}
-            onChange={(cmdStr) => updateField("commands", cmdStr)}
+            commands={stage.command}
+            onChange={(cmdStr) => updateField("command", cmdStr)}
           />
         ) : (
           // Show commands as multi-line text (preserves formatting)
           <pre className="mt-2 p-3 bg-gray-100 rounded-md text-gray-800 whitespace-pre-wrap">
-            {stage.commands}
+            {stage.command}
           </pre>
         )}
       </div>
