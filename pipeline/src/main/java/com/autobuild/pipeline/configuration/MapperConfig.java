@@ -100,7 +100,8 @@ public class MapperConfig {
                 PipelineBuildDTO.class);
         typeMapper.addMapping(PipelineBuild::getId, PipelineBuildDTO::setId);
         typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getId(), PipelineBuildDTO::setPipelineId);
-        typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getName(), PipelineBuildDTO::setPipelineName);
+        typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getName(),
+                PipelineBuildDTO::setPipelineName);
         typeMapper.addMapping(PipelineBuild::getCurrentState, PipelineBuildDTO::setCurrentState);
     }
 

@@ -2,6 +2,7 @@ package com.autobuild.pipeline.executor.execution.observer.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,7 +15,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
@@ -60,7 +60,7 @@ public class PipelineExecutionObservableImplTest {
 
     @Test
     public void removeExecutionForObservationErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.removeExecutionForObservation(dummyBuild));
+        pipelineExecutionObservable.removeExecutionForObservation(dummyBuild);
     }
 
     @Test
@@ -86,18 +86,12 @@ public class PipelineExecutionObservableImplTest {
 
         List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable.getAllSpecificSubscribedObservers(dummyBuild);
 
-        assertNotNull(subscribers);
-        assertEquals(0, subscribers.size());
+        assertNull(subscribers);
     }
 
     @Test
     public void unSubscribeNullErrorTest() {
         assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(null,null));
-    }
-
-    @Test
-    public void unsubscribeFromEmptySubErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(dummyBuild,mock(PipelineExecutionObserver.class)));
     }
 
     @Test

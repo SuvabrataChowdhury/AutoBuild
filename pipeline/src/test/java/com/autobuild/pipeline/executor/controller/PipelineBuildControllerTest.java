@@ -56,6 +56,7 @@ public class PipelineBuildControllerTest {
         assertNotNull(response.getBody());
 
         assertEquals(pipelineBuildId, response.getBody().getId());
+        assertEquals(pipelineBuildId, response.getBody().getId());
     }
 
     @Test
