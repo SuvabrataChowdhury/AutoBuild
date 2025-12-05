@@ -1,11 +1,10 @@
 /* eslint-disable prefer-const */
 import { useEffect, useState } from "react";
-import type { Pipeline, StageBuilds } from "../../types/pipeline.types";
+import type { StageBuilds } from "../../types/pipeline.types";
 import { getBuildStagesLogs } from "../../services/pipelines.api";
 
 type Props = {
   stage: StageBuilds;
-  pipeline: Pipeline | undefined;
 };
 
 export default function StageDetails({ stage }: Props) {
@@ -25,12 +24,14 @@ export default function StageDetails({ stage }: Props) {
 
     // Initial log load
     fetchLogs();
+    if (stage.currentState === "FAILED" || "STOPPED" || "SUCCESS") {
+      return () => clearInterval(intervalId);
+    }
 
     // Start polling every 10 seconds
     intervalId = setInterval(fetchLogs, 10000);
 
     // Cleanup interval on stage change or unmount
-    return () => clearInterval(intervalId);
   }, [stage.id]);
 
   if (!stage) {
@@ -43,7 +44,7 @@ export default function StageDetails({ stage }: Props) {
 
   return (
     <div className="w-full p-6 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-semibold">{stage.id}</h2>
+      <h2 className="text-xl font-semibold">{stage.stageName}</h2>
 
       {/* Logs */}
       <div className="mt-6">
