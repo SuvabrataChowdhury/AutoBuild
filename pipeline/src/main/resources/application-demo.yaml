@@ -1,22 +1,32 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:demodb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-  
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
-  
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false
+  
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
 app:
   jwt:
     secret: demoSecretKeyForDevelopment1234567890
-    expiration: 86400000
+    expiration: 86400000 # TODO: Too high of a expiration. Reduce it
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

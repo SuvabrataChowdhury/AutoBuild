@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -64,6 +65,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile("demo")
+    @Order(1)
     public SecurityFilterChain demoSecurityFilterChain(HttpSecurity http,
             @Qualifier("jwtAuthenticationFilter") OncePerRequestFilter jwtAuthFilter,
             AuthenticationProvider authenticationProvider,
@@ -79,7 +81,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll() 
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
@@ -88,8 +91,10 @@ public class SecurityConfig {
      * Security filter chain for TEST profile - WITHOUT authentication.
      * All endpoints are permitted.
      */
+    //TODO: should have less restriction for test profile
     @Bean
     @Profile("test")
+    @Order(2)
     public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -97,7 +102,8 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions().disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()); 
+                        .anyRequest().permitAll())
+                .formLogin(form -> form.disable()); 
 
         return http.build();
     }

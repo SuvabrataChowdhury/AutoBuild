@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: test # Change to 'demo' for demo environment
-
   application:
     name: pipeline
   datasource:
