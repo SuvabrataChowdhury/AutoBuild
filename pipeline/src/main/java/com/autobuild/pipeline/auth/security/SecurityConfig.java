@@ -91,6 +91,7 @@ public class SecurityConfig {
      * Security filter chain for TEST profile - WITHOUT authentication.
      * All endpoints are permitted.
      */
+    //TODO: should have less restriction for test profile
     @Bean
     @Profile("test")
     @Order(2)

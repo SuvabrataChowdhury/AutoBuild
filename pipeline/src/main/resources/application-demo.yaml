@@ -23,7 +23,7 @@ spring:
 app:
   jwt:
     secret: demoSecretKeyForDevelopment1234567890
-    expiration: 86400000
+    expiration: 1800000
 
 logging:
   level:
