@@ -12,8 +12,21 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  h2:
+    console:
+      enabled: false
+  
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
 app:
   jwt:
     secret: demoSecretKeyForDevelopment1234567890
     expiration: 86400000
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
