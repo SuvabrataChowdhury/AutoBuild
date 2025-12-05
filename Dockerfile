@@ -14,4 +14,4 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 COPY --from=build /home/app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar","--spring.profiles.active=demo"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
