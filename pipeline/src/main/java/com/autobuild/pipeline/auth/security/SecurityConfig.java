@@ -92,7 +92,7 @@ public class SecurityConfig {
      * Security filter chain for TEST profile - WITHOUT authentication.
      * All endpoints are permitted.
      */
-    //TODO: should have less restriction for test profile
+    // TODO: should have less restriction for test profile
     @Bean
     @Profile("test")
     @Order(2)
@@ -103,7 +103,8 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions().disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll());
+                        .anyRequest().permitAll())
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
