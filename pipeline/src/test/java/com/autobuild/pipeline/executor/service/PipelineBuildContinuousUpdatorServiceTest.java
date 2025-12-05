@@ -12,13 +12,10 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.ReflectionUtils;
-
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
@@ -32,7 +29,7 @@ public class PipelineBuildContinuousUpdatorServiceTest {
 
     @Mock
     private PipelineExecutionObservable pipelineExecutionObservable;
-    
+
     @InjectMocks
     private PipelineBuildContinuousUpdatorService pipelineBuildContinuousUpdatorService;
 
@@ -43,8 +40,10 @@ public class PipelineBuildContinuousUpdatorServiceTest {
         MockitoAnnotations.openMocks(this);
 
         ReflectionTestUtils.setField(pipelineBuildContinuousUpdatorService, "repository", pipelineBuildRepository);
-        // pipelineBuildContinuousUpdatorService = new PipelineBuildContinuousUpdatorService(pipelineExecutionObservable);
-        // ReflectionTestUtils.setField(pipelineBuildContinuousUpdatorService, "pipelineExecutionObservable", pipelineExecutionObservable);
+        // pipelineBuildContinuousUpdatorService = new
+        // PipelineBuildContinuousUpdatorService(pipelineExecutionObservable);
+        // ReflectionTestUtils.setField(pipelineBuildContinuousUpdatorService,
+        // "pipelineExecutionObservable", pipelineExecutionObservable);
     }
 
     @Test

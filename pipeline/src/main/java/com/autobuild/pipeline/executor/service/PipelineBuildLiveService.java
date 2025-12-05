@@ -1,9 +1,10 @@
 package com.autobuild.pipeline.executor.service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class PipelineBuildLiveService implements PipelineExecutionObserver {
 
     private static final int MAX_LIVE_SUBSCRIBERS = 50;
 
-    private final List<SseEmitter> subscriberEmitters = new CopyOnWriteArrayList<>();
+    private final ConcurrentHashMap<UUID, List<SseEmitter>> liveSubscribers = new ConcurrentHashMap<>();
 
     @Autowired
     private PipelineBuildRepository repository;
@@ -47,6 +48,21 @@ public class PipelineBuildLiveService implements PipelineExecutionObserver {
     private PipelineBuildMapper mapper;
 
     public void addSubscriber(SseEmitter newSubscriber, UUID pipelineBuildId) {
+        List<SseEmitter> liveSubscribersForBuild = liveSubscribers.compute(pipelineBuildId, (id, emitters) -> {
+            if (emitters == null) {
+                emitters = new CopyOnWriteArrayList<>();
+            }
+
+            if (MAX_LIVE_SUBSCRIBERS <= emitters.size()) {
+                UnsupportedOperationException exception = new UnsupportedOperationException(
+                        "Maximum number of subscribers exceeded");
+                newSubscriber.completeWithError(exception);
+                throw exception;
+            }
+
+            return emitters;
+        });
+
         Optional<PipelineBuild> optionalPipelineBuild = repository.findById(pipelineBuildId);
 
         if (optionalPipelineBuild.isEmpty()) {
@@ -56,13 +72,6 @@ public class PipelineBuildLiveService implements PipelineExecutionObserver {
             throw entityNotFoundException;
         }
 
-        if (MAX_LIVE_SUBSCRIBERS == subscriberEmitters.size()) {
-            UnsupportedOperationException exception = new UnsupportedOperationException(
-                    "Maximum number of subscribers exceeded");
-            newSubscriber.completeWithError(exception);
-            throw exception;
-        }
-
         if (!optionalPipelineBuild.get().getCurrentState().equals(PipelineExecutionState.RUNNING)) {
             UnsupportedOperationException exception = new UnsupportedOperationException(
                     "Live broadcast is not suppoerted as build is not in running state");
@@ -70,21 +79,21 @@ public class PipelineBuildLiveService implements PipelineExecutionObserver {
             throw exception;
         }
 
-        subscriberEmitters.add(newSubscriber);
+        liveSubscribersForBuild.add(newSubscriber);
 
         newSubscriber.onCompletion(() -> {
-            subscriberEmitters.remove(newSubscriber);
+            liveSubscribersForBuild.remove(newSubscriber);
             executionObservable.unsubscribe(optionalPipelineBuild.get(), this);
         });
 
         newSubscriber.onError(throwable -> {
             log.error(throwable.getMessage(), throwable);
-            subscriberEmitters.remove(newSubscriber);
+            liveSubscribersForBuild.remove(newSubscriber);
             executionObservable.unsubscribe(optionalPipelineBuild.get(), this);
         });
 
         newSubscriber.onTimeout(() -> {
-            subscriberEmitters.remove(newSubscriber);
+            liveSubscribersForBuild.remove(newSubscriber);
             executionObservable.unsubscribe(optionalPipelineBuild.get(), this);
         });
 
@@ -93,42 +102,72 @@ public class PipelineBuildLiveService implements PipelineExecutionObserver {
 
     @Override
     public void update(PipelineBuild pipelineBuild) {
-        for (SseEmitter subscriberEmitter : subscriberEmitters) {
-            log.info("sending messages");
-            try {
-                subscriberEmitter.send(SseEmitter.event().data(mapper.entityToDto(pipelineBuild)));
+        List<SseEmitter> subscriberEmitters = liveSubscribers.get(pipelineBuild.getId());
 
-                if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.SUCCESS)
-                        || pipelineBuild.getCurrentState().equals(PipelineExecutionState.FAILED)) {
-                    subscriberEmitter.complete();
+        List<SseEmitter> deadEmitters = new ArrayList<>();
+
+        if (subscriberEmitters != null) {
+            for (SseEmitter subscriberEmitter : subscriberEmitters) {
+                try {
+                    subscriberEmitter.send(SseEmitter.event().data(mapper.entityToDto(pipelineBuild)));
+
+                    if (pipelineBuild.getCurrentState().equals(PipelineExecutionState.SUCCESS)
+                            || pipelineBuild.getCurrentState().equals(PipelineExecutionState.FAILED)) {
+                        subscriberEmitter.complete();
+                        deadEmitters.add(subscriberEmitter);
+                    }
+
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    deadEmitters.add(subscriberEmitter);
                 }
-
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
             }
+
+            liveSubscribers.computeIfPresent(pipelineBuild.getId(), (id, emitters) -> {
+                if (null == emitters) {
+                    return null;
+                }
+                emitters.removeAll(deadEmitters);
+                return emitters.isEmpty() ? null : emitters;
+            });
+        } else {
+            executionObservable.unsubscribe(pipelineBuild, this);
         }
     }
 
     // TODO: Better implementation as this method is executed unconditionally
     @Scheduled(fixedRate = 15000)
     public void sentHeartBeat() {
-        for (SseEmitter sseEmitter : subscriberEmitters) {
-            try {
-                sseEmitter.send(SseEmitter.event().comment("heartbeat pulse to keep connection open"));
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
+
+        liveSubscribers.forEach((id, subscriberEmitters) -> {
+            List<SseEmitter> deadEmitters = new ArrayList<>();
+
+            for (SseEmitter sseEmitter : subscriberEmitters) {
+                try {
+                    sseEmitter.send(SseEmitter.event().comment("heartbeat pulse to keep connection open"));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    deadEmitters.add(sseEmitter);
+                }
             }
-        }
+
+            liveSubscribers.computeIfPresent(id, (key, emitters) -> {
+                emitters.removeAll(deadEmitters);
+                return emitters.isEmpty() ? null : emitters;
+            });
+        });
     }
 
     @PreDestroy
     public void forceCloseAllEmitters() {
-        for (SseEmitter subscriberEmitter : subscriberEmitters) {
-            log.info("completing emitters");
-
-            subscriberEmitter.complete();
-        }
-
-        subscriberEmitters.clear();
+        liveSubscribers.forEach((id, emitters) -> {
+            emitters.forEach(emitter -> {
+                try {
+                    emitter.complete();
+                } catch (Exception ignored) {
+                }
+            });
+        });
+        liveSubscribers.clear();
     }
 }

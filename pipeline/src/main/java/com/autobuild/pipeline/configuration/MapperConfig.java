@@ -80,6 +80,7 @@ public class MapperConfig {
         TypeMap<StageBuild, StageBuildDTO> typeMapper = mapper.createTypeMap(StageBuild.class, StageBuildDTO.class);
         typeMapper.addMapping(StageBuild::getId, StageBuildDTO::setId);
         typeMapper.addMapping(stageBuild -> stageBuild.getStage().getId(), StageBuildDTO::setStageId);
+        typeMapper.addMapping(stageBuild -> stageBuild.getStage().getName(), StageBuildDTO::setStageName);
         typeMapper.addMapping(StageBuild::getCurrentState, StageBuildDTO::setCurrentState);
     }
 
@@ -99,6 +100,8 @@ public class MapperConfig {
                 PipelineBuildDTO.class);
         typeMapper.addMapping(PipelineBuild::getId, PipelineBuildDTO::setId);
         typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getId(), PipelineBuildDTO::setPipelineId);
+        typeMapper.addMapping(pipelineBuild -> pipelineBuild.getPipeline().getName(),
+                PipelineBuildDTO::setPipelineName);
         typeMapper.addMapping(PipelineBuild::getCurrentState, PipelineBuildDTO::setCurrentState);
     }
 

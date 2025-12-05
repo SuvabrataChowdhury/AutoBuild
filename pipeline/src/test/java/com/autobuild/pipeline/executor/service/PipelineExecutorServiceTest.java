@@ -41,7 +41,7 @@ public class PipelineExecutorServiceTest {
 
     @Mock
     private PipelineExecutor pipelineExecutor;
-    
+
     @Mock
     private PipelineBuildMapper pipelineBuildMapper;
 
@@ -61,26 +61,26 @@ public class PipelineExecutorServiceTest {
     @Test
     public void executePipelineTest() throws IOException {
         UUID pipelineId = UUID.randomUUID();
-        
+
         Pipeline pipeline = DummyData.getPipeline(pipelineId);
 
         PipelineExecuteRequest pipelineExecuteRequest = new PipelineExecuteRequest(pipelineId);
         PipelineBuild pipelineBuild = DummyData.getPipelineBuild(pipelineId);
         PipelineBuildDTO pipelineBuildDTO = DummyData.getPipelineBuildDTO(pipelineId);
 
-
         doReturn(Optional.of(pipeline)).when(pipelineRepository).findById(any(UUID.class));
         doReturn(pipelineBuild).when(pipelineBuildRepository).save(any(PipelineBuild.class));
         doReturn(pipelineBuildDTO).when(pipelineBuildMapper).entityToDto(pipelineBuild);
 
-        try (MockedStatic<TransactionSynchronizationManager> transactionSynMockedStatic = mockStatic(TransactionSynchronizationManager.class)) {
+        try (MockedStatic<TransactionSynchronizationManager> transactionSynMockedStatic = mockStatic(
+                TransactionSynchronizationManager.class)) {
             PipelineBuildDTO resultantDTO = pipelineExecutorService.executePipeline(pipelineExecuteRequest);
 
             assertEquals(pipelineExecuteRequest.getPipelineId(), resultantDTO.getPipelineId());
 
             verify(pipelineRepository, times(1)).findById(eq(pipelineId));
             verify(pipelineBuildRepository, times(1)).save(any(PipelineBuild.class));
-            
+
         }
     }
 }

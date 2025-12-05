@@ -56,14 +56,14 @@ public class DummyData {
     }
 
     public static StageBuildDTO getStageBuildDTO() {
-        return new StageBuildDTO(UUID.randomUUID(), UUID.randomUUID(), StageExecutionState.WAITING);
+        return new StageBuildDTO(UUID.randomUUID(), UUID.randomUUID(), "Dummy Stage", StageExecutionState.WAITING);
     }
 
     public static PipelineBuildDTO getPipelineBuildDTO() {
-        return new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
+        return new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), "Dummy Pipeline", PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
     }
 
     public static PipelineBuildDTO getPipelineBuildDTO(UUID pipelineId) {
-        return new PipelineBuildDTO(UUID.randomUUID(), pipelineId, PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
+        return new PipelineBuildDTO(UUID.randomUUID(), pipelineId, "Dummy Pipeline", PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
     }
 }
