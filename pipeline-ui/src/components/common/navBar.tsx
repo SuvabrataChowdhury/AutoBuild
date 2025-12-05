@@ -77,6 +77,7 @@ export default function NavBar() {
         <NavButton label="Home" route="/" />
         <NavButton label="Pipelines" route="/pipelines" />
         <NavButton label="Builds" route="/builds" />
+        <NavButton label="About" route="/about"/>
       </div>
 
       {/* RIGHT — Profile Menu */}
