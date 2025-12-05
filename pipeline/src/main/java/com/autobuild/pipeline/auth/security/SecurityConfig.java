@@ -76,7 +76,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/user/auth/register", "/api/v1/user/auth/login").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll() 
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("api/v1/pipeline/build/sse/subscribe/*").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -84,7 +85,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-   /**
+    /**
      * Security filter chain for TEST profile - WITHOUT authentication.
      * All endpoints are permitted.
      */
@@ -97,7 +98,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions().disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()); 
+                        .anyRequest().permitAll());
 
         return http.build();
     }

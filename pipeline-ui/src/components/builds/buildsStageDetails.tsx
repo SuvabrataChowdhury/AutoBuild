@@ -11,7 +11,7 @@ export default function StageDetails({ stage }: Props) {
   const [logs, setLogs] = useState<string>("");
 
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval>;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
     async function fetchLogs() {
       try {
@@ -22,17 +22,22 @@ export default function StageDetails({ stage }: Props) {
       }
     }
 
-    // Initial log load
+    // Load logs once immediately
     fetchLogs();
 
-    if (["FAILED", "STOPPED", "SUCCESS"].includes(stage.currentState)) {
-      return () => clearInterval(intervalId);
+    const isFinal = ["FAILED", "STOPPED", "SUCCESS"].includes(
+      stage.currentState
+    );
+
+    // Only start polling if NOT in a final state
+    if (!isFinal) {
+      intervalId = setInterval(fetchLogs, 10000);
     }
 
-    // Start polling every 10 seconds
-    intervalId = setInterval(fetchLogs, 10000);
-
-    // Cleanup interval on stage change or unmount
+    // Cleanup interval always
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [stage.id, stage.currentState]);
 
   if (!stage) {
