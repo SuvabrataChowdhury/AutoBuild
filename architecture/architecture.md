@@ -9,7 +9,7 @@
 ![block](./drawio/img/block.svg)
 
 ## Security Flow Diagram
-![block](./drawio/img/security_architecture.svg)
+![security flow](./drawio/img/security_architecture.svg)
 
 ## Sequence Diagram
 ![pipeline seq](./drawio/img/sequence.svg)
