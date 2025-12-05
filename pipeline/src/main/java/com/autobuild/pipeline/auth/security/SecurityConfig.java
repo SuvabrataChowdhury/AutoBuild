@@ -78,7 +78,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/user/auth/register", "/api/v1/user/auth/login").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll() 
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("api/v1/pipeline/build/sse/subscribe/*").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -87,11 +88,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-   /**
+    /**
      * Security filter chain for TEST profile - WITHOUT authentication.
      * All endpoints are permitted.
      */
-    //TODO: should have less restriction for test profile
+    // TODO: should have less restriction for test profile
     @Bean
     @Profile("test")
     @Order(2)
@@ -103,7 +104,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
-                .formLogin(form -> form.disable()); 
+                .formLogin(form -> form.disable());
 
         return http.build();
     }

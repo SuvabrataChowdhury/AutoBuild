@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -23,59 +22,72 @@ export default function BuildsRunningPage() {
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval>;
     const buildId = id as unknown as number;
 
-    let eventSource: EventSource;
-
-    async function fetchData() {
+    // --- 1. Fetch initial build ---
+    async function load() {
       const data = await getBuildData(buildId);
       setBuild(data);
 
-      // Auto-select first stage
       if (data.stageBuilds.length > 0) {
         setSelectedStageId(data.stageBuilds[0].id);
       }
-
-      // Only open SSE if running
-      if (data.currentState === "RUNNING" && booleanFlags.ENABLE_SSE) {
-        const url = await getLiveBuildUpdates(buildId);
-        eventSource = new EventSource(url);
-
-        eventSource.onmessage = (event) => {
-          const parsed = JSON.parse(event.data);
-          console.log("SSE Update:", parsed);
-
-          setBuild((prev) => ({
-            ...prev!,
-            currentState: parsed.currentState,
-            stageBuilds: parsed.stageBuilds,
-          }));
-
-          // Close stream when job ends
-          if (parsed.currentState !== "RUNNING") {
-            setIsDeleteVisible(true);
-            eventSource.close();
-          }
-        };
-
-        eventSource.onerror = () => {
-          eventSource.close();
-        };
-      }
     }
 
-    fetchData();
+    load();
+  }, [id]);
+  useEffect(() => {
+    const buildId = id as unknown as number;
+
+    // Stop polling for final states
+    if (["SUCCESS", "FAILED", "STOPPED"].includes(build?.currentState ?? "")) {
+      return; // no interval created
+    }
+
+    // Skip polling while running (SSE should handle this)
+    if (build?.currentState === "RUNNING") return;
+
+    // Start polling
+    const intervalId = setInterval(async () => {
+      const data = await getBuildData(buildId);
+      setBuild(data);
+    }, 10000);
+
+    // Cleanup
+    return () => clearInterval(intervalId);
+  }, [build?.currentState, id]);
+
+  useEffect(() => {
+    if (booleanFlags.ENABLE_SSE === false) return;
 
     if (build?.currentState !== "RUNNING") return;
 
-    intervalId = setInterval(fetchData, 10000);
+    const buildId = id as unknown as number;
+    const url = getLiveBuildUpdates(buildId);
 
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-      eventSource?.close();
+    const es = new EventSource(url);
+
+    es.onmessage = (event) => {
+      const parsed = JSON.parse(event.data);
+
+      setBuild((prev) => ({
+        ...prev!,
+        currentState: parsed.currentState,
+        stageBuilds: parsed.stageBuilds,
+      }));
+
+      if (parsed.currentState !== "RUNNING") {
+        es.close();
+        setIsDeleteVisible(true);
+      }
     };
-  }, [id, build?.currentState]);
+
+    es.onerror = () => {
+      es.close();
+    };
+
+    return () => es.close();
+  }, [build?.currentState, id]);
 
   if (!build) return <div>Loading...</div>;
 
