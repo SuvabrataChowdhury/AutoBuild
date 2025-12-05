@@ -19,7 +19,7 @@ services:
       retries: 10
 
   pipeline-app:
-    image: pipeline-app   # The same name you built using `docker build -t pipeline-app .`
+    image: pipeline-app 
     container_name: pipeline-app
     volumes:
       - pipeline_scripts:/app/pipeline_scripts
