@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import PipelineHeader from "../../components/pipelines/pipelineHeader";
 import StageList from "../../components/pipelines/stageList";
 import StageDetails from "../../components/pipelines/stageDetails";
+import { booleanFlags } from "../../flags/booleanFlags";
 
 import type {
   Pipeline,
@@ -17,6 +18,7 @@ import {
   getBuildsList,
   getPipeline,
   savePipeline,
+  updatePipeline,
 } from "../../services/pipelines.api";
 
 import { Pencil, Play, Trash } from "lucide-react";
@@ -43,6 +45,7 @@ export default function PipelineDetailPage() {
     null
   );
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
+  const [error, setError] = useState<string[] | null>(null);
 
   async function checkDelete(id: number) {
     const response = await getBuildsList();
@@ -60,6 +63,7 @@ export default function PipelineDetailPage() {
   // Load pipeline on mount / when ID changes
   useEffect(() => {
     async function fetchData() {
+      setError(null);
       if (id === "0") {
         // New pipeline template
         const newPipeline: Pipeline = {
@@ -88,7 +92,13 @@ export default function PipelineDetailPage() {
   }, [id]);
 
   // While loading
-  if (!pipeline) return <div>Loading...</div>;
+  if (!pipeline)
+    return (
+      <div>
+        <NavBar></NavBar>
+        <div className="p-20 min-h-screen">Loading...</div>
+      </div>
+    );
 
   //   // Current displayed stage (from real pipeline)
   //   const selectedStage = pipeline.stages.find((s) => s.id === selectedStageId);
@@ -126,6 +136,33 @@ export default function PipelineDetailPage() {
         stages: removeOrderFromStages(editablePipeline!.stages),
       } as unknown as PipelineAPIModel;
       const data = await savePipeline(pipelineToSave as PipelineAPIModel);
+      if (typeof data.id === "undefined") {
+        setError(data as unknown as string[]);
+        setIsCreateMode(true);
+        setTimeout(() => {
+          setError(null);
+        }, 5000);
+        return;
+      }
+      window.location.href = `/pipelines/${data.id}`;
+      return;
+    } else {
+      const pipelineToUpdate = {
+        name: editablePipeline!.name,
+        stages: removeOrderFromStages(editablePipeline!.stages),
+      } as unknown as PipelineAPIModel;
+
+      const data = await updatePipeline(
+        id as unknown as number,
+        pipelineToUpdate
+      );
+      if (typeof data.id === "undefined") {
+        setError(data as unknown as string[]);
+        setTimeout(() => {
+          setError(null);
+        }, 5000);
+        return;
+      }
       window.location.href = `/pipelines/${data.id}`;
       return;
     }
@@ -239,6 +276,11 @@ export default function PipelineDetailPage() {
     <>
       <NavBar></NavBar>
       <div className="p-20 min-h-screen">
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
+            {`Error: ${error}`}
+          </div>
+        )}
         {/* --- HEADER AREA (Name + Action Buttons) --- */}
         <div className="w-full flex items-center justify-between">
           {/* Pipeline Name — text or input */}
@@ -289,14 +331,16 @@ export default function PipelineDetailPage() {
                 </div>
 
                 {/* Edit Button */}
-                <button
-                  onClick={handleEdit}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 
+                {booleanFlags.ENABLE_EDIT_PIPELINE && (
+                  <button
+                    onClick={handleEdit}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 
                   rounded-xl hover:bg-gray-300 transition-all shadow-sm"
-                >
-                  <Pencil size={18} />
-                  Edit
-                </button>
+                  >
+                    <Pencil size={18} />
+                    Edit
+                  </button>
+                )}
 
                 {/* Start Build */}
                 <button
@@ -331,7 +375,6 @@ export default function PipelineDetailPage() {
             )}
           </div>
         </div>
-
         {/* --- DESCRIPTION ---
       {isEditing ? (
         <textarea
@@ -347,7 +390,6 @@ export default function PipelineDetailPage() {
       ) : (
         <PipelineDescription text={pipeline.description} />
       )} */}
-
         {/* --- STAGES + RIGHT PANEL --- */}
         <div className="flex flex-row mt-10">
           <StageList

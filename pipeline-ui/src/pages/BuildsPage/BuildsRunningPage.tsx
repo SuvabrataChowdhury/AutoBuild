@@ -2,12 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import type { Build, Pipeline } from "../../types/pipeline.types";
+import type { Build } from "../../types/pipeline.types";
 import {
   deleteBuild,
   getBuildData,
   getLiveBuildUpdates,
-  getPipeline,
 } from "../../services/pipelines.api";
 
 import NavBar from "../../components/common/navBar";
@@ -21,7 +20,6 @@ export default function BuildsRunningPage() {
   const { id } = useParams();
   const [build, setBuild] = useState<Build | null>(null);
   const [selectedStageId, setSelectedStageId] = useState<number>(0);
-  const [pipeline, setPipeline] = useState<Pipeline>();
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   useEffect(() => {
@@ -38,10 +36,6 @@ export default function BuildsRunningPage() {
       if (data.stageBuilds.length > 0) {
         setSelectedStageId(data.stageBuilds[0].id);
       }
-
-      // Load pipeline
-      const pipelineData = await getPipeline(data.pipelineId);
-      setPipeline(pipelineData);
 
       // Only open SSE if running
       if (data.currentState === "RUNNING" && booleanFlags.ENABLE_SSE) {
@@ -73,13 +67,15 @@ export default function BuildsRunningPage() {
 
     fetchData();
 
+    if (build?.currentState !== "RUNNING") return;
+
     intervalId = setInterval(fetchData, 10000);
 
     return () => {
       if (intervalId) clearInterval(intervalId);
       eventSource?.close();
     };
-  }, [id]);
+  }, [id, build?.currentState]);
 
   if (!build) return <div>Loading...</div>;
 
@@ -109,6 +105,14 @@ export default function BuildsRunningPage() {
       icon = <Loader className="text-yellow-600 animate-spin" size={25} />;
       color = "text-yellow-600";
       break;
+    case "STOPPED":
+      icon = <XCircle className="text-gray-600" size={18} />;
+      color = "text-gray-600";
+      break;
+    case "WAITING":
+      icon = <Loader className="text-blue-600 animate-spin" size={18} />;
+      color = "text-blue-600";
+      break;
     default:
       color = "text-gray-500";
   }
@@ -119,7 +123,7 @@ export default function BuildsRunningPage() {
 
       <div className="min-h-screen p-14 ml-10">
         <div className=" mb-10 mt-10 text-center flex-row gap-6 flex">
-          <PipelineHeader name={pipeline?.name} />
+          <PipelineHeader name={build.pipelineName} />
           <span className={color}>{icon}</span>
           {/* Delete button */}
           <div className="relative group inline-block">
@@ -156,9 +160,7 @@ export default function BuildsRunningPage() {
             onSelect={setSelectedStageId}
           />
 
-          {selectedStage && (
-            <BuildStageDetails stage={selectedStage} pipeline={pipeline} />
-          )}
+          {selectedStage && <BuildStageDetails stage={selectedStage} />}
         </div>
       </div>
     </>
