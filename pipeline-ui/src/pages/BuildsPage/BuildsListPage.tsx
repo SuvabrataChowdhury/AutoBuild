@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
 import type { Build } from "../../types/pipeline.types";
-import { getBuildsList, getPipeline } from "../../services/pipelines.api";
+import { getBuildsList } from "../../services/pipelines.api";
 import BuildsTable from "../../components/builds/buildsTable";
 import { useParams } from "react-router-dom";
 import NavBar from "../../components/common/navBar";
@@ -13,8 +13,7 @@ export default function BuildsListPage() {
   const [data, setData] = useState<Build[]>([]);
 
   const filtered = data.filter(async (p) => {
-    const pipeline = await getPipeline(p.pipelineId);
-    pipeline.name.toLowerCase().includes(search.toLowerCase());
+    p.pipelineName.toLowerCase().includes(search.toLowerCase());
   });
 
   useEffect(() => {

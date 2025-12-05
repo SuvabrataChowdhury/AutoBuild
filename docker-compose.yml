@@ -1,0 +1,42 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pipeline
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline-app:
+    image: pipeline-app 
+    container_name: pipeline-app
+    volumes:
+      - pipeline_scripts:/app/pipeline_scripts
+      - pipeline_build_logs:/app/pipeline_build_logs
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: pipeline
+      DB_USER: testuser
+      DB_PASSWORD: testpass
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
+  pipeline_scripts:
+  pipeline_build_logs:
