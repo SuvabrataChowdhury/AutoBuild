@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -38,18 +37,15 @@ export default function BuildsRunningPage() {
     load();
   }, [id]);
   useEffect(() => {
-    if (!build) return;
-
-    const buildId = Number(id);
+    const buildId = id as unknown as number;
 
     // Stop polling for final states
-    if (["SUCCESS", "FAILED", "STOPPED"].includes(build.currentState)) {
-      setIsDeleteVisible(true);
+    if (["SUCCESS", "FAILED", "STOPPED"].includes(build?.currentState ?? "")) {
       return; // no interval created
     }
 
     // Skip polling while running (SSE should handle this)
-    if (build.currentState === "RUNNING") return;
+    if (build?.currentState === "RUNNING") return;
 
     // Start polling
     const intervalId = setInterval(async () => {
@@ -62,9 +58,9 @@ export default function BuildsRunningPage() {
   }, [build?.currentState, id]);
 
   useEffect(() => {
-    if (!build) return;
+    if (booleanFlags.ENABLE_SSE === false) return;
 
-    if (build.currentState !== "RUNNING") return;
+    if (build?.currentState !== "RUNNING") return;
 
     const buildId = id as unknown as number;
     const url = getLiveBuildUpdates(buildId);
