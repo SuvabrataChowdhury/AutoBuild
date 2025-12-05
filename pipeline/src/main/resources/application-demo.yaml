@@ -23,7 +23,7 @@ spring:
 app:
   jwt:
     secret: demoSecretKeyForDevelopment1234567890
-    expiration: 1800000
+    expiration: 86400000 # TODO: Too high of a expiration. Reduce it
 
 logging:
   level:
