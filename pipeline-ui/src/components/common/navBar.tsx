@@ -1,14 +1,42 @@
-import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../../services/auth.api";
+import type { UserInfo } from "../../types/user.types";
 
 export default function NavBar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [user, setUser] = useState<UserInfo>();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
+    async function fetchUser() {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const data = await getCurrentUser(token);
+          setUser(data);
+        } catch (err) {
+          console.error("Failed to fetch user:", err);
+        }
+      }
+    }
+    fetchUser();
     return () => clearTimeout(t);
+  }, []);
+
+  // Close popover when clicking outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   if (loading) {
@@ -23,15 +51,16 @@ export default function NavBar() {
   return (
     <nav
       className="
-        w-full sticky top-0 z-40
-        h-12
-        bg-[#444]   /* lighter than pure black (#000 orrgb(75, 75, 75)) */
-        text-white
-        shadow-lg
-        py-4 px-8 flex items-center justify-between
-      "
+    w-full sticky top-0 z-40
+    h-12
+    bg-[#444]
+    text-white
+    shadow-lg
+    px-8
+    grid grid-cols-3 items-center
+  "
     >
-      {/* Left Logo (Clickable Home) */}
+      {/* LEFT — Logo */}
       <div
         className="flex items-center gap-3 group cursor-pointer select-none"
         onClick={() => navigate("/")}
@@ -43,14 +72,62 @@ export default function NavBar() {
         <span className="text-xl font-semibold tracking-wide">AutoBuild</span>
       </div>
 
-      {/* Center Navigation */}
-      <div className="flex items-center gap-8 text-lg">
+      {/* CENTER — Navigation */}
+      <div className="flex items-center justify-center gap-8 text-lg">
         <NavButton label="Home" route="/" />
         <NavButton label="Pipelines" route="/pipelines" />
         <NavButton label="Builds" route="/builds" />
       </div>
 
-      <div className="w-[80px]"></div>
+      {/* RIGHT — Profile Menu */}
+      <div className="flex justify-end">
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setOpen(!open)}
+            className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-full hover:bg-white/20 transition"
+          >
+            <User size={18} />
+            <span className="text-sm font-medium">
+              {user?.username || "User"}
+            </span>
+            <ChevronDown
+              size={16}
+              className={`transition-transform ${
+                open ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </button>
+
+          {open && (
+            <div
+              className="
+            absolute right-0 mt-2 w-56 
+            bg-[#333] text-white rounded-xl shadow-xl 
+            border border-white/10 p-4 animate-fadeIn
+          "
+            >
+              <p className="font-semibold text-lg">{user?.username}</p>
+              <p className="text-sm text-gray-300 mb-3">{user?.email}</p>
+
+              <hr className="border-white/10 my-3" />
+
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }}
+                className="
+              w-full flex items-center gap-2 px-3 py-2 
+              hover:bg-white/10 rounded-lg transition
+            "
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }

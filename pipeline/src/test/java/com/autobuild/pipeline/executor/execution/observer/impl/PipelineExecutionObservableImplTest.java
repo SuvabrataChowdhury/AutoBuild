@@ -14,7 +14,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.autobuild.pipeline.executor.entity.PipelineBuild;
 import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObservable;
@@ -36,7 +35,7 @@ public class PipelineExecutionObservableImplTest {
         pipelineExecutionObservable.attachExecutionForObservation(dummyBuild);
 
         List<UUID> allExecutions = pipelineExecutionObservable.getAllAttachedExecutions();
-        
+
         assertEquals(1, allExecutions.size());
         assertEquals(allExecutions.get(0), dummyBuild.getId());
     }
@@ -45,7 +44,8 @@ public class PipelineExecutionObservableImplTest {
     public void attachExecutionForObservationErrorTest() {
         pipelineExecutionObservable.attachExecutionForObservation(dummyBuild);
 
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.attachExecutionForObservation(dummyBuild));
+        assertThrows(IllegalArgumentException.class,
+                () -> pipelineExecutionObservable.attachExecutionForObservation(dummyBuild));
     }
 
     @Test
@@ -60,14 +60,16 @@ public class PipelineExecutionObservableImplTest {
 
     @Test
     public void removeExecutionForObservationErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.removeExecutionForObservation(dummyBuild));
+        assertThrows(IllegalArgumentException.class,
+                () -> pipelineExecutionObservable.removeExecutionForObservation(dummyBuild));
     }
 
     @Test
     public void subscribeTest() {
         pipelineExecutionObservable.subscribe(dummyBuild, mock(PipelineExecutionObserver.class));
 
-        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable.getAllSpecificSubscribedObservers(dummyBuild);
+        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable
+                .getAllSpecificSubscribedObservers(dummyBuild);
 
         assertNotNull(subscribers);
         assertEquals(1, subscribers.size());
@@ -75,7 +77,7 @@ public class PipelineExecutionObservableImplTest {
 
     @Test
     public void subscribeErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null,null));
+        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null, null));
     }
 
     @Test
@@ -84,7 +86,8 @@ public class PipelineExecutionObservableImplTest {
         pipelineExecutionObservable.subscribe(dummyBuild, subscriber);
         pipelineExecutionObservable.unsubscribe(dummyBuild, subscriber);
 
-        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable.getAllSpecificSubscribedObservers(dummyBuild);
+        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable
+                .getAllSpecificSubscribedObservers(dummyBuild);
 
         assertNotNull(subscribers);
         assertEquals(0, subscribers.size());
@@ -92,12 +95,13 @@ public class PipelineExecutionObservableImplTest {
 
     @Test
     public void unSubscribeNullErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(null,null));
+        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(null, null));
     }
 
     @Test
     public void unsubscribeFromEmptySubErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(dummyBuild,mock(PipelineExecutionObserver.class)));
+        assertThrows(IllegalArgumentException.class,
+                () -> pipelineExecutionObservable.unsubscribe(dummyBuild, mock(PipelineExecutionObserver.class)));
     }
 
     @Test
@@ -116,7 +120,6 @@ public class PipelineExecutionObservableImplTest {
     public void subscribeAllErrorTest() {
         assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null));
     }
-
 
     @Test
     public void unsubscribeAllTest() {
