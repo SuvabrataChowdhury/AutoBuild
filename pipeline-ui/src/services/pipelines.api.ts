@@ -1,8 +1,7 @@
 import axiosInstance from "./axiosInstance";
 import type { Build, BuildStageLogs, Pipeline, PipelineAPIModel } from "../types/pipeline.types";
-import type { AxiosError } from "axios";
-import { data } from "react-router-dom";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Temporary API base URL, this needs to be configured properly
 // TODO: Move to environment variable
 const API_BASE_URL = "http://localhost:8080/api/v1";
@@ -11,7 +10,7 @@ export async function getPipeline(id: number): Promise<Pipeline> {
     try {
         const response = await axiosInstance.get(`${API_BASE_URL}/pipeline/${id}`);
         return response.data as Pipeline;
-    } catch (error: AxiosError | any) {
+    } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error fetching pipeline:", error);
         throw error;
@@ -22,7 +21,7 @@ export async function getPipelines(): Promise<Pipeline[]> {
     try {
     const response = await axiosInstance.get(`${API_BASE_URL}/pipeline`);
     return response.data as Pipeline[];
-  } catch (error: AxiosError | any) {
+  } catch (error:any) {
         errorHandler(error?.response as Response);
     console.error("Error fetching pipelines:", error);
     return [];
@@ -33,7 +32,7 @@ export async function savePipeline(pipeline: PipelineAPIModel): Promise<Pipeline
     try {
         const response = await axiosInstance.post(`${API_BASE_URL}/pipeline`, pipeline);
         return response.data as Pipeline;
-   } catch (error: AxiosError | any) {
+   } catch (error:any) {
         const response = errorHandler(error?.response as Response);
         console.error("Error saving pipeline:", error);
         return response as unknown as Pipeline;
@@ -46,7 +45,7 @@ export async function updatePipeline(id: number, pipeline: PipelineAPIModel): Pr
     try{
         const response = await axiosInstance.put(`${API_BASE_URL}/pipeline/${id}`, pipeline);
         return response.data as Pipeline;   
-    } catch (error: AxiosError | any) {
+    } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error updating pipeline:", error);
         return error;
@@ -58,7 +57,7 @@ export async function deletePipeline(id: number) : Promise<boolean> {
     try {
         await axiosInstance.delete(`${API_BASE_URL}/pipeline/${id}`)
         return true
-    }catch (error: AxiosError | any) {
+    }catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error while deleting Pipeline", error)
         throw error;
@@ -70,7 +69,7 @@ export async function getBuildData(pipelineId: number): Promise<Build> {
     try {
         const response = await axiosInstance.get(`${API_BASE_URL}/pipeline/build/${pipelineId}`);
         return response.data as Build;
-    } catch (error: AxiosError | any) {
+    } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error fetching build data:", error);
         throw error;
@@ -84,7 +83,7 @@ export async function executeBuild(pipelineId: number): Promise<Build> {
         }
         const response = await axiosInstance.post(`${API_BASE_URL}/execute/pipeline`, req)
         return response.data as Build;
-    } catch (error: AxiosError | any) {
+    } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error executing Build:", error)
         throw error;
@@ -96,7 +95,7 @@ export async function getBuildsList(): Promise<Build[]> {
     try {
         const response = await axiosInstance.get(`${API_BASE_URL}/pipeline/build`)
         return response.data as Build[];
-   } catch (error: AxiosError | any) {
+   } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error fetching pipeline:", error)
         throw error;
@@ -107,7 +106,7 @@ export async function getBuildStagesLogs(id: number): Promise<BuildStageLogs> {
     try {
         const response = await axiosInstance.get(`${API_BASE_URL}/stage/build/logs/${id}`);
         return response.data as BuildStageLogs;
-    } catch (error: AxiosError | any) {
+    } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error fetching build stage logs:", error);
         throw error;
@@ -121,7 +120,7 @@ export async function getLiveBuildUpdates(id: number): Promise<string> {
 export async function deleteBuild(id: number) : Promise<void> {
     try {
         await axiosInstance.delete(`${API_BASE_URL}/pipeline/build/${id}`)
-   } catch (error: AxiosError | any) {
+   } catch (error:any) {
         errorHandler(error?.response as Response);
         console.error("Error while deleting Build", error)
         throw error;

@@ -75,7 +75,7 @@ export default function BuildsRunningPage() {
       if (intervalId) clearInterval(intervalId);
       eventSource?.close();
     };
-  }, [id]);
+  }, [id, build?.currentState]);
 
   if (!build) return <div>Loading...</div>;
 

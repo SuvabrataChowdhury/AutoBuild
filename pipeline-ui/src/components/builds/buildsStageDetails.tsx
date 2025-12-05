@@ -24,7 +24,8 @@ export default function StageDetails({ stage }: Props) {
 
     // Initial log load
     fetchLogs();
-    if (stage.currentState === "FAILED" || "STOPPED" || "SUCCESS") {
+
+    if (["FAILED", "STOPPED", "SUCCESS"].includes(stage.currentState)) {
       return () => clearInterval(intervalId);
     }
 
@@ -32,7 +33,7 @@ export default function StageDetails({ stage }: Props) {
     intervalId = setInterval(fetchLogs, 10000);
 
     // Cleanup interval on stage change or unmount
-  }, [stage.id]);
+  }, [stage.id, stage.currentState]);
 
   if (!stage) {
     return (
