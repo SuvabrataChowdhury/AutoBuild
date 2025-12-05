@@ -1,4 +1,4 @@
-export type PipelineStatus = "SUCCESS" | "FAILED" | "RUNNING" | "queued"
+export type PipelineStatus = "SUCCESS" | "FAILED" | "RUNNING" | "STOPPED" | "WAITING";
 
 // All interfaces are subjected to change as per the fields returned by the backend 
 
@@ -29,6 +29,7 @@ export interface PipelineAPIModel {
 
 export interface StageBuilds {
   id: number
+  stageName: string
   stageId : number
   currentState: PipelineStatus
 }
@@ -36,6 +37,7 @@ export interface StageBuilds {
 export interface Build {
   id: number
   pipelineId: number
+  pipelineName: string
   currentState: PipelineStatus
   stageBuilds: StageBuilds[]
 }

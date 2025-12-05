@@ -37,6 +37,14 @@ export default function BuildStageList({
             );
             color = "text-yellow-600";
             break;
+          case "STOPPED":
+            icon = <XCircle className="text-gray-600" size={18} />;
+            color = "text-gray-600";
+            break;
+          case "WAITING":
+            icon = <Loader className="text-blue-600 animate-spin" size={18} />;
+            color = "text-blue-600";
+            break;
           default:
             color = "text-gray-500";
         }
@@ -54,7 +62,7 @@ export default function BuildStageList({
               }
             `}
           >
-            <span className="font-medium">{stage.id}</span>
+            <span className="font-medium">{stage.stageName}</span>
             <span className={color}>{icon}</span>
           </button>
         );
