@@ -7,6 +7,7 @@ import BuildsListPage from "../pages/BuildsPage/BuildsListPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegistrationPage";
 import ProtectedRoute from "../pages/ProtectedRoute";
+import About from "../pages/About/About";
 
 export const router = createBrowserRouter([
   //protected routes
@@ -48,6 +49,12 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <BuildsListPage />
       </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/about",
+    element: (
+        <About />
     ),
   },
 
