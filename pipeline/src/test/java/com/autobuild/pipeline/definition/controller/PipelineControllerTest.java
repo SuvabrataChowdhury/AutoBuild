@@ -249,4 +249,81 @@ public class PipelineControllerTest {
         ResponseEntity<PipelineDTO> resp = controller.createPipeline(dto);
         assertEquals(saved.getId(), resp.getBody().getId());
     }
+
+    @Test
+    public void testReplacePipelineStagesCompletely() throws Exception {
+        PipelineDTO original = DummyData.getPipelineDTO();
+        original.setStages(new ArrayList<>(List.of(
+            new StageDTO(UUID.randomUUID(), "build", "bash", "echo build"),
+            new StageDTO(UUID.randomUUID(), "test", "bash", "echo test")
+        )));
+
+        PipelineDTO replaced = new PipelineDTO();
+        replaced.setId(original.getId());
+        replaced.setName(original.getName());
+        replaced.setStages(List.of(
+            new StageDTO(UUID.randomUUID(), "deploy", "bash", "echo deploy")
+        ));
+
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(List.of(
+            new StageDTO(null, "deploy", "bash", "echo deploy")
+        ));
+
+        doReturn(replaced).when(pipelineService).replacePipeline(eq("pid"), any(PipelineDTO.class));
+
+        ResponseEntity<PipelineDTO> response = controller.updatePipeline("pid", request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().getStages().size());
+        assertEquals("deploy", response.getBody().getStages().get(0).getName());
+    }
+
+    @Test
+    public void testReplacePipelineNameAndStages() throws Exception {
+        PipelineDTO replaced = new PipelineDTO();
+        replaced.setId(UUID.randomUUID());
+        replaced.setName("NewPipelineName");
+        replaced.setStages(List.of(
+            new StageDTO(UUID.randomUUID(), "stage1", "python", "print('hello')"),
+            new StageDTO(UUID.randomUUID(), "stage2", "bash", "echo 'world'")
+        ));
+
+        PipelineDTO request = new PipelineDTO();
+        request.setName("NewPipelineName");
+        request.setStages(List.of(
+            new StageDTO(null, "stage1", "python", "print('hello')"),
+            new StageDTO(null, "stage2", "bash", "echo 'world'")
+        ));
+
+        doReturn(replaced).when(pipelineService).replacePipeline(eq("pid"), any(PipelineDTO.class));
+
+        ResponseEntity<PipelineDTO> response = controller.updatePipeline("pid", request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("NewPipelineName", response.getBody().getName());
+        assertEquals(2, response.getBody().getStages().size());
+    }
+
+    @Test
+    public void testReplacePipelineInvalidId() throws Exception {
+        PipelineDTO request = new PipelineDTO();
+        request.setName("test");
+
+        doThrow(new InvalidIdException("Invalid ID")).when(pipelineService)
+                .replacePipeline(eq("invalid"), any(PipelineDTO.class));
+
+        assertThrows(InvalidIdException.class, () -> controller.updatePipeline("invalid", request));
+    }
+
+    @Test
+    public void testReplacePipelineDuplicateName() throws Exception {
+        PipelineDTO request = new PipelineDTO();
+        request.setName("existingName");
+
+        doThrow(new DuplicateEntryException("Name exists")).when(pipelineService)
+                .replacePipeline(eq("pid"), any(PipelineDTO.class));
+
+        assertThrows(DuplicateEntryException.class, () -> controller.updatePipeline("pid", request));
+    }
 }

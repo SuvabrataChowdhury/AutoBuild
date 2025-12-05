@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -55,7 +56,7 @@ public class PipelineController {
         return ResponseEntity.created(location).body(createdPipeline);
     }
 
-    @PutMapping("/{pipelineId}")
+    @PatchMapping("/{pipelineId}")
     public ResponseEntity<PipelineDTO> modifyPipeline(
             @PathVariable String pipelineId,
             @RequestBody PipelineDTO patchRequest)
@@ -68,5 +69,12 @@ public class PipelineController {
             throws IOException, InvalidIdException {
         pipelineService.deletePipelineById(pipelineId);
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/{pipelineId}")
+    public ResponseEntity<PipelineDTO> updatePipeline(
+            @PathVariable String pipelineId,
+            @RequestBody @Valid PipelineDTO putRequest)
+            throws InvalidIdException, IOException, DuplicateEntryException {
+        return ResponseEntity.ok(pipelineService.replacePipeline(pipelineId, putRequest));
     }
 }
