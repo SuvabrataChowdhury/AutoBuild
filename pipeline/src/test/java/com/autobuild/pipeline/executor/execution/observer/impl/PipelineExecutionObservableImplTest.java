@@ -36,7 +36,7 @@ public class PipelineExecutionObservableImplTest {
         pipelineExecutionObservable.attachExecutionForObservation(dummyBuild);
 
         List<UUID> allExecutions = pipelineExecutionObservable.getAllAttachedExecutions();
-        
+
         assertEquals(1, allExecutions.size());
         assertEquals(allExecutions.get(0), dummyBuild.getId());
     }
@@ -45,7 +45,8 @@ public class PipelineExecutionObservableImplTest {
     public void attachExecutionForObservationErrorTest() {
         pipelineExecutionObservable.attachExecutionForObservation(dummyBuild);
 
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.attachExecutionForObservation(dummyBuild));
+        assertThrows(IllegalArgumentException.class,
+                () -> pipelineExecutionObservable.attachExecutionForObservation(dummyBuild));
     }
 
     @Test
@@ -67,7 +68,8 @@ public class PipelineExecutionObservableImplTest {
     public void subscribeTest() {
         pipelineExecutionObservable.subscribe(dummyBuild, mock(PipelineExecutionObserver.class));
 
-        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable.getAllSpecificSubscribedObservers(dummyBuild);
+        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable
+                .getAllSpecificSubscribedObservers(dummyBuild);
 
         assertNotNull(subscribers);
         assertEquals(1, subscribers.size());
@@ -75,7 +77,7 @@ public class PipelineExecutionObservableImplTest {
 
     @Test
     public void subscribeErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null,null));
+        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null, null));
     }
 
     @Test
@@ -84,14 +86,15 @@ public class PipelineExecutionObservableImplTest {
         pipelineExecutionObservable.subscribe(dummyBuild, subscriber);
         pipelineExecutionObservable.unsubscribe(dummyBuild, subscriber);
 
-        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable.getAllSpecificSubscribedObservers(dummyBuild);
+        List<PipelineExecutionObserver> subscribers = pipelineExecutionObservable
+                .getAllSpecificSubscribedObservers(dummyBuild);
 
         assertNull(subscribers);
     }
 
     @Test
     public void unSubscribeNullErrorTest() {
-        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(null,null));
+        assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.unsubscribe(null, null));
     }
 
     @Test
@@ -110,7 +113,6 @@ public class PipelineExecutionObservableImplTest {
     public void subscribeAllErrorTest() {
         assertThrows(IllegalArgumentException.class, () -> pipelineExecutionObservable.subscribe(null));
     }
-
 
     @Test
     public void unsubscribeAllTest() {

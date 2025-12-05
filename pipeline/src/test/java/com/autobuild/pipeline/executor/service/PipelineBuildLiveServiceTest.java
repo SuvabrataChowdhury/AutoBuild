@@ -26,7 +26,6 @@ import com.autobuild.pipeline.executor.execution.observer.PipelineExecutionObser
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 import com.autobuild.pipeline.executor.repository.PipelineBuildRepository;
 import com.autobuild.pipeline.testutility.DummyData;
-import com.autobuild.pipeline.utility.file.PipelineFileService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -79,7 +78,8 @@ public class PipelineBuildLiveServiceTest {
 
         SseEmitter newSubscriber = mock(SseEmitter.class);
 
-        assertThrows(UnsupportedOperationException.class,() -> pipelineBuildService.addSubscriber(newSubscriber, pipelineId));
+        assertThrows(UnsupportedOperationException.class,
+                () -> pipelineBuildService.addSubscriber(newSubscriber, pipelineId));
     }
 
     @Test
@@ -91,7 +91,8 @@ public class PipelineBuildLiveServiceTest {
 
         SseEmitter newSubscriber = mock(SseEmitter.class);
 
-        assertThrows(EntityNotFoundException.class,() -> pipelineBuildService.addSubscriber(newSubscriber, pipelineId));
+        assertThrows(EntityNotFoundException.class,
+                () -> pipelineBuildService.addSubscriber(newSubscriber, pipelineId));
     }
 
     @Test
