@@ -1,2 +1,4 @@
 pipeline_scripts/*
 pipeline_build_logs/*
+
+.vscode/*
