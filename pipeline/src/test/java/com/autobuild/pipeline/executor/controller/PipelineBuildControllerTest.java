@@ -44,7 +44,7 @@ public class PipelineBuildControllerTest {
     public void getPipelineBuildTest() {
         UUID pipelineBuildId = UUID.randomUUID();
 
-        PipelineBuildDTO dummyPipelineDTO = new PipelineBuildDTO(pipelineBuildId, UUID.randomUUID(),
+        PipelineBuildDTO dummyPipelineDTO = new PipelineBuildDTO(pipelineBuildId, UUID.randomUUID(), "Dummy Pipeline",
                 PipelineExecutionState.WAITING, List.of(DummyData.getStageBuildDTO()));
 
         doReturn(dummyPipelineDTO).when(service).getPipelineBuild(pipelineBuildId);
@@ -55,6 +55,7 @@ public class PipelineBuildControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
+        assertEquals(pipelineBuildId, response.getBody().getId());
         assertEquals(pipelineBuildId, response.getBody().getId());
     }
 
@@ -68,9 +69,9 @@ public class PipelineBuildControllerTest {
     @Test
     public void getAllBuildsTest() {
         List<PipelineBuildDTO> dummyBuilds = List.of(
-                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.WAITING,
+                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), "Dummy Pipeline",PipelineExecutionState.WAITING,
                         List.of(DummyData.getStageBuildDTO())),
-                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), PipelineExecutionState.SUCCESS,
+                new PipelineBuildDTO(UUID.randomUUID(), UUID.randomUUID(), "Dummy Pipeline", PipelineExecutionState.SUCCESS,
                         List.of(DummyData.getStageBuildDTO())));
         doReturn(dummyBuilds).when(service).getAllBuilds();
         ResponseEntity<List<PipelineBuildDTO>> response = controller.getAllBuilds();

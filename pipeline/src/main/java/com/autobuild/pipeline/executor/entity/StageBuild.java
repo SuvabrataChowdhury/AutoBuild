@@ -32,7 +32,6 @@ import lombok.Setter;
 @Entity
 public class StageBuild {
     @Id
-    // @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
@@ -43,9 +42,8 @@ public class StageBuild {
     @Column(name = "stage_build_current_state", nullable = false)
     private StageExecutionState currentState;
 
-    //TODO: Add this attribute
     @Column(name = "log_path", nullable = false)
-    private String logPath; //Points to stored log file for reading purpose
+    private String logPath;
 
     public StageBuild(Stage stage) {
         this.stage = stage;

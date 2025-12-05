@@ -25,5 +25,7 @@ public class StageBuildDTO {
 
     private UUID stageId;
 
+    private String stageName;
+
     private StageExecutionState currentState;
 }
