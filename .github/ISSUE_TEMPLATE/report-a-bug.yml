@@ -3,6 +3,9 @@ description: Form to file a Bug Report
 title: "[Bug]: "
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: "> **Note:** A Bug is considered to be an existing functionality working unexpectedly"
   - type: text-area
     id: bug-description
     attributes:
