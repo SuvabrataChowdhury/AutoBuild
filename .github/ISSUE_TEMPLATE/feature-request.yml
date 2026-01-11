@@ -1,0 +1,33 @@
+name: Request a Feature
+description: Form to enlist a Feature.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "> **Note:** A Feature is considered to be a completely new functionality that does not exist yet in the application."
+  - type: text-area
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Enter the detailed description of the desired feature
+      placeholder: description..
+    validations:
+      required: true
+  - type: text-area
+    id: benefit-hypothesis
+    attributes:
+      label: Benefit hypothesis
+      description: How will this feature be beneficial to the end-users?
+      value: |
+        1. As a developer, I ..
+        2. As a user, I ...
+        3. As a QA, I ...
+        ...
+    validations:
+      required: true
+  - type: input
+    id: additional-comments
+    attriputes:
+      label: Additional comments
+      placeholder: Any Additional Comment related to this feature request

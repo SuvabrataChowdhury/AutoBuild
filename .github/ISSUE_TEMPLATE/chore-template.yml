@@ -1,0 +1,41 @@
+name: Enlist a Chore
+description: Form to enlist a chore.
+title: "[chore]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "> **Note:** A Chore is considered to be a task that is not related to the core application development and has no apparant visibility to end user. But these tasks help out the actual application development."
+  - type: text-area
+    id: chore-description
+    attributes:
+      label: Chore Description
+      description: Enter the detailed description of the chore
+      placeholder: description..
+    validations:
+      required: true
+  - type: text-area
+    id: benefit-hypothesis
+    attributes:
+      label: Benefit hypothesis
+      description: How will this chore help the application development? 
+    validations:
+      required: true
+  - type: dropdown
+    id: importance
+    attributes:
+      label: Chore importance
+      description: Choose how important this chore is. In absense of it how much does the application suffers?
+      options:
+        - Very High
+        - High
+        - Medium
+        - Low
+      default: 3
+    validations:
+      required: true
+  - type: input
+    id: additional-comments
+    attriputes:
+      label: Additional comments
+      placeholder: Any Additional Comment related to this feature request
