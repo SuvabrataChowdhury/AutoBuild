@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: "> **Note:** A Chore is considered to be a task that is not related to the core application development and has no apparant visibility to end user. But these tasks help out the actual application development."
-  - type: text-area
+  - type: textarea
     id: chore-description
     attributes:
       label: Chore Description
@@ -14,7 +14,7 @@ body:
       placeholder: description..
     validations:
       required: true
-  - type: text-area
+  - type: textarea
     id: benefit-hypothesis
     attributes:
       label: Benefit hypothesis
