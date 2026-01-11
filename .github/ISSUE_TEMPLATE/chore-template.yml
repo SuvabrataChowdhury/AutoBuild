@@ -36,6 +36,6 @@ body:
       required: true
   - type: input
     id: additional-comments
-    attriputes:
+    attributes:
       label: Additional comments
       placeholder: Any Additional Comment related to this feature request
