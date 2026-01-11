@@ -1,0 +1,43 @@
+name: Report A Bug
+description: Form to file a Bug Report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: text-area
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: Enter the detailed description of the bug discovered
+      placeholder: description..
+    validations:
+      required: true
+  - type: text-area
+    id: bug-reproduction
+    attributes:
+      label: Steps to Reproduce the Bug
+      description: Enter the steps that can be followed to reproduce this bug
+      value: |
+        1. 
+        2.
+        3. 
+        ...
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Bug severity
+      description: Choose how severe this bug is. How much does it affect core functionality?
+      options:
+        - Very High
+        - High
+        - Medium
+        - Low
+      default: 3
+    validations:
+      required: true
+  - type: input
+    id: additional-comments
+    attriputes:
+      label: Additional comments
+      placeholder: Any Additional Comment related to this Bug
