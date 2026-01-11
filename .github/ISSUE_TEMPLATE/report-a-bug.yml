@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: "> **Note:** A Bug is considered to be an existing functionality working unexpectedly"
-  - type: text-area
+  - type: textarea
     id: bug-description
     attributes:
       label: Bug Description
@@ -14,7 +14,7 @@ body:
       placeholder: description..
     validations:
       required: true
-  - type: text-area
+  - type: textarea
     id: bug-reproduction
     attributes:
       label: Steps to Reproduce the Bug

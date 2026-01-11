@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: "> **Note:** A Feature is considered to be a completely new functionality that does not exist yet in the application."
-  - type: text-area
+  - type: textarea
     id: feature-description
     attributes:
       label: Feature Description
@@ -14,7 +14,7 @@ body:
       placeholder: description..
     validations:
       required: true
-  - type: text-area
+  - type: textarea
     id: benefit-hypothesis
     attributes:
       label: Benefit hypothesis
