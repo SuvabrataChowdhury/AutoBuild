@@ -15,7 +15,7 @@ body:
     validations:
       required: true
   - type: text-area
-    id: benefit-hypothesis
+    id: chore-benefit-hypothesis
     attributes:
       label: Benefit hypothesis
       description: How will this chore help the application development? 
@@ -35,7 +35,7 @@ body:
     validations:
       required: true
   - type: input
-    id: additional-comments
-    attriputes:
+    id: chore-additional-comments
+    attributes:
       label: Additional comments
       placeholder: Any Additional Comment related to this feature request
