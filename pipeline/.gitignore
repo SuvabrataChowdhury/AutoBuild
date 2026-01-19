@@ -30,5 +30,7 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+.vscode/*
 
+## Don't Ignore Templates
+!.vscode/*.template

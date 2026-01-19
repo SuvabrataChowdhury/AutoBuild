@@ -1,4 +1,4 @@
-# Backend setup
+# Run backend container
 
 ## Steps:
 - From project root execute,
