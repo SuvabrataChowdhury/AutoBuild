@@ -38,6 +38,6 @@ AutoBuild is platform to build your CI/CD pipelines at ease.
 
 ## Quick Links
 1. [Architecture](./architecture/architecture.md)
-2. [Backend Docker Build](./setup/backend/setup.md) 
+2. [Local Dev Environment Setup](./setup/dev-env-setup.md) 
 
 > Note: All mentioned technologies and requirements might change in future
