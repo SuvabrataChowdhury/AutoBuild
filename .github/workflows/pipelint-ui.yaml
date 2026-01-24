@@ -1,0 +1,14 @@
+name: Pipeline UI CI
+
+on:
+    pull_request:
+        paths:
+            - 'pipelint-ui/**'
+        branches: ["main"]
+        types: [review_requested, ready_for_review]
+
+jobs:
+    ci:
+        uses: ./.github/workflows/_react_ci.yaml
+        with:
+            ui-path: ./pipelint-ui

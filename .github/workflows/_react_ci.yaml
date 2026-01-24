@@ -1,0 +1,23 @@
+name: React UI CI
+
+on:
+    workflow_call:
+        inputs:
+            ui-path:
+                required: true
+                type: string
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: "22"
+            - name: Lint UI
+              run: |
+                cd ${{ inputs.ui-path }}
+                npm install # TODO: use npm ci and introduce package-lock.json
+                npm run lint
