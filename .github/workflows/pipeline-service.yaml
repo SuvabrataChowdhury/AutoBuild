@@ -1,14 +1,14 @@
-name: Pipeline Service CI
+name: Pipeline Service
 
 on:
     pull_request:
         paths:
             - 'pipeline/**'
         branches: ["main"]
-        types: [review_requested, ready_for_review]
+        types: [opened, reopened, synchronize]
 
 jobs:
-    ci:
+    service-ci:
         uses: ./.github/workflows/_springboot_service_ci.yaml
         with:
-            service-path: ./pipeline
+            service-path: pipeline

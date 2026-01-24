@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+// Dummy change to test ci
+
 /**
  * Auth-less security configuration for local development.
  * 
