@@ -12,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-public class DefaultSecurityConfigTest {
+public class BasicAuthSecurityConfigTest {
     @Mock
     private HttpSecurity mockHttpSecurity;
 
     @InjectMocks
-    private DefaultSecurityConfig localSecurityConfig;
+    private BasicAuthSecurityConfig basicAuthSecurityConfig;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -31,9 +31,9 @@ public class DefaultSecurityConfigTest {
     }
 
     @Test
-    void testDefaultSecurity() throws Exception {
-        localSecurityConfig.defaultSecurityFilterChain(mockHttpSecurity);
-        
+    void testFilterChain() throws Exception {
+        basicAuthSecurityConfig.filterChain(mockHttpSecurity);
+
         verify(mockHttpSecurity,times(1)).csrf(any());
         verify(mockHttpSecurity,times(1)).authorizeHttpRequests(any());
         verify(mockHttpSecurity,times(1)).httpBasic(any());

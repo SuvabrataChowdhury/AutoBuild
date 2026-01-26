@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,6 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 
  * @author Baibhab Dey
  */
+
+//TODO: Move it to integration tests.
+
+@ActiveProfiles("demo")
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {AuthController.class, AuthControllerTest.TestSecurityConfig.class})

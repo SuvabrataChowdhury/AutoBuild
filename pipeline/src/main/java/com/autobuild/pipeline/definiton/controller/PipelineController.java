@@ -26,7 +26,7 @@ import jakarta.validation.Valid;
 /**
  * Controller for all CRUD operations on Pipeline.
  * 
- * @author Suvabrata Chowdhury & Baibhab Dey
+ * @author Suvabrata Chowdhury
  */
 @RestController
 @RequestMapping("/api/v1/pipeline")

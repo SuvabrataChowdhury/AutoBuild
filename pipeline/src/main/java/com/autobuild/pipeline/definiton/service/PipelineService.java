@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Service for pipeline CRUD operations.
  * 
- * @author Suvabrata Chowdhury & Baibhab Dey
+ * @author Suvabrata Chowdhury
  */
 @Slf4j
 @Service

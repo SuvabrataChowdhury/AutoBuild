@@ -1,0 +1,7 @@
+# TODO: Put it with the base application.yaml for easier management
+
+spring:
+  security:
+    user:
+      name: admin
+      password: "{noop}admin"
