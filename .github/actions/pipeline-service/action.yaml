@@ -1,0 +1,34 @@
+name: Pipeline Service Check
+description: Composite actions for pipeline service
+
+inputs:
+  base-ref:
+    required: true
+    description: Reference to base github branch
+
+runs:
+  using: composite
+  steps:
+    - name: Check if pipeline service has changed
+      id: is_pipeline_service_changed
+      uses: ./.github/actions/detect-directory-changes
+      with:
+        directory-path: pipeline
+        base-ref: ${{ inputs.base-ref }}
+    - name: Set up JDK 17
+      if: steps.is_pipeline_service_changed.outputs.is_changed == 'true'
+      uses: actions/setup-java@v4
+      with:
+        java-version: "17"
+        distribution: "temurin"
+        cache: maven
+    - name: Basic Validation
+      shell: bash
+      run: | 
+        if ${{steps.is_pipeline_service_changed.outputs.is_changed}}; then
+          echo "Directory contents have changed. Proceeding with subsequent checks"
+          cd pipeline
+          mvn --batch-mode clean install
+        else
+          echo "Directory contents are unchanged. Skipping subsequent checks"
+        fi
