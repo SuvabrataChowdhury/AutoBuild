@@ -13,8 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 
 @Configuration
-@Profile("!demo & !test")
-public class DefaultLocalSecurityConfig {
+@Profile("default")
+public class DefaultSecurityConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurity(HttpSecurity http) throws Exception {

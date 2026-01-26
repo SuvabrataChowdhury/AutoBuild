@@ -2,7 +2,6 @@ package com.autobuild.pipeline.auth.security;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -13,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-public class DefaultLocalSecurityConfigTest {
+public class DefaultSecurityConfigTest {
     @Mock
     private HttpSecurity mockHttpSecurity;
 
     @InjectMocks
-    private DefaultLocalSecurityConfig localSecurityConfig;
+    private DefaultSecurityConfig localSecurityConfig;
 
     @BeforeEach
     public void setup() throws Exception {
