@@ -1,3 +1,5 @@
+# TODO: Deprecate it and move it into one application.yaml
+
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
