@@ -38,4 +38,4 @@ body:
     id: additional-comments
     attributes:
       label: Additional comments
-      placeholder: Any Additional Comment related to this feature request
+      placeholder: Any Additional Comment related to this chore request
