@@ -7,7 +7,8 @@
 # Changes Summary
 > What changes has been done to solve the issue
 
-# Relevant Screenshots
+# Testing Done
+> How has the solution been tested?
 
 # Pull Request Checklist
 
