@@ -8,6 +8,7 @@ import com.autobuild.pipeline.auth.entity.User;
 import com.autobuild.pipeline.auth.repository.UserRepository;
 import com.autobuild.pipeline.auth.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 /**
  * Service class handling authentication logic such as user registration and login.
  */
+@Profile("!default & !basicAuth")
 @Service
 public class AuthService {
 

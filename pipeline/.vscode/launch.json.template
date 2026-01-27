@@ -3,12 +3,22 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot: Local",
+      "name": "Pipeline: Local",
       "request": "launch",
       "mainClass": "com.autobuild.pipeline.PipelineApplication",
       "projectName": "pipeline",
       "env": {
-        "SPRING_PROFILES_ACTIVE": "default"
+        "SPRING_PROFILES_ACTIVE": "default,h2InMemory"
+      }
+    },
+    {
+      "type": "java",
+      "name": "Pipeline: Local Basic Auth",
+      "request": "launch",
+      "mainClass": "com.autobuild.pipeline.PipelineApplication",
+      "projectName": "pipeline",
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "basicAuth,h2InMemory"
       }
     }
   ]
