@@ -29,7 +29,7 @@ AutoBuild is platform to build your CI/CD pipelines at ease.
 - **DevOps:**
     - Github Actions
 
-![tech stack](./architecture/drawio/img/techstack.svg)
+![tech stack](./autobuild-docs/architecture/drawio/img/techstack.svg)
 
 ## Design Tools:
 1. [Figma](https://www.figma.com/design/2Uv5PkfkJ2xkceuN9gf75z/Untitled?t=kS7SzIYWNZSZ6t2r-0): Figma Link
@@ -37,7 +37,7 @@ AutoBuild is platform to build your CI/CD pipelines at ease.
 2. [TAM](https://help.sap.com/docs/SAP_POWERDESIGNER/1cc460ad80f446e6a9d19303919ee269/c818cfa96e1b1014abb5d137d4620b1e.html): SAP specified architectural modelling standard.
 
 ## Quick Links
-1. [Architecture](./architecture/architecture.md)
-2. [Local Dev Environment Setup](./setup/dev-env-setup.md) 
+1. [Architecture](./autobuild-docs/architecture/architecture.md)
+2. [Local Dev Environment Setup](./autobuild-docs/setup/dev-env-setup.md) 
 
 > Note: All mentioned technologies and requirements might change in future
