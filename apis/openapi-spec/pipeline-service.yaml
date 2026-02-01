@@ -1,0 +1,332 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Pipeline Build
+  description: Operations related to builds of a pipeline
+- name: Pipeline
+  description: Operations related to pipeline
+paths:
+  /api/v1/pipeline/{pipelineId}:
+    get:
+      tags:
+      - Pipeline
+      summary: Get a pipeline
+      operationId: getPipelineById
+      parameters:
+      - name: pipelineId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+    put:
+      tags:
+      - Pipeline
+      summary: "[Experimental]: Update a pipeline"
+      description: API to update pipeline. It's currently under development. Do not
+        use it!
+      operationId: updatePipeline
+      parameters:
+      - name: pipelineId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pipeline"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+      deprecated: true
+    delete:
+      tags:
+      - Pipeline
+      summary: Delete a pipeline
+      operationId: deletePipeline
+      parameters:
+      - name: pipelineId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+      - Pipeline
+      summary: "[Experimental]: Update a pipeline"
+      description: API to update pipeline. It's currently under development. Do not
+        use it!
+      operationId: modifyPipeline
+      parameters:
+      - name: pipelineId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pipeline"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+      deprecated: true
+  /api/v1/pipeline:
+    get:
+      tags:
+      - Pipeline
+      summary: Get all pipelines
+      operationId: getAllPipelines
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pipeline"
+    post:
+      tags:
+      - Pipeline
+      summary: Create a pipeline
+      operationId: createPipeline
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pipeline"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+  /api/v1/execute/pipeline:
+    post:
+      tags:
+      - Pipeline
+      summary: Execute a pipeline
+      operationId: executePipeline
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PipelineExecuteRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PipelineBuild"
+  /api/v1/stage/build/logs/{stageBuildId}:
+    get:
+      tags:
+      - Stage Build
+      summary: Get the logs related to a stage build
+      operationId: getStageBuildLogs
+      parameters:
+      - name: stageBuildId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/v1/pipeline/build:
+    get:
+      tags:
+      - Pipeline Build
+      summary: Get all pipeline builds
+      operationId: getAllBuilds
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PipelineBuild"
+  /api/v1/pipeline/build/{pipelineBuildId}:
+    get:
+      tags:
+      - Pipeline Build
+      summary: Get a pipeline build
+      operationId: getPipelineBuild
+      parameters:
+      - name: pipelineBuildId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PipelineBuild"
+    delete:
+      tags:
+      - Pipeline Build
+      summary: Delete a pipeline build
+      operationId: deletePipelineBuild
+      parameters:
+      - name: pipelineBuildId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+  /api/v1/pipeline/build/sse/subscribe/{pipelineBuildId}:
+    get:
+      tags:
+      - Pipeline Build
+      summary: Get a live executing pipeline build as Server Sent Event
+      operationId: getLivePipelineBuild
+      parameters:
+      - name: pipelineBuildId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/SseEmitter"
+components:
+  schemas:
+    Pipeline:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
+      required:
+      - name
+      - stages
+    Stage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        scriptType:
+          type: string
+        command:
+          type: string
+      required:
+      - command
+      - name
+      - scriptType
+    PipelineExecuteRequest:
+      type: object
+      properties:
+        pipelineId:
+          type: string
+          format: uuid
+      required:
+      - pipelineId
+    PipelineBuild:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipelineId:
+          type: string
+          format: uuid
+        pipelineName:
+          type: string
+        currentState:
+          type: string
+          enum:
+          - WAITING
+          - RUNNING
+          - SUCCESS
+          - FAILED
+        stageBuilds:
+          type: array
+          items:
+            $ref: "#/components/schemas/StageBuild"
+    StageBuild:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stageId:
+          type: string
+          format: uuid
+        stageName:
+          type: string
+        currentState:
+          type: string
+          enum:
+          - WAITING
+          - RUNNING
+          - SUCCESS
+          - FAILED
+          - STOPPED
+    SseEmitter:
+      type: object
+      properties:
+        timeout:
+          type: integer
+          format: int64
