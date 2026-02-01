@@ -13,6 +13,8 @@ import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
 import com.autobuild.pipeline.executor.service.PipelineExecutorService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
@@ -20,7 +22,7 @@ import jakarta.validation.Valid;
  * 
  * @author Suvabrata Chowdhury
  */
-
+@Tag(name = "Pipeline")
 @RestController
 @RequestMapping("/api/v1/execute")
 public class PipelineExecutorController {
@@ -28,6 +30,7 @@ public class PipelineExecutorController {
     @Autowired
     private PipelineExecutorService service;
 
+    @Operation(summary = "Execute a pipeline")
     @PostMapping("/pipeline")
     public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request)
             throws IOException {

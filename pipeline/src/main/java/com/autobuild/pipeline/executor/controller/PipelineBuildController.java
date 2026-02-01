@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.service.PipelineBuildService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
+@Tag(name = "Pipeline Build", description = "Operations related to builds of a pipeline")
 @RestController
 @RequestMapping("/api/v1/pipeline/build")
 public class PipelineBuildController {
@@ -31,16 +34,19 @@ public class PipelineBuildController {
     @Autowired
     private PipelineBuildService service;
 
+    @Operation(summary = "Get a pipeline build")
     @GetMapping("/{pipelineBuildId}")
     public ResponseEntity<PipelineBuildDTO> getPipelineBuild(@PathVariable UUID pipelineBuildId) {
         return ResponseEntity.ok(service.getPipelineBuild(pipelineBuildId));
     }
 
+    @Operation(summary = "Get all pipeline builds")
     @GetMapping
     public ResponseEntity<List<PipelineBuildDTO>> getAllBuilds() {
         return ResponseEntity.ok(service.getAllBuilds());
     }
 
+    @Operation(summary = "Delete a pipeline build")
     @DeleteMapping("/{pipelineBuildId}")
     public ResponseEntity<Void> deletePipelineBuild(@PathVariable UUID pipelineBuildId) throws IOException {
         service.deletePipelineBuild(pipelineBuildId);
