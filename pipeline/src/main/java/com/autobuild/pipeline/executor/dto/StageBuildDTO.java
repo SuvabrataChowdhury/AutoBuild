@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.autobuild.pipeline.executor.execution.state.StageExecutionState;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+@Schema(name = "StageBuild")
 public class StageBuildDTO {
     private UUID id;
-    // private String buildStatus; //TODO: use enums for strict enforcement
 
     private UUID stageId;
 

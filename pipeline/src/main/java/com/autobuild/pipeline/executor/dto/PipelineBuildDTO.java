@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.autobuild.pipeline.executor.execution.state.PipelineExecutionState;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+@Schema(name = "PipelineBuild")
 public class PipelineBuildDTO {
     private UUID id;
     // private int buildNo;

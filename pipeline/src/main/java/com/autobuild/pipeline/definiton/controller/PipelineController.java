@@ -21,6 +21,8 @@ import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
 import com.autobuild.pipeline.definiton.service.PipelineService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
@@ -28,6 +30,7 @@ import jakarta.validation.Valid;
  * 
  * @author Suvabrata Chowdhury
  */
+@Tag(name = "Pipeline", description = "Operations related to pipeline")
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
@@ -35,25 +38,33 @@ public class PipelineController {
     @Autowired
     private PipelineService pipelineService;
 
+    @Operation(summary = "Get a pipeline")
     @GetMapping("/{pipelineId}")
     public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId)
             throws InvalidIdException, IOException {
         return ResponseEntity.ok(pipelineService.getPipelineById(pipelineId));
     }
 
+    @Operation(summary = "Get all pipelines")
     @GetMapping
     public ResponseEntity<List<PipelineDTO>> getAllPipelines() {
         return ResponseEntity.ok(pipelineService.getAllPipelines());
     }
 
+    @Operation(summary = "Create a pipeline")
     @PostMapping
     public ResponseEntity<PipelineDTO> createPipeline(@RequestBody @Valid PipelineDTO pipelineRequest)
-            throws DuplicateEntryException, IOException, InvalidIdException { // added InvalidIdException
+            throws DuplicateEntryException, IOException, InvalidIdException {
         PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
         URI location = URI.create("/api/v1/pipeline/" + createdPipeline.getId());
         return ResponseEntity.created(location).body(createdPipeline);
     }
 
+    @Operation(
+        summary = "[Experimental]: Update a pipeline",
+        description = "API to update pipeline. It's currently under development. Do not use it!",
+        deprecated = true
+    )
     @PatchMapping("/{pipelineId}")
     public ResponseEntity<PipelineDTO> modifyPipeline(
             @PathVariable String pipelineId,
@@ -62,12 +73,19 @@ public class PipelineController {
         return ResponseEntity.ok(pipelineService.modifyPipeline(pipelineId, patchRequest));
     }
 
+    @Operation(summary = "Delete a pipeline")
     @DeleteMapping("/{pipelineId}")
     public ResponseEntity<Void> deletePipeline(@PathVariable String pipelineId)
             throws IOException, InvalidIdException {
         pipelineService.deletePipelineById(pipelineId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(
+        summary = "[Experimental]: Update a pipeline",
+        description = "API to update pipeline. It's currently under development. Do not use it!",
+        deprecated = true
+    )
     @PutMapping("/{pipelineId}")
     public ResponseEntity<PipelineDTO> updatePipeline(
             @PathVariable String pipelineId,

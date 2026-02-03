@@ -3,6 +3,7 @@ package com.autobuild.pipeline.definiton.dto;
 import java.util.List;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Schema(name = "Pipeline")
 public class PipelineDTO {
     private UUID id;
 
