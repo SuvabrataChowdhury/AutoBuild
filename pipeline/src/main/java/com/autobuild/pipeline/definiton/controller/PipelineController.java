@@ -30,7 +30,7 @@ import jakarta.validation.Valid;
  * 
  * @author Suvabrata Chowdhury
  */
-@Tag(name = "Pipeline", description = "Operations related to pipeline <testing changes>")
+@Tag(name = "Pipeline", description = "Operations related to pipeline")
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
@@ -62,7 +62,7 @@ public class PipelineController {
 
     @Operation(
         summary = "[Experimental]: Update a pipeline",
-        description = "<some other testing changes>",
+        description = "API to update pipeline. It's currently under development. Do not use it!",
         deprecated = true
     )
     @PatchMapping("/{pipelineId}")

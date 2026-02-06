@@ -21,13 +21,12 @@ jobs:
         id: is_openapi_contract_violated
         shell: bash
         run: |
-          if git diff --quiet HEAD -- apis/openapi-spec && \
-              [ -z "$(git status --porcelain -- apis/openapi-spec)" ]; then
-            echo "OpenAPI contracts are unchanged/ committed."
-          else
+          if [ -n "$(git status --porcelain -- apis/openapi-spec)" ]; then
             echo "Exiting as OpenAPI contract changes are not committed. Please commit all changes of api contracts if any."
             exit 1
           fi
+          
+          echo "OpenAPI contracts are upto date"
       
       - name: Pipeline UI Validation
         id: pipeline-ui-validation
