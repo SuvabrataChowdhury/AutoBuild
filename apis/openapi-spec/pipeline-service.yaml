@@ -9,7 +9,7 @@ tags:
 - name: Pipeline Build
   description: Operations related to builds of a pipeline
 - name: Pipeline
-  description: Operations related to <testing> pipeline
+  description: Operations related to pipeline
 paths:
   /api/v1/pipeline/{pipelineId}:
     get:
