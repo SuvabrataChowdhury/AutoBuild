@@ -16,7 +16,7 @@ runs:
       id: check-diff
       shell: bash
       run: |
-        echo 'Checking if contents of ${{inputs.directory-path}} has changed'
+        echo "Checking if contents of ${{inputs.directory-path}} has changed"
 
         git fetch origin ${{ inputs.base-ref }}
 

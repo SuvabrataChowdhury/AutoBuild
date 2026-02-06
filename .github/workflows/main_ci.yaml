@@ -19,14 +19,10 @@ jobs:
 
       - name: Check for OpenAPI contract violation
         id: is_openapi_contract_violated
-        shell: bash
-        run: |
-          if [ -n "$(git status --porcelain -- apis/openapi-spec)" ]; then
-            echo "Exiting as OpenAPI contract changes are not committed. Please commit all changes of api contracts if any."
-            exit 1
-          fi
-          
-          echo "OpenAPI contracts are upto date"
+        uses: ./.github/actions/openapi-changes
+        with:
+          base-ref: ${{github.base_ref}}
+          has-pipeline-validations-executed: ${{steps.pipeline-service-validation.outputs.has_executed}}
       
       - name: Pipeline UI Validation
         id: pipeline-ui-validation
