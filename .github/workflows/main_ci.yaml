@@ -1,25 +1,58 @@
 name: AutoBuild CI
 
 on:
-    pull_request:
-        branches: ["main"]
-        types: [opened, reopened, synchronize]
+  pull_request:
+    branches: ["main"]
+    types: [opened, reopened, synchronize]
 
 jobs:
-    central-validation:
-        runs-on: ubuntu-latest
+  central-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        steps:
-            - uses: actions/checkout@v4
+      - name: Pipeline Service Validation
+        id: pipeline-service-validation
+        uses: ./.github/actions/pipeline-service
+        with:
+          base-ref: ${{github.base_ref}}
 
-            - name: Pipeline Service Validation
-              id: pipeline-service-validation
-              uses: ./.github/actions/pipeline-service
-              with:
-                base-ref: ${{github.base_ref}}
+      - name: Pipeline UI Validation
+        id: pipeline-ui-validation
+        uses: ./.github/actions/pipeline-ui
+        with:
+          base-ref: ${{github.base_ref}}
+      - name: Check for OpenAPI contract violation
+        shell: bash
+        run: |
+          if git diff --quiet HEAD -- apis/openapi-spec && \
+              [ -z "$(git status --porcelain -- apis/openapi-spec)" ]; then
+            echo "OpenAPI contracts are unchanged/ committed."
+          else
+            echo "Exiting as OpenAPI contract changes are not committed. Please commit all changes of api contracts if any."
+            exit 1
+          fi
+      - name: Suggestive comment incase of OpenAPI contract violation
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
 
-            - name: Pipeline UI Validation
-              id: pipeline-ui-validation
-              uses: ./.github/actions/pipeline-ui
-              with:
-                base-ref: ${{github.base_ref}}
+            const alreadyCommented = comments.some(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('OpenAPI contracts are out of date')
+            );
+
+            if (!alreadyCommented) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ **OpenAPI contracts are out of date**\n\nPlease regenerate and commit changes under \`apis/openapi-spec/\`.`
+              });
+            }

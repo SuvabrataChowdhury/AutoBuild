@@ -17,15 +17,15 @@ runs:
       shell: bash
       run: |
         echo 'Checking if contents of ${{inputs.directory-path}} has changed'
-        
-        git fetch origin ${{ github.base_ref }}
-        
-        if git diff --name-only origin/${{ github.base_ref }} | grep "^${{ inputs.directory-path }}/"; then
+
+        git fetch origin ${{ inputs.base_ref }}
+
+        if git diff --name-only origin/${{ inputs.base_ref }} | grep "^${{ inputs.directory-path }}/"; then
           echo "changed=true" >> $GITHUB_OUTPUT
-          echo "Directory contents have changed!"
+          echo "${{ inputs.directory_path }} directory contents have changed!"
         else
           echo "changed=false" >> $GITHUB_OUTPUT
-          echo "Directory contents are unchanged"
+          echo "${{ inputs.directory_path }} directory contents are unchanged"
         fi
 
 outputs:

@@ -24,11 +24,12 @@ runs:
         cache: maven
     - name: Basic Validation
       shell: bash
-      run: | 
+      run: |
         if ${{steps.is_pipeline_service_changed.outputs.is_changed}}; then
           echo "Directory contents have changed. Proceeding with subsequent checks"
           cd pipeline
-          mvn --batch-mode clean install
+          mvn --batch-mode clean install -Pintegration-test #Generate open-api docs as well with this step
+          cd ..
         else
           echo "Directory contents are unchanged. Skipping subsequent checks"
         fi
