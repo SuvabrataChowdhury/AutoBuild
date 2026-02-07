@@ -18,7 +18,3 @@ spring:
       enabled: true
       path: /h2-console
 
-app:
-  jwt:
-    secret: testSecretKey12345678901234567890
-    expiration: 86400000

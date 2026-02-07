@@ -22,11 +22,6 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
-app:
-  jwt:
-    secret: demoSecretKeyForDevelopment1234567890
-    expiration: 86400000 # TODO: Too high of a expiration. Reduce it
-
 logging:
   level:
     org.springframework.jdbc.datasource: DEBUG
