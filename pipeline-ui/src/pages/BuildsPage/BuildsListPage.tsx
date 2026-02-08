@@ -12,9 +12,9 @@ export default function BuildsListPage() {
 
   const [data, setData] = useState<Build[]>([]);
 
-  const filtered = data.filter(async (p) => {
-    p.pipelineName.toLowerCase().includes(search.toLowerCase());
-  });
+  const filtered = data.filter((p) =>
+    p.pipelineName.toLowerCase().includes(search.toLowerCase()),
+  );
 
   useEffect(() => {
     async function fetchData() {

@@ -6,6 +6,7 @@ import type { Pipeline } from "../../types/pipeline.types";
 import { getPipelines } from "../../services/pipelines.api";
 import "./PipelinePage.css";
 import NavBar from "../../components/common/navBar";
+import { useNavigate } from "react-router-dom";
 
 export default function PipelinePage() {
   const [search, setSearch] = useState("");
@@ -13,8 +14,9 @@ export default function PipelinePage() {
   const [data, setData] = useState<Pipeline[]>([]);
 
   const filtered = data.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+    p.name.toLowerCase().includes(search.toLowerCase()),
   );
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +27,7 @@ export default function PipelinePage() {
   }, []);
 
   function onCreate(): void {
-    window.location.href = "/pipelines/0";
+    navigate("/pipelines/0");
   }
 
   return (
