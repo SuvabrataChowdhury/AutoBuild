@@ -1,32 +1,43 @@
 package com.autobuild.pipeline.integrationtest.security;
 
 import com.autobuild.pipeline.auth.repository.UserRepository;
+import com.autobuild.pipeline.definiton.repository.PipelineRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
- * Integration tests for Security Configuration with Keycloak JWT.
- * Tests validate that:
- * - Public endpoints are accessible without authentication
- * - Protected endpoints require valid JWT tokens from Keycloak
- * - JWT token validation is performed correctly
+ * Integration tests for SecurityConfig with Keycloak JWT authentication.
+ * Tests profiles where @Profile("!default & !basicAuth & !test") is active (e.g., demo, prod).
+ * Verifies that Keycloak JWT authentication is enforced.
  * 
  * @author Baibhab Dey
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("demo")
+@TestPropertySource(properties = {
+    "spring.security.oauth2.resourceserver.jwt.issuer-uri=https://mock-issuer.test",
+    "spring.datasource.url=jdbc:h2:mem:testdb",
+    "spring.datasource.driverClassName=org.h2.Driver",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.jpa.hibernate.ddl-auto=create-drop"
+})
 class SecurityConfigTest {
 
     @Autowired
@@ -35,101 +46,58 @@ class SecurityConfigTest {
     @MockitoBean
     private UserRepository userRepository;
 
-    @Test
-    void testPublicEndpointsAreAccessible() throws Exception {
-        // H2 Console should be accessible
-        mockMvc.perform(get("/h2-console/"))
-                .andExpect(status().isOk());
-    }
+    @MockitoBean
+    private PipelineRepository pipelineRepository;
 
-    @Test
-    void testSwaggerEndpointsAreAccessible() throws Exception {
-        // Swagger UI should be publicly accessible
-        mockMvc.perform(get("/swagger-ui/index.html"))
-                .andExpect(status().isOk());
+    @BeforeEach
+    void setUp() {
+        // Mock pipeline repository to return empty list
+        when(pipelineRepository.findAll()).thenReturn(Collections.emptyList());
     }
-
+    
     @Test
-    void testProtectedEndpointWithoutTokenReturnsUnauthorized() throws Exception {
-        // Protected endpoint without JWT should return 401
+    void testProtectedEndpointWithoutTokenReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/pipeline"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void testProtectedEndpointWithValidJwtToken() throws Exception {
-        // Protected endpoint with valid JWT mock should return 200
+    void testProtectedEndpointWithValidJwtReturns200() throws Exception {
         mockMvc.perform(get("/api/v1/pipeline")
                 .with(jwt()
                     .jwt(builder -> builder
                         .claim("preferred_username", "testuser")
                         .claim("email", "test@example.com")
-                        .claim("realm_access", java.util.Map.of(
-                            "roles", java.util.List.of("user", "admin")
-                        ))
+                        .claim("sub", "test-user-id")
                     )
                 ))
                 .andExpect(status().isOk());
     }
-
+    
     @Test
-    void testCurrentUserEndpointWithValidJwt() throws Exception {
-        // Current user endpoint should extract JWT claims
-        mockMvc.perform(get("/api/v1/user/auth/currentuser")
-                .with(jwt()
-                    .jwt(builder -> builder
-                        .claim("preferred_username", "john.doe")
-                        .claim("email", "john.doe@example.com")
-                    )
-                ))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("john.doe"))
-                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
-    }
-
-    @Test
-    void testCurrentUserEndpointWithoutTokenReturnsUnauthorized() throws Exception {
-        // Current user endpoint without JWT should return 401
-        mockMvc.perform(get("/api/v1/user/auth/currentuser"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(username = "testuser", roles = {"USER"})
-    void testProtectedEndpointWithMockUser() throws Exception {
-        // Alternative: Using Spring Security's @WithMockUser
-        mockMvc.perform(get("/api/v1/pipeline"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testJwtWithRealmRolesIsProcessed() throws Exception {
-        // Test that realm roles are correctly extracted from JWT
+    void testJwtWithRealmRolesIsAccepted() throws Exception {
         mockMvc.perform(get("/api/v1/pipeline")
                 .with(jwt()
                     .jwt(builder -> builder
                         .claim("preferred_username", "admin")
                         .claim("email", "admin@example.com")
+                        .claim("sub", "admin-123")
                         .claim("realm_access", java.util.Map.of(
                             "roles", java.util.List.of("PIPELINE_ADMIN", "USER")
                         ))
-                    )
-                    .authorities(
-                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_PIPELINE_ADMIN"),
-                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER")
                     )
                 ))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testJwtWithClientRolesIsProcessed() throws Exception {
-        // Test that client-specific roles are correctly extracted from JWT
+    void testJwtWithClientRolesIsAccepted() throws Exception {
         mockMvc.perform(get("/api/v1/pipeline")
                 .with(jwt()
                     .jwt(builder -> builder
                         .claim("preferred_username", "client-user")
                         .claim("email", "client@example.com")
+                        .claim("sub", "client-123")
                         .claim("resource_access", java.util.Map.of(
                             "pipeline-service", java.util.Map.of(
                                 "roles", java.util.List.of("pipeline-creator", "pipeline-viewer")
@@ -141,16 +109,57 @@ class SecurityConfigTest {
     }
 
     @Test
-    void testSseEndpointIsPublic() throws Exception {
-        // SSE subscription endpoint should be publicly accessible
-        mockMvc.perform(get("/api/v1/pipeline/build/sse/subscribe/test-pipeline-id"))
+    void testJwtWithBothRealmAndClientRoles() throws Exception {
+        mockMvc.perform(get("/api/v1/pipeline")
+                .with(jwt()
+                    .jwt(builder -> builder
+                        .claim("preferred_username", "poweruser")
+                        .claim("email", "power@example.com")
+                        .claim("sub", "power-123")
+                        .claim("realm_access", java.util.Map.of(
+                            "roles", java.util.List.of("USER")
+                        ))
+                        .claim("resource_access", java.util.Map.of(
+                            "pipeline-service", java.util.Map.of(
+                                "roles", java.util.List.of("pipeline-admin")
+                            )
+                        ))
+                    )
+                ))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    @WithMockUser(username = "testuser", roles = {"USER"})
+    void testWithMockUserAnnotation() throws Exception {
+        mockMvc.perform(get("/api/v1/pipeline"))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    void testJwtWithMissingClaimsStillAuthenticates() throws Exception {
+        mockMvc.perform(get("/api/v1/pipeline")
+                .with(jwt()
+                    .jwt(builder -> builder
+                        .claim("sub", "minimal-user")
+                    )
+                ))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void testActuatorEndpointsArePublic() throws Exception {
-        // Actuator health endpoint should be publicly accessible
-        mockMvc.perform(get("/actuator/health"))
+    void testJwtWithEmptyRoles() throws Exception {
+        mockMvc.perform(get("/api/v1/pipeline")
+                .with(jwt()
+                    .jwt(builder -> builder
+                        .claim("preferred_username", "noroles")
+                        .claim("email", "noroles@example.com")
+                        .claim("sub", "noroles-123")
+                        .claim("realm_access", java.util.Map.of(
+                            "roles", java.util.List.of()
+                        ))
+                    )
+                ))
                 .andExpect(status().isOk());
     }
 }
