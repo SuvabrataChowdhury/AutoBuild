@@ -30,7 +30,7 @@ public class ApiResponse<T> {
     private String path;
     
     /**
-     * Create a success response with data
+     * Create a success response with data.
      */
     public static <T> ApiResponse<T> success(T data, String message, String path) {
         return ApiResponse.<T>builder()
@@ -43,7 +43,7 @@ public class ApiResponse<T> {
     }
     
     /**
-     * Create an error response
+     * Create an error response.
      */
     public static <T> ApiResponse<T> error(int status, String error, String message, String path) {
         return ApiResponse.<T>builder()
