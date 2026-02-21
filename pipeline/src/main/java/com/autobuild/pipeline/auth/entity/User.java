@@ -8,10 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 /**
- * Entity representing a User in the authentication system.
+ * Entity representing application-specific user data.
+ * Authentication is handled by Keycloak, this stores additional app data.
+ * @author Baibhab Dey
  */
 @Entity
 @Table(name = "users")
@@ -21,8 +21,8 @@ import java.util.UUID;
 public class User {
     
     @Id
-    @Column(name = "id", nullable = false)
-    private UUID id;
+    @Column(name = "keycloak_user_id", nullable = false)
+    private String keycloakUserId; // Maps to Keycloak 'sub' claim
     
     @Column(unique = true, nullable = false)
     private String username;
@@ -30,6 +30,10 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
     
-    @Column(nullable = false)
-    private String passwordHash;
+    // Application-specific fields (not for authentication)
+    @Column
+    private String displayName;
+    
+    @Column
+    private String avatarUrl;
 }

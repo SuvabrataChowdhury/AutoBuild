@@ -26,6 +26,9 @@ public class SecurityConfig {
     
     @Autowired
     private KeycloakJwtConverter keycloakJwtConverter;
+    
+    @Autowired
+    private CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,7 +37,6 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/user/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/v1/pipeline/build/sse/subscribe/*").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
@@ -42,6 +44,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(createJwtConverter()))
+                .authenticationEntryPoint(authenticationEntryPoint)
             );
 
         return http.build();
