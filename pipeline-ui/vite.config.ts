@@ -5,7 +5,7 @@ import fs from "fs";
 
 // https://vite.dev/config/
 const COVERAGE_THRESHOLDS = {
-  lines: 50,
+  lines: 80,
   functions: 50,
   branches: 50,
   statements: 50,
