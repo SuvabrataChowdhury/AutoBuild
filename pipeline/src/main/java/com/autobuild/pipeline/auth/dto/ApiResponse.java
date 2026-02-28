@@ -30,19 +30,6 @@ public class ApiResponse<T> {
     private String path;
     
     /**
-     * Create a success response with data.
-     */
-    public static <T> ApiResponse<T> success(T data, String message, String path) {
-        return ApiResponse.<T>builder()
-                .timestamp(LocalDateTime.now())
-                .status(200)
-                .message(message)
-                .data(data)
-                .path(path)
-                .build();
-    }
-    
-    /**
      * Create an error response.
      */
     public static <T> ApiResponse<T> error(int status, String error, String message, String path) {
