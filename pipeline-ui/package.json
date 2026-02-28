@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:local": "vitest --ui",
-    "test:coverage-pipeline": "vitest run --coverage"
+    "test:coverage-pipeline": "vitest run --coverage --no-color"
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.2.14",
