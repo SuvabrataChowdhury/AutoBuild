@@ -27,9 +27,16 @@ runs:
           echo "Directory contents have changed. Proceeding with subsequent checks"
 
           cd pipeline-ui
-          npm install # TODO: use npm ci and introduce package-lock.json
+          npm ci
           npm run lint
         else
           echo "Directory contents are unchanged. Skipping subsequent checks"
         fi
-        
+    - name: Test
+      shell: bash
+      if: steps.is_pipeline_ui_changed.outputs.is_changed == 'true'
+      run: |
+        cd pipeline-ui
+        npm ci
+        echo "Running Tests"
+        npm run test:coverage-pipeline

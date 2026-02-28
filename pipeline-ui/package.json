@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint src",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:local": "vitest --ui",
+    "test:coverage-pipeline": "vitest run --coverage"
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.2.14",

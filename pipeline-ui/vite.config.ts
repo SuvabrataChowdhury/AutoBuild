@@ -25,7 +25,7 @@ export default defineConfig({
     include: ['test/**/*.test.{ts,tsx}', 'test/**/*.spec.{ts,tsx}'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html', 'json'],
+      reporter: ['text'],
       reportsDirectory: path.resolve(__dirname, 'coverage'),
       thresholds: COVERAGE_THRESHOLDS
     },
