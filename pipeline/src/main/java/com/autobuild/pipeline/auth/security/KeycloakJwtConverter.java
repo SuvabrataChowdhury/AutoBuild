@@ -1,6 +1,5 @@
 package com.autobuild.pipeline.auth.security;
 
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
  * @author Baibhab Dey
  */
 @Component
-public class KeycloakJwtConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+public class KeycloakJwtConverter implements JwtAuthoritiesConverter {
 
     @Override
     @SuppressWarnings("unchecked")

@@ -1,7 +1,6 @@
 spring:
   application:
     name: pipeline
-
 ---
 
 spring:
@@ -12,7 +11,6 @@ spring:
     user:
       name: admin
       password: "{noop}admin"
-
 ---
 
 spring:
@@ -33,16 +31,3 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: demo
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8180/realms/SpringBootRealm
-          jwk-set-uri: http://localhost:8180/realms/SpringBootRealm/protocol/openid-connect/certs

@@ -22,6 +22,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8180/realms/SpringBootRealm
+          jwk-set-uri: http://localhost:8180/realms/SpringBootRealm/protocol/openid-connect/certs
 
 logging:
   level:

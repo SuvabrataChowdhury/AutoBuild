@@ -25,7 +25,7 @@ public class SecurityConfig {
     private CorsConfigurationSource corsConfigurationSource;
     
     @Autowired
-    private KeycloakJwtConverter keycloakJwtConverter;
+    private JwtAuthoritiesConverter jwtAuthoritiesConverter;
     
     @Autowired
     private CustomAuthenticationEntryPoint authenticationEntryPoint;
@@ -52,7 +52,7 @@ public class SecurityConfig {
 
     private JwtAuthenticationConverter createJwtConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(keycloakJwtConverter);
+        converter.setJwtGrantedAuthoritiesConverter(jwtAuthoritiesConverter);
         return converter;
     }
 }
