@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 
 // https://vite.dev/config/
+//TODO: Thresholds to be increased after adding more tests
 const COVERAGE_THRESHOLDS = {
   lines: 50,
   functions: 50,
