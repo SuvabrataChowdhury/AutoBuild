@@ -23,6 +23,7 @@ import {
 
 import { Pencil, Play, Trash } from "lucide-react";
 import NavBar from "../../components/common/navBar";
+import { useNavigate } from "react-router-dom";
 
 export default function PipelineDetailPage() {
   const { id } = useParams();
@@ -42,10 +43,12 @@ export default function PipelineDetailPage() {
 
   // Editable clone (we do not modify the real pipeline until Save)
   const [editablePipeline, setEditablePipeline] = useState<Pipeline | null>(
-    null
+    null,
   );
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
   const [error, setError] = useState<string[] | null>(null);
+
+  const navigate = useNavigate();
 
   async function checkDelete(id: number) {
     const response = await getBuildsList();
@@ -115,7 +118,7 @@ export default function PipelineDetailPage() {
     const response = await deletePipeline(id as unknown as number);
     if (response) {
       console.log("Pipeline deleted");
-      window.location.href = "/pipelines";
+      navigate("/pipelines");
     }
   }
 
@@ -144,7 +147,7 @@ export default function PipelineDetailPage() {
         }, 5000);
         return;
       }
-      window.location.href = `/pipelines/${data.id}`;
+      navigate(`/pipelines/${data.id}`);
       return;
     } else {
       const pipelineToUpdate = {
@@ -154,7 +157,7 @@ export default function PipelineDetailPage() {
 
       const data = await updatePipeline(
         id as unknown as number,
-        pipelineToUpdate
+        pipelineToUpdate,
       );
       if (typeof data.id === "undefined") {
         setError(data as unknown as string[]);
@@ -163,7 +166,7 @@ export default function PipelineDetailPage() {
         }, 5000);
         return;
       }
-      window.location.href = `/pipelines/${data.id}`;
+      navigate(`/pipelines/${data.id}`);
       return;
     }
 
@@ -181,7 +184,7 @@ export default function PipelineDetailPage() {
   // Cancel editing -> discard clone
   function handleCancel() {
     if (isCreateMode) {
-      window.location.href = "/pipelines";
+      navigate("/pipelines");
     }
     setEditablePipeline(null);
     setIsEditing(false);
@@ -189,7 +192,7 @@ export default function PipelineDetailPage() {
 
   async function handleStartBuild() {
     const data = await executeBuild(id as unknown as number);
-    window.location.href = `/builds/${data.id}`;
+    navigate(`/builds/${data.id}`);
   }
 
   // Helper: update a stage inside editablePipeline
@@ -200,7 +203,7 @@ export default function PipelineDetailPage() {
       return {
         ...prev,
         stages: prev.stages.map((s) =>
-          s.id === updatedStage.id ? updatedStage : s
+          s.id === updatedStage.id ? updatedStage : s,
         ),
       };
     });
@@ -251,7 +254,7 @@ export default function PipelineDetailPage() {
     if (!editablePipeline) return;
 
     const stages = [...editablePipeline.stages].sort(
-      (a, b) => a.order - b.order
+      (a, b) => a.order - b.order,
     );
     const index = stages.findIndex((s) => s.id === stageId);
 
@@ -265,7 +268,7 @@ export default function PipelineDetailPage() {
     const reordered = stages.map((s, i) => ({ ...s, order: i + 1 }));
 
     setEditablePipeline((prev) =>
-      prev ? { ...prev, stages: reordered } : prev
+      prev ? { ...prev, stages: reordered } : prev,
     );
   }
 
@@ -290,7 +293,7 @@ export default function PipelineDetailPage() {
               value={editablePipeline?.name ?? ""}
               onChange={(e) =>
                 setEditablePipeline((prev) =>
-                  prev ? { ...prev, name: e.target.value } : prev
+                  prev ? { ...prev, name: e.target.value } : prev,
                 )
               }
             />
