@@ -14,6 +14,24 @@ import {
 // Create a mutable mock params object that can be changed per test
 const mockParams = { id: "1" };
 
+const mockPipelineTemplate = {
+  id: "1",
+  name: "Test Pipeline",
+  createdAt: "2024-01-01T00:00:00Z",
+  stages: [
+    {
+      name: "Build",
+      status: "success",
+      logs: "Build logs...",
+    },
+    {
+      name: "Test",
+      status: "pending",
+      logs: "",
+    },
+  ],
+};
+
 // Mock react-router-dom useParams
 vi.mock("react-router-dom", async (importActual) => {
   const actual: any = await importActual();
@@ -41,23 +59,7 @@ describe("PipelineDetailsPage", () => {
   });
 
   it("renders pipeline details content", async () => {
-    const mockPipeline = {
-      id: "1",
-      name: "Test Pipeline",
-      createdAt: "2024-01-01T00:00:00Z",
-      stages: [
-        {
-          name: "Build",
-          status: "success",
-          logs: "Build logs...",
-        },
-        {
-          name: "Test",
-          status: "pending",
-          logs: "",
-        },
-      ],
-    };
+    const mockPipeline = mockPipelineTemplate;
 
     vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
     vi.mocked(getBuildsList).mockResolvedValueOnce([]);
@@ -77,23 +79,7 @@ describe("PipelineDetailsPage", () => {
   });
 
   it("handles pipeline execution", async () => {
-    const mockPipeline = {
-      id: "1",
-      name: "Test Pipeline",
-      createdAt: "2024-01-01T00:00:00Z",
-      stages: [
-        {
-          name: "Build",
-          status: "success",
-          logs: "Build logs...",
-        },
-        {
-          name: "Test",
-          status: "pending",
-          logs: "",
-        },
-      ],
-    };
+    const mockPipeline = mockPipelineTemplate;
     vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
     vi.mocked(getBuildsList).mockResolvedValueOnce([]);
     vi.mocked(executeBuild).mockResolvedValueOnce({
@@ -127,23 +113,7 @@ describe("PipelineDetailsPage", () => {
   });
 
   it("displays stage information when pipeline has stages", async () => {
-    const mockPipeline = {
-      id: "1",
-      name: "Test Pipeline",
-      createdAt: "2024-01-01T00:00:00Z",
-      stages: [
-        {
-          name: "Build",
-          status: "success",
-          logs: "Build logs...",
-        },
-        {
-          name: "Test",
-          status: "pending",
-          logs: "",
-        },
-      ],
-    };
+    const mockPipeline = mockPipelineTemplate;
 
     vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
     vi.mocked(getBuildsList).mockResolvedValueOnce([]);
