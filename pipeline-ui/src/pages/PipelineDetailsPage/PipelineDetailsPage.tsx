@@ -147,6 +147,7 @@ export default function PipelineDetailPage() {
         }, 5000);
         return;
       }
+      setIsEditing(false);
       navigate(`/pipelines/${data.id}`);
       return;
     } else {
