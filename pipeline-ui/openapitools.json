@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.20.0",
+    "generators": {
+      "pipeline-service": {
+        "generatorName": "typescript-axios",
+        "glob": "../apis/openapi-spec/pipeline-service.yaml",
+        "output": "./src/gen/"
+      }
+    }
+  }
+}

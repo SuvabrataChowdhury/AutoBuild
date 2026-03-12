@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:local": "vitest --ui",
-    "test:coverage-pipeline": "vitest run --coverage --no-color"
+    "test:coverage-pipeline": "vitest run --coverage --no-color",
+    "generate:client-code": "openapi-generator-cli generate"
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.2.14",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@openapitools/openapi-generator-cli": "^2.30.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
