@@ -15,7 +15,7 @@ function TestComponent() {
 
 describe("AuthProvider", () => {
   beforeEach(() => {
-    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it("provides null token by default", () => {
@@ -27,7 +27,7 @@ describe("AuthProvider", () => {
     expect(screen.getByTestId("token").textContent).toBe("");
   });
 
-  it("login sets token and updates localStorage", () => {
+  it("login sets token and updates sessionStorage", () => {
     render(
       <AuthProvider>
         <TestComponent />
@@ -37,11 +37,11 @@ describe("AuthProvider", () => {
       screen.getByText("Login").click();
     });
     expect(screen.getByTestId("token").textContent).toBe("test-token");
-    expect(localStorage.getItem("token")).toBe("test-token");
+    expect(sessionStorage.getItem("token")).toBe("test-token");
   });
 
-  it("logout clears token and localStorage", () => {
-    localStorage.setItem("token", "existing-token");
+  it("logout clears token and sessionStorage", () => {
+    sessionStorage.setItem("token", "existing-token");
     render(
       <AuthProvider>
         <TestComponent />
@@ -51,11 +51,11 @@ describe("AuthProvider", () => {
       screen.getByText("Logout").click();
     });
     expect(screen.getByTestId("token").textContent).toBe("");
-    expect(localStorage.getItem("token")).toBeNull();
+    expect(sessionStorage.getItem("token")).toBeNull();
   });
 
-  it("initializes token from localStorage", () => {
-    localStorage.setItem("token", "persisted-token");
+  it("initializes token from sessionStorage", () => {
+    sessionStorage.setItem("token", "persisted-token");
     render(
       <AuthProvider>
         <TestComponent />

@@ -25,7 +25,7 @@ const mockedRegister = vi.mocked(register);
 
 describe("RegistrationPage", () => {
   beforeEach(() => {
-    localStorage.clear();
+    sessionStorage.clear();
     vi.clearAllMocks();
   });
 
