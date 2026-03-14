@@ -34,7 +34,7 @@ const mockedLoginApi = vi.mocked(loginApi);
 
 describe("LoginPage", () => {
   beforeEach(() => {
-    localStorage.clear();
+    sessionStorage.clear();
     vi.clearAllMocks();
   });
 

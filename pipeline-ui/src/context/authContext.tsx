@@ -10,15 +10,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function AuthProvider({ children }: any) {
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(sessionStorage.getItem("token"));
 
   const login = (t: string) => {
-    localStorage.setItem("token", t);
+    sessionStorage.setItem("token", t);
     setToken(t);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setToken(null);
   };
 

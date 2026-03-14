@@ -14,7 +14,7 @@ export default function NavBar() {
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     async function fetchUser() {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (token) {
         try {
           const data = await getCurrentUser(token);
@@ -77,7 +77,7 @@ export default function NavBar() {
         <NavButton label="Home" route="/" />
         <NavButton label="Pipelines" route="/pipelines" />
         <NavButton label="Builds" route="/builds" />
-        <NavButton label="About" route="/about"/>
+        <NavButton label="About" route="/about" />
       </div>
 
       {/* RIGHT — Profile Menu */}
@@ -114,7 +114,7 @@ export default function NavBar() {
 
               <button
                 onClick={() => {
-                  localStorage.removeItem("token");
+                  sessionStorage.removeItem("token");
                   navigate("/login");
                 }}
                 className="
