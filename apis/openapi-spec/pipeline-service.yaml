@@ -30,6 +30,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
     put:
       tags:
       - Pipeline
@@ -57,6 +59,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
+      security:
+      - bearerAuth: []
     delete:
       tags:
       - Pipeline
@@ -71,6 +75,8 @@ paths:
       responses:
         "200":
           description: OK
+      security:
+      - bearerAuth: []
     patch:
       tags:
       - Pipeline
@@ -98,6 +104,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
+      security:
+      - bearerAuth: []
   /api/v1/pipeline:
     get:
       tags:
@@ -113,6 +121,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
     post:
       tags:
       - Pipeline
@@ -131,6 +141,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
   /api/v1/execute/pipeline:
     post:
       tags:
@@ -150,6 +162,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
+      security:
+      - bearerAuth: []
   /api/v1/stage/build/logs/{stageBuildId}:
     get:
       tags:
@@ -330,3 +344,9 @@ components:
         timeout:
           type: integer
           format: int64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: "JWT authentication. Enter token as: Bearer <token>"
+      scheme: bearer
+      bearerFormat: JWT

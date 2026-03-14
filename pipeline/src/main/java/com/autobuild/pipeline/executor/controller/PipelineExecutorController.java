@@ -14,6 +14,9 @@ import com.autobuild.pipeline.executor.dto.PipelineExecuteRequest;
 import com.autobuild.pipeline.executor.service.PipelineExecutorService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -23,6 +26,14 @@ import jakarta.validation.Valid;
  * @author Suvabrata Chowdhury
  */
 @Tag(name = "Pipeline")
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "JWT authentication. Enter token as: Bearer <token>"
+)
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/execute")
 public class PipelineExecutorController {
