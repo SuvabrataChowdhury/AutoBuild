@@ -76,6 +76,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/user/auth/register", "/api/v1/user/auth/login").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("api/v1/pipeline/build/sse/subscribe/*").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)

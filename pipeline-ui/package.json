@@ -11,7 +11,9 @@
     "test": "vitest",
     "test:local": "vitest --ui",
     "test:coverage-pipeline": "vitest run --coverage --no-color",
-    "generate:client-code": "openapi-generator-cli generate"
+    "generate:clean": "rm -rf ./src/gen",
+    "generate:client-code": "openapi-generator-cli generate",
+    "generate:clean-client-code": "npm run generate:clean && npm run generate:client-code"
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.2.14",
