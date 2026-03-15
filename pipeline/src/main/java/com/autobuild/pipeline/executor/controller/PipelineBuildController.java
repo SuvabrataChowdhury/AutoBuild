@@ -16,6 +16,9 @@ import com.autobuild.pipeline.executor.dto.PipelineBuildDTO;
 import com.autobuild.pipeline.executor.service.PipelineBuildService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Tag(name = "Pipeline Build", description = "Operations related to builds of a pipeline")
+@SecurityRequirement(name = "bearerAuth")
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "JWT authentication. Enter token as: Bearer <token>"
+)
 @RestController
 @RequestMapping("/api/v1/pipeline/build")
 public class PipelineBuildController {

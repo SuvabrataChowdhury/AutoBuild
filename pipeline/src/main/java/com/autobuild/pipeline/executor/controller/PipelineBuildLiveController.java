@@ -11,8 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.autobuild.pipeline.executor.service.PipelineBuildLiveService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-@Tag(name = "Pipeline Build")
+@Hidden // For now hiding SSE from OpenAPI spec
 @RestController
 @RequestMapping("/api/v1/pipeline/build")
 public class PipelineBuildLiveController {
@@ -30,7 +29,6 @@ public class PipelineBuildLiveController {
     @Autowired
     private PipelineBuildLiveService service;
 
-    @Operation(summary = "Get a live executing pipeline build as Server Sent Event")
     @GetMapping(value = "/sse/subscribe/{pipelineBuildId}", produces = "text/event-stream")
     public SseEmitter getLivePipelineBuild(@PathVariable UUID pipelineBuildId) {
         log.info("Subscription requested");
