@@ -1,5 +1,6 @@
 import { TableCell, TableRow } from "../ui/table";
-import type { Pipeline } from "../../types/pipeline.types";
+// import type { Pipeline } from "../../types/pipeline.types";
+import type { Pipeline } from '../../gen/api';
 
 export function PipelineRow({ pipeline }: { pipeline: Pipeline }) {
   return (
