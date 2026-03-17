@@ -15,6 +15,7 @@ import com.autobuild.pipeline.executor.service.PipelineExecutorService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +42,7 @@ public class PipelineExecutorController {
     @Autowired
     private PipelineExecutorService service;
 
-    @Operation(summary = "Execute a pipeline")
+    @Operation(summary = "Execute a pipeline", responses = @ApiResponse(responseCode = "203"))
     @PostMapping("/pipeline")
     public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request)
             throws IOException {

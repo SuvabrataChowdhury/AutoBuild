@@ -1,10 +1,13 @@
-import type { Stage } from "../../types/pipeline.types";
+// import type { Stage } from "../../types/pipeline.types";
+import type {
+  Stage as NewStage
+} from "../../gen/api";
 import StageCommandsEditor from "./stageCommandsEditor";
 
 type Props = {
-  stage: Stage;
+  stage: NewStage;
   isEditing: boolean;
-  onChangeStage: (updated: Stage) => void;
+  onChangeStage: (updated: NewStage) => void;
 };
 
 export default function StageDetails({
@@ -21,7 +24,7 @@ export default function StageDetails({
     );
   }
   // Helper for updating fields safely
-  function updateField(key: keyof Stage, value: string) {
+  function updateField(key: keyof NewStage, value: string) {
     onChangeStage({ ...stage, [key]: value });
   }
 

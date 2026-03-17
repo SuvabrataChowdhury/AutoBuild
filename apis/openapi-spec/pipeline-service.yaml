@@ -73,8 +73,8 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
       security:
       - bearerAuth: []
     patch:
@@ -135,8 +135,8 @@ paths:
               $ref: "#/components/schemas/Pipeline"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
@@ -156,8 +156,8 @@ paths:
               $ref: "#/components/schemas/PipelineExecuteRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "203":
+          description: Non-Authoritative Information
           content:
             '*/*':
               schema:
