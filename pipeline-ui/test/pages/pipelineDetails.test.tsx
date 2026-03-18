@@ -9,7 +9,9 @@ import {
   executeBuild,
   deletePipeline,
   savePipeline,
+  updatePipeline,
 } from "../../src/services/pipelines.api";
+import { booleanFlags } from "../../src/flags/booleanFlags";
 
 // Create a mutable mock params object that can be changed per test
 const mockParams = { id: "1" };
@@ -17,7 +19,6 @@ const mockParams = { id: "1" };
 const mockPipelineTemplate = {
   id: "1",
   name: "Test Pipeline",
-  createdAt: "2024-01-01T00:00:00Z",
   stages: [
     {
       name: "Build",
@@ -49,6 +50,7 @@ vi.mock("../../src/services/pipelines.api", () => ({
   executeBuild: vi.fn(),
   getPipelineLogs: vi.fn(),
   savePipeline: vi.fn(),
+  updatePipeline: vi.fn(),
 }));
 
 describe("PipelineDetailsPage", () => {
@@ -146,7 +148,6 @@ describe("PipelineDetailsPage", () => {
     const mockPipeline = {
       id: "1",
       name: "Test Pipeline",
-      createdAt: "2024-01-01T00:00:00Z",
       stages: [],
     };
 
@@ -176,7 +177,6 @@ describe("PipelineDetailsPage", () => {
     const mockPipeline = {
       id: "1",
       name: "Test Pipeline",
-      createdAt: "2024-01-01T00:00:00Z",
       stages: [
         {
           name: "Build",
@@ -346,5 +346,297 @@ describe("PipelineDetailsPage", () => {
     await waitFor(() => {
       expect(executeBuild).toHaveBeenCalledWith("1");
     });
+  });
+
+  it("When ID changes useEffect is called with new call and data set", async () => {
+    const mockPipeline1 = {
+      id: "1",
+      name: "Test Pipeline 1",
+      stages: [],
+    };
+
+    const mockPipeline2 = {
+      id: "2",
+      name: "Test Pipeline 2",
+      stages: [],
+    };
+
+    // First load with pipeline 1
+    vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline1 as any);
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    // Wait for pipeline 1 to load
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Test Pipeline 1" }),
+      ).toBeInTheDocument();
+    });
+
+    // Change the mock params to load pipeline 2
+    mockParams.id = "2";
+
+    // Mock the API call for pipeline 2
+    vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline2 as any);
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    // Wait for pipeline 2 to load
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Test Pipeline 2" }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("shows loading state when pipeline data is not yet loaded", async () => {
+    mockParams.id = "1";
+    // Mock getPipeline to return a promise that never resolves (simulating loading)
+    vi.mocked(getPipeline).mockImplementation(
+      () => new Promise(() => {}), // Never resolves
+    );
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    // Should display loading message (use getAllByText since there might be multiple)
+    const loadingElements = screen.getAllByText("Loading...");
+    expect(loadingElements.length).toBeGreaterThan(0);
+  });
+
+  it("renders pipeline with empty stages array", async () => {
+    mockParams.id = "999";
+
+    // Mock getPipeline to return a valid pipeline with no stages
+    const emptyPipeline = {
+      id: 999,
+      name: "Empty Pipeline",
+      createdAt: "2024-01-01T00:00:00Z",
+      stages: [],
+    };
+    vi.mocked(getPipeline).mockResolvedValueOnce(emptyPipeline as any);
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    // Component should render the pipeline name
+    await waitFor(() => {
+      expect(screen.getByText("Empty Pipeline")).toBeInTheDocument();
+    });
+
+    // Should show "No stages yet" message
+    await waitFor(() => {
+      expect(screen.getByText("No stages yet.")).toBeInTheDocument();
+    });
+  });
+
+  it("We can edit and buttons are changed accordingly", async () => {
+    const mockPipeline = mockPipelineTemplate;
+    mockParams.id = "1";
+
+    vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+
+    //mocking the feature flag to be true for this test
+    vi.mock("../../src/flags/booleanFlags", () => ({
+      booleanFlags: {
+        ENABLE_EDIT_PIPELINE: true,
+      },
+    }));
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+    });
+
+    // Click the Edit button
+    const editButton = screen.getByText("Edit");
+    fireEvent.click(editButton);
+
+    // After clicking edit, the button should change to Save
+    await waitFor(() => {
+      expect(screen.getByText("Save")).toBeInTheDocument();
+      expect(screen.getByText("Cancel")).toBeInTheDocument();
+    });
+  });
+
+  it("we can save Pipeline after editing and updatePipeline is called with the correct data", async () => {
+    const mockPipeline = mockPipelineTemplate;
+    mockParams.id = "1";
+
+    vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+    vi.mocked(updatePipeline).mockResolvedValueOnce({
+      id: 1,
+    } as any);
+
+    //mocking the feature flag to be true for this test
+    vi.mock("../../src/flags/booleanFlags", () => ({
+      booleanFlags: {
+        ENABLE_EDIT_PIPELINE: true,
+      },
+    }));
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+    });
+
+    // Click the Edit button
+    const editButton = screen.getByText("Edit");
+    fireEvent.click(editButton);
+
+    // After clicking edit, the button should change to Save
+    await waitFor(() => {
+      expect(screen.getByText("Save")).toBeInTheDocument();
+    });
+
+    // Change the pipeline name
+    const nameInput = screen.getByDisplayValue("Test Pipeline");
+    fireEvent.change(nameInput, { target: { value: "Updated Pipeline" } });
+
+    // Click the Save button
+    const saveButton = screen.getByText("Save");
+    fireEvent.click(saveButton);
+
+    // Wait for updatePipeline to be called with the ID and updated pipeline data
+    await waitFor(() => {
+      expect(updatePipeline).toHaveBeenCalledWith(
+        "1",
+        expect.objectContaining({
+          name: "Updated Pipeline",
+          stages: expect.any(Array),
+        }),
+      );
+    });
+  });
+
+  it("handles Cancel when editing and discards the copy while keeping the original", async () => {
+    const mockPipeline = mockPipelineTemplate;
+    mockParams.id = "1";
+
+    vi.mocked(getPipeline).mockResolvedValueOnce(mockPipeline as any);
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+    //mocking the feature flag to be true for this test
+    vi.mock("../../src/flags/booleanFlags", () => ({
+      booleanFlags: {
+        ENABLE_EDIT_PIPELINE: true,
+      },
+    }));
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+    });
+
+    // Click the Edit button
+    const editButton = screen.getByText("Edit");
+    fireEvent.click(editButton);
+
+    // After clicking edit, the button should change to Cancel
+    await waitFor(() => {
+      expect(screen.getByText("Cancel")).toBeInTheDocument();
+    });
+
+    const nameInput = screen.getByDisplayValue("Test Pipeline");
+    fireEvent.change(nameInput, { target: { value: "Updated Pipeline" } });
+
+    //click Cancel
+    const cancelButton = screen.getByText("Cancel");
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
+      // Changes Discarded after Cancel
+      expect(screen.getByText("Test Pipeline")).toBeInTheDocument();
+    });
+  });
+
+  it("Should be able to add Stages in the Pipeline through addStage()", async () => {
+    mockParams.id = "0";
+
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+    //mocking the feature flag to be true for this test
+    vi.mock("../../src/flags/booleanFlags", () => ({
+      booleanFlags: {
+        ENABLE_EDIT_PIPELINE: true,
+      },
+    }));
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("Plus")).toBeInTheDocument();
+    });
+
+    const addButton = screen.getByTestId("Plus");
+    fireEvent.click(addButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("TestStage")).toBeInTheDocument();
+    });
+  });
+
+  it("it should be able to move stages up and down after creating stages", async () => {
+    mockParams.id = "0";
+
+    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+    //mocking the feature flag to be true for this test
+    vi.mock("../../src/flags/booleanFlags", () => ({
+      booleanFlags: {
+        ENABLE_EDIT_PIPELINE: true,
+      },
+    }));
+
+    render(
+      <MemoryRouter>
+        <PipelineDetails />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("Plus")).toBeInTheDocument();
+    });
+
+    const addButton = screen.getByTestId("Plus");
+    fireEvent.click(addButton);
+
+    //add one more stage
+    fireEvent.click(addButton);
   });
 });

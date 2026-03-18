@@ -6,10 +6,10 @@ import fs from "fs";
 // https://vite.dev/config/
 //TODO: Thresholds to be increased after adding more tests
 const COVERAGE_THRESHOLDS = {
-  lines: 50,
-  functions: 50,
-  branches: 50,
-  statements: 50,
+  lines: 75,
+  functions: 65,
+  branches: 65,
+  statements: 75,
 };
 
 export default defineConfig({
