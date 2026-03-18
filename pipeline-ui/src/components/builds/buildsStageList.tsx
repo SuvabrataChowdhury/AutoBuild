@@ -1,10 +1,11 @@
 import { CheckCircle, XCircle, Loader } from "lucide-react";
-import type { StageBuilds } from "../../types/pipeline.types";
+// import type { StageBuilds } from "../../types/pipeline.types";
+import type { StageBuild } from "../../gen";
 
 interface Props {
-  stages: StageBuilds[];
-  selectedId: number;
-  onSelect: (id: number) => void;
+  stages: StageBuild[];
+  selectedId: string;
+  onSelect: (id: string) => void;
 }
 
 export default function BuildStageList({
@@ -52,7 +53,7 @@ export default function BuildStageList({
         return (
           <button
             key={stage.id}
-            onClick={() => onSelect(stage.id)}
+            onClick={() => onSelect(stage.id as string)}
             className={`
               flex items-center justify-between px-4 py-2 rounded-lg border text-sm 
               ${

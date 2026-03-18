@@ -114,7 +114,7 @@ export async function getBuildStagesLogs(id: number): Promise<BuildStageLogs> {
     }
 }
 
-export function getLiveBuildUpdates(id: number): string {
+export function getLiveBuildUpdates(id: string): string {
     return `${API_BASE_URL}/pipeline/build/sse/subscribe/${id}`
 }
 

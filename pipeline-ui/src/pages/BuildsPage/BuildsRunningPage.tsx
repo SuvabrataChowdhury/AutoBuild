@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import type { Build } from "../../types/pipeline.types";
 import {
-  deleteBuild,
-  getBuildData,
+  // deleteBuild,
   getLiveBuildUpdates,
 } from "../../services/pipelines.api";
 
@@ -15,41 +13,55 @@ import BuildStageDetails from "../../components/builds/buildsStageDetails";
 import { CheckCircle, Loader, Trash, XCircle } from "lucide-react";
 import { booleanFlags } from "../../flags/booleanFlags";
 
+import { PipelineBuildCurrentStateEnum, type PipelineBuild } from "../../gen";
+import { pipelineBuildApiInstance } from "../../services/newPipeline.api";
+
 export default function BuildsRunningPage() {
   const { id } = useParams();
-  const [build, setBuild] = useState<Build | null>(null);
-  const [selectedStageId, setSelectedStageId] = useState<number>(0);
+  const [build, setBuild] = useState<PipelineBuild | null>(null);
+  const [selectedStageId, setSelectedStageId] = useState<string>("");
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   useEffect(() => {
-    const buildId = id as unknown as number;
+    const buildId = id as string;
 
     // --- 1. Fetch initial build ---
     async function load() {
-      const data = await getBuildData(buildId);
+      const {status, data} = await pipelineBuildApiInstance.getPipelineBuild(buildId);
+
+      if (status !== 200) {
+        console.error("Error getting build");
+      }
+
       setBuild(data);
 
-      if (data.stageBuilds.length > 0) {
-        setSelectedStageId(data.stageBuilds[0].id);
+      if (data.stageBuilds !== undefined && data.stageBuilds.length > 0) {
+        setSelectedStageId(data.stageBuilds[0].id as string);
       }
     }
 
     load();
   }, [id]);
+
   useEffect(() => {
-    const buildId = id as unknown as number;
+    const buildId = id as string;
 
     // Stop polling for final states
-    if (["SUCCESS", "FAILED", "STOPPED"].includes(build?.currentState ?? "")) {
+    if (([PipelineBuildCurrentStateEnum.Success, PipelineBuildCurrentStateEnum.Failed] as PipelineBuildCurrentStateEnum[]).includes(build?.currentState as PipelineBuildCurrentStateEnum)) {
       return; // no interval created
     }
 
     // Skip polling while running (SSE should handle this)
-    if (build?.currentState === "RUNNING") return;
+    if (build?.currentState === PipelineBuildCurrentStateEnum.Running) return;
 
     // Start polling
     const intervalId = setInterval(async () => {
-      const data = await getBuildData(buildId);
+      const {status, data} = await pipelineBuildApiInstance.getPipelineBuild(buildId);
+
+      if (status !== 200) {
+        console.error("Error getting build");
+      }
+
       setBuild(data);
     }, 10000);
 
@@ -60,13 +72,14 @@ export default function BuildsRunningPage() {
   useEffect(() => {
     if (booleanFlags.ENABLE_SSE === false) return;
 
-    if (build?.currentState !== "RUNNING") return;
+    if (build?.currentState !== PipelineBuildCurrentStateEnum.Running) return;
 
-    const buildId = id as unknown as number;
+    const buildId = id as string;
     const url = getLiveBuildUpdates(buildId);
 
     const es = new EventSource(url);
 
+    // TODO: Better implementation with ID.
     es.onmessage = (event) => {
       const parsed = JSON.parse(event.data);
 
@@ -76,7 +89,7 @@ export default function BuildsRunningPage() {
         stageBuilds: parsed.stageBuilds,
       }));
 
-      if (parsed.currentState !== "RUNNING") {
+      if (parsed.currentState !== PipelineBuildCurrentStateEnum.Running) {
         es.close();
         setIsDeleteVisible(true);
       }
@@ -91,13 +104,19 @@ export default function BuildsRunningPage() {
 
   if (!build) return <div>Loading...</div>;
 
-  if (isDeleteVisible === false && build.currentState !== "RUNNING") {
+  if (isDeleteVisible === false && build.currentState !== PipelineBuildCurrentStateEnum.Running) {
     setIsDeleteVisible(true);
   }
-  const selectedStage = build.stageBuilds.find((s) => s.id === selectedStageId);
+  const selectedStage = (build.stageBuilds ?? []).find((s) => s.id === selectedStageId);
 
   async function handleDelete() {
-    await deleteBuild(build?.id as unknown as number);
+    // await deleteBuild(build?.id as unknown as number);
+    const {status} = await pipelineBuildApiInstance.deletePipelineBuild(build?.id as string);
+
+    if (status !== 204) {
+      console.error("Error deleting build");
+    }
+
     window.location.href = "/builds";
   }
 
@@ -105,23 +124,19 @@ export default function BuildsRunningPage() {
   let color = "";
 
   switch (build.currentState) {
-    case "SUCCESS":
+    case PipelineBuildCurrentStateEnum.Success:
       icon = <CheckCircle className="text-green-600" size={18} />;
       color = "text-green-600";
       break;
-    case "FAILED":
+    case PipelineBuildCurrentStateEnum.Failed:
       icon = <XCircle className="text-red-600" size={18} />;
       color = "text-red-600";
       break;
-    case "RUNNING":
+    case PipelineBuildCurrentStateEnum.Running:
       icon = <Loader className="text-yellow-600 animate-spin" size={25} />;
       color = "text-yellow-600";
       break;
-    case "STOPPED":
-      icon = <XCircle className="text-gray-600" size={18} />;
-      color = "text-gray-600";
-      break;
-    case "WAITING":
+    case PipelineBuildCurrentStateEnum.Waiting:
       icon = <Loader className="text-blue-600 animate-spin" size={18} />;
       color = "text-blue-600";
       break;
@@ -167,7 +182,7 @@ export default function BuildsRunningPage() {
 
         <div className="flex flex-row gap-10">
           <BuildStageList
-            stages={build.stageBuilds}
+            stages={build.stageBuilds!}
             selectedId={selectedStageId}
             onSelect={setSelectedStageId}
           />

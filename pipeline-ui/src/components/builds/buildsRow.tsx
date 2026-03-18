@@ -1,20 +1,26 @@
 import { TableCell, TableRow } from "../ui/table";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import type { Build, Pipeline } from "../../types/pipeline.types";
 import { useEffect, useState } from "react";
-import { getPipeline } from "../../services/pipelines.api";
 
-export function BuildsRow({ build }: { build: Build }) {
+import type { Pipeline, PipelineBuild } from "../../gen";
+import { pipelineApiInstance } from "../../services/newPipeline.api";
+
+export function BuildsRow({ build }: { build: PipelineBuild }) {
   const state = build.currentState;
-  const pipelineId = build.pipelineId;
+  const pipelineId = build.pipelineId as string;
 
   const [data, setData] = useState<Pipeline>();
 
   useEffect(() => {
-    async function fetchData(id: number) {
-      const build = await getPipeline(id);
-      setData(build);
+    async function fetchData(id: string) {
+      const {status, data} = await pipelineApiInstance.getPipelineById(id);
+
+      if (status !== 200) {
+        console.error("Error fetching pipeline")
+      }
+      setData(data);
     }
+
     fetchData(pipelineId);
   }, [pipelineId]);
 
