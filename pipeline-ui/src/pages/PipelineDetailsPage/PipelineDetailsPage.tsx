@@ -81,6 +81,10 @@ export default function PipelineDetailPage() {
         return;
       }
       const data = await getPipeline(id as unknown as number);
+      if (!data) {
+        setError(["Pipeline not found"]);
+        navigate("/pipelines");
+      }
       setPipeline(data);
 
       setIsDeleteVisible(await checkDelete(id as unknown as number));

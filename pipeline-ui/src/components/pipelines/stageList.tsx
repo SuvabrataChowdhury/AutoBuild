@@ -69,7 +69,10 @@ export default function StageList({
                   : "bg-white hover:bg-gray-50"
               }`}
             >
-              <div className="flex justify-between items-center">
+              <div
+                className="flex justify-between items-center"
+                data-testid="TestStage"
+              >
                 <div>
                   <p className="font-medium text-lg">{stage.name}</p>
                   <p className="text-xs text-gray-500">Order: {stage.order}</p>
@@ -79,6 +82,7 @@ export default function StageList({
                   <div className="flex flex-col gap-2 ml-4">
                     {/* Move Up */}
                     <button
+                      data-testid="MoveUp"
                       onClick={(e) => {
                         e.stopPropagation();
                         onMoveStageUp(stage.id);
@@ -91,6 +95,7 @@ export default function StageList({
 
                     {/* Move Down */}
                     <button
+                      data-testid="MoveDown"
                       onClick={(e) => {
                         e.stopPropagation();
                         onMoveStageDown(stage.id);
@@ -103,6 +108,7 @@ export default function StageList({
 
                     {/* Delete */}
                     <button
+                      data-testid="StageDelete"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteStage(stage.id);
@@ -121,6 +127,7 @@ export default function StageList({
         {canEdit && (
           <div className="flex justify-center mt-6">
             <button
+              data-testid="Plus"
               onClick={onAddStage}
               className="h-10 w-10 rounded-full flex items-center justify-center 
                    bg-blue-600 text-white hover:bg-blue-700 transition-all shadow"
