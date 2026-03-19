@@ -83,7 +83,8 @@ export default function PipelineDetailPage() {
       const {status, data} = await pipelineApiInstance.getPipelineById(id as string);
 
       if (status !== 200) {
-        console.error("Error fetching pipeline");
+        setError(["Pipeline not found"]);
+        navigate("/pipelines");
       }
 
       setPipeline(data);
