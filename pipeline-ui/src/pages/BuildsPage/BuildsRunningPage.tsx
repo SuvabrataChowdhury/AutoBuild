@@ -125,7 +125,7 @@ export default function BuildsRunningPage() {
 
   switch (build.currentState) {
     case PipelineBuildCurrentStateEnum.Success:
-      icon = <CheckCircle className="text-green-600" size={18} />;
+      icon = <CheckCircle className="text-green-600" size={18} aria-label="success-circle-pipeline"/>;
       color = "text-green-600";
       break;
     case PipelineBuildCurrentStateEnum.Failed:

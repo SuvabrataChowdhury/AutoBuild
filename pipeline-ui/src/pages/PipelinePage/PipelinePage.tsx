@@ -16,6 +16,7 @@ export default function PipelinePage() {
   const filtered = data.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
   );
+  
   const navigate = useNavigate();
 
   // TODO: check call is happening twice

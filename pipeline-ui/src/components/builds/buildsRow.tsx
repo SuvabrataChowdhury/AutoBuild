@@ -1,28 +1,29 @@
 import { TableCell, TableRow } from "../ui/table";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import type { PipelineBuild } from "../../gen";
 
-import type { Pipeline, PipelineBuild } from "../../gen";
-import { pipelineApiInstance } from "../../services/newPipeline.api";
+interface BuildRowProps {
+  build: PipelineBuild
+};
 
-export function BuildsRow({ build }: { build: PipelineBuild }) {
+export function BuildsRow({ build }: BuildRowProps) {
   const state = build.currentState;
-  const pipelineId = build.pipelineId as string;
+  // const pipelineId = build.pipelineId as string;
 
-  const [data, setData] = useState<Pipeline>();
+  // const [data, setData] = useState<Pipeline>();
 
-  useEffect(() => {
-    async function fetchData(id: string) {
-      const {status, data} = await pipelineApiInstance.getPipelineById(id);
+  // useEffect(() => {
+  //   async function fetchData(id: string) {
+  //     const {status, data} = await pipelineApiInstance.getPipelineById(id);
 
-      if (status !== 200) {
-        console.error("Error fetching pipeline")
-      }
-      setData(data);
-    }
+  //     if (status !== 200) {
+  //       console.error("Error fetching pipeline")
+  //     }
+  //     setData(data);
+  //   }
 
-    fetchData(pipelineId);
-  }, [pipelineId]);
+  //   fetchData(pipelineId);
+  // }, [pipelineId]);
 
   return (
     <TableRow
@@ -32,7 +33,7 @@ export function BuildsRow({ build }: { build: PipelineBuild }) {
       className="hover:cursor-pointer"
     >
       <TableCell className="font-semibold text-left">{build.id}</TableCell>
-      <TableCell className="font-semibold text-left">{data?.name}</TableCell>
+      <TableCell className="font-semibold text-left">{build.pipelineName}</TableCell>
 
       <TableCell>
         {state === "SUCCESS" && <CheckCircle className="text-green-500" />}

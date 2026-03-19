@@ -3,13 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 import BuildsListPage from "../../src/pages/BuildsPage/BuildsListPage";
-import { getBuildsList, getPipeline } from "../../src/services/pipelines.api";
+import { pipelineBuildApiInstance } from "../../src/services/newPipeline.api";
+import { PipelineBuildCurrentStateEnum } from "../../src/gen";
 
 // Mock the API calls
-vi.mock("../../src/services/pipelines.api", () => ({
-  getBuildsList: vi.fn(),
-  getPipeline: vi.fn(),
-}));
+vi.mock(import("../../src/services/newPipeline.api"));
 
 describe("BuildsListPage", () => {
   beforeEach(() => {
@@ -17,7 +15,7 @@ describe("BuildsListPage", () => {
   });
 
   it("renders builds list page content", () => {
-    vi.mocked(getBuildsList).mockResolvedValueOnce([]);
+    (pipelineBuildApiInstance.getAllBuilds as any).mockResolvedValueOnce([]);
 
     render(
       <MemoryRouter>
@@ -28,29 +26,28 @@ describe("BuildsListPage", () => {
   });
 
   it("fetches builds on load and displays them", async () => {
-    const mockBuilds = [
-      {
-        id: 1,
-        pipelineId: 10,
-        pipelineName: "Pipeline 1",
-        currentState: "SUCCESS",
-        stageBuilds: [],
-      },
-      {
-        id: 2,
-        pipelineId: 20,
-        pipelineName: "Pipeline 2",
-        currentState: "FAILED",
-        stageBuilds: [],
-      },
-    ];
+    const mockBuildsResponse = {
+      status: 200,
+      statusText: "OK",
+      data: [
+        {
+          id: "build-1",
+          pipelineId: "1",
+          pipelineName: "Pipeline 1",
+          currentState: PipelineBuildCurrentStateEnum.Running,
+          stageBuilds: []
+        },
+        {
+          id: "build-2",
+          pipelineId: "2",
+          pipelineName: "Pipeline 2",
+          currentState: PipelineBuildCurrentStateEnum.Running,
+          stageBuilds: []
+        }
+      ]
+    };
 
-    // Mock the pipelines that will be fetched by BuildsRow
-    vi.mocked(getPipeline)
-      .mockResolvedValueOnce({ id: 10, name: "Build 1" } as any)
-      .mockResolvedValueOnce({ id: 20, name: "Build 2" } as any);
-
-    vi.mocked(getBuildsList).mockResolvedValueOnce(mockBuilds as any);
+    vi.mocked(pipelineBuildApiInstance.getAllBuilds).mockResolvedValueOnce(mockBuildsResponse as any);
 
     render(
       <MemoryRouter>
@@ -58,39 +55,38 @@ describe("BuildsListPage", () => {
       </MemoryRouter>,
     );
 
-    expect(getBuildsList).toHaveBeenCalled();
+    expect(pipelineBuildApiInstance.getAllBuilds).toHaveBeenCalled();
 
     // Wait for the builds to be rendered (the names come from getPipeline)
-    const build1 = await screen.findByText("Build 1");
-    const build2 = await screen.findByText("Build 2");
+    const build1 = await screen.findByText("build-1");
+    const build2 = await screen.findByText("build-2");
     expect(build1).toBeInTheDocument();
     expect(build2).toBeInTheDocument();
   });
 
   it("Filters builds based on search input", async () => {
-    const mockBuilds = [
-      {
-        id: 1,
-        pipelineId: 10,
-        pipelineName: "Pipeline 1",
-        currentState: "SUCCESS",
-        stageBuilds: [],
-      },
-      {
-        id: 2,
-        pipelineId: 20,
-        pipelineName: "Pipeline 2",
-        currentState: "FAILED",
-        stageBuilds: [],
-      },
-    ];
-
-    // Mock the pipelines that will be fetched by BuildsRow
-    vi.mocked(getPipeline)
-      .mockResolvedValueOnce({ id: 10, name: "Build 1" } as any)
-      .mockResolvedValueOnce({ id: 20, name: "Build 2" } as any);
-
-    vi.mocked(getBuildsList).mockResolvedValueOnce(mockBuilds as any);
+    const mockBuildsResponse = {
+      status: 200,
+      statusText: "OK",
+      data: [
+        {
+          id: "build-1",
+          pipelineId: "1",
+          pipelineName: "Pipeline 1",
+          currentState: PipelineBuildCurrentStateEnum.Running,
+          stageBuilds: []
+        },
+        {
+          id: "build-2",
+          pipelineId: "2",
+          pipelineName: "Pipeline 2",
+          currentState: PipelineBuildCurrentStateEnum.Running,
+          stageBuilds: []
+        }
+      ]
+    };
+    
+    vi.mocked(pipelineBuildApiInstance.getAllBuilds).mockResolvedValueOnce(mockBuildsResponse as any);
 
     render(
       <MemoryRouter>
@@ -99,8 +95,10 @@ describe("BuildsListPage", () => {
     );
 
     // Wait for the builds to be rendered
-    await screen.findByText("Build 1");
-    await screen.findByText("Build 2");
+    const build1 = await screen.findByText("build-1");
+    const build2 = await screen.findByText("build-2");
+    expect(build1).toBeInTheDocument();
+    expect(build2).toBeInTheDocument();
 
     // Type in the search input
     const searchInput = screen.getByPlaceholderText("Value");
@@ -108,8 +106,8 @@ describe("BuildsListPage", () => {
 
     // Wait for the filtering to take effect
     await waitFor(() => {
-      expect(screen.getByText("Build 1")).toBeInTheDocument();
-      expect(screen.queryByText("Build 2")).not.toBeInTheDocument();
+      expect(screen.getByText("Pipeline 1")).toBeInTheDocument();
+      expect(screen.queryByText("Pipeline 2")).not.toBeInTheDocument();
     });
   });
 });

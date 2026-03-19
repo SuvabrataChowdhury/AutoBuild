@@ -21,8 +21,4 @@ async function errorHandler(response: any) : Promise<string[]> {
     return response.data;
 }
 
-
-
-
 //TODO : on start build, send an execute call to backend
-

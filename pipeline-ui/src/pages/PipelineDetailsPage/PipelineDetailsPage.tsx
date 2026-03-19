@@ -79,7 +79,7 @@ export default function PipelineDetailPage() {
         setIsCreateMode(true);
         return;
       }
-      // const data = await getPipeline(id as unknown as number);
+      
       const {status, data} = await pipelineApiInstance.getPipelineById(id as string);
 
       if (status !== 200) {

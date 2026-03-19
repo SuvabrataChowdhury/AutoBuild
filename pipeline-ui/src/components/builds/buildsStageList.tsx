@@ -25,7 +25,7 @@ export default function BuildStageList({
 
         switch (stage.currentState) {
           case "SUCCESS":
-            icon = <CheckCircle className="text-green-600" size={18} />;
+            icon = <CheckCircle className="text-green-600" size={18} aria-label="success-circle-stage"/>;
             color = "text-green-600";
             break;
           case "FAILED":
