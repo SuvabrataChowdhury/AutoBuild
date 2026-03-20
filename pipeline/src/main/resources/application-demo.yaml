@@ -2,27 +2,32 @@
 
 spring:
   datasource:
-    url: jdbc:h2:mem:demodb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driverClassName: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
   h2:
     console:
-      enabled: true
+      enabled: false
 
-  security:
+    security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/SpringBootRealm
-          jwk-set-uri: http://localhost:8180/realms/SpringBootRealm/protocol/openid-connect/certs
+          issuer-uri: http://auth-service:8180/realms/SpringBootRealm
+          jwk-set-uri: http://auth-service:8180/realms/SpringBootRealm/protocol/openid-connect/certs
+
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
 logging:
   level:
