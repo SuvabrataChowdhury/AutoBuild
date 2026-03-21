@@ -5,6 +5,9 @@ inputs:
   base-ref:
     required: true
     description: Reference to base github branch
+  has-openapi-contract-changed:
+    required: true
+    description: Boolean to indicate if openapi contract has changed or not
 
 runs:
   using: composite
@@ -34,7 +37,7 @@ runs:
         fi
     - name: Test
       shell: bash
-      if: steps.is_pipeline_ui_changed.outputs.is_changed == 'true'
+      if: steps.is_pipeline_ui_changed.outputs.is_changed == 'true' || inputs.has-openapi-contract-changed == 'true'
       run: |
         cd pipeline-ui
         npm ci
