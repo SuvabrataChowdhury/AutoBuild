@@ -6,7 +6,7 @@ import PipelineDetails from "../../src/pages/PipelineDetailsPage/PipelineDetails
 
 import { PipelineBuildCurrentStateEnum} from "../../src/gen";
 
-import { pipelineApiInstance, pipelineBuildApiInstance } from "../../src/services/newPipeline.api";
+import { pipelineApiInstance, pipelineBuildApiInstance } from "../../src/services/pipelines.api";
 // Create a mutable mock params object that can be changed per test
 const mockParams = { id: "1" };
 
@@ -38,7 +38,7 @@ vi.mock("react-router-dom", async (importActual) => {
 
 // Mock pipelines.api - combine both mocks into one
 
-vi.mock(import("../../src/services/newPipeline.api"));
+vi.mock(import("../../src/services/pipelines.api"));
 
 describe("PipelineDetailsPage", () => {
   beforeEach(() => {
@@ -269,14 +269,14 @@ describe("PipelineDetailsPage", () => {
     };
 
     const mockPipelineBuildResponse = {
-      status: 404, 
+      status: 200, 
       data: []
     };
 
-    (pipelineApiInstance.getPipelineById as any).mockResolvedValueOnce(mockPipelineResponse);
-    (pipelineBuildApiInstance.getAllBuilds as any).mockResolvedValueOnce(mockPipelineBuildResponse);
+    vi.mocked(pipelineApiInstance.getPipelineById).mockResolvedValueOnce(mockPipelineResponse as any);
+    vi.mocked(pipelineBuildApiInstance.getAllBuilds).mockResolvedValueOnce(mockPipelineBuildResponse as any);
     
-    (pipelineApiInstance.deletePipeline as any).mockResolvedValueOnce({status: 204});
+    vi.mocked(pipelineApiInstance.deletePipeline).mockResolvedValueOnce({status: 204} as any);
 
     // vi.mocked(deletePipeline).mockResolvedValueOnce(undefined as any);
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 // import type { StageBuilds } from "../../types/pipeline.types";
 import { StageBuildCurrentStateEnum, type StageBuild } from "../../gen";
 // import { getBuildStagesLogs } from "../../services/pipelines.api";
-import { stageBuildApiInstance } from "../../services/newPipeline.api";
+import { stageBuildApiInstance } from "../../services/pipelines.api";
 
 type Props = {
   stage: StageBuild;

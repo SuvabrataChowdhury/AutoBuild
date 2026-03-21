@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
-import { pipelineBuildApiInstance } from "../../services/newPipeline.api";
+import { pipelineBuildApiInstance } from "../../services/pipelines.api";
 import BuildsTable from "../../components/builds/buildsTable";
 import { useParams } from "react-router-dom";
 import NavBar from "../../components/common/navBar";

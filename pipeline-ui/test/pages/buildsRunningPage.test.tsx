@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 import BuildsRunningPage from "../../src/pages/BuildsPage/BuildsRunningPage";
-import { pipelineBuildApiInstance, stageBuildApiInstance } from "../../src/services/newPipeline.api";
+import { pipelineBuildApiInstance, stageBuildApiInstance } from "../../src/services/pipelines.api";
 import { PipelineBuildCurrentStateEnum, StageBuildCurrentStateEnum } from "../../src/gen";
 
-vi.mock(import("../../src/services/newPipeline.api"));
+vi.mock(import("../../src/services/pipelines.api"));
 
 // Mock react-router-dom useParams
 const mockParams = { id: "1" };
@@ -55,14 +55,17 @@ describe("BuildsRunningPage", () => {
   });
 
   it("renders builds running page content", () => {
-    const mockBuilds = {
-      id: "1",
-      pipelineId: "10",
-      pipelineName: "Pipeline 1",
-      currentState: PipelineBuildCurrentStateEnum.Running,
-      stageBuilds: [],
+    const mockBuildsResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: []
+      }
     };
-    vi.mocked(pipelineBuildApiInstance.getAllBuilds).mockResolvedValueOnce(mockBuilds as any);
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildsResponse as any);
 
     render(
       <MemoryRouter>

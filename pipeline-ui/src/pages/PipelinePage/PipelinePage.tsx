@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
 import { PipelinesTable } from "../../components/pipelines/pipelinesTable";
 import { Button } from "../../components/ui/button";
-import { pipelineApiInstance } from "../../services/newPipeline.api";
+import { pipelineApiInstance } from "../../services/pipelines.api";
 import type {Pipeline} from '../../gen/api';
 import "./PipelinePage.css";
 import NavBar from "../../components/common/navBar";

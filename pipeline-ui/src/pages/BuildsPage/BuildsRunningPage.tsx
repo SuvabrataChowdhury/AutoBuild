@@ -14,7 +14,7 @@ import { CheckCircle, Loader, Trash, XCircle } from "lucide-react";
 import { booleanFlags } from "../../flags/booleanFlags";
 
 import { PipelineBuildCurrentStateEnum, type PipelineBuild } from "../../gen";
-import { pipelineBuildApiInstance } from "../../services/newPipeline.api";
+import { pipelineBuildApiInstance } from "../../services/pipelines.api";
 
 export default function BuildsRunningPage() {
   const { id } = useParams();

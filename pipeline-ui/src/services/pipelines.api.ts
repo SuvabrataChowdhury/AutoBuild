@@ -1,6 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Temporary API base URL, this needs to be configured properly
 // TODO: Move to environment variable
+
+import {
+    PipelineApi,
+    PipelineBuildApi,
+    StageBuildApi
+} from '../gen/api';
+
+import {
+    Configuration
+} from '../gen/configuration';
+
+import axiosInstance from './axiosInstance';
+
+export const pipelineApiInstance = new PipelineApi(new Configuration(), undefined, axiosInstance);
+export const pipelineBuildApiInstance = new PipelineBuildApi(new Configuration(), undefined, axiosInstance);
+export const stageBuildApiInstance = new StageBuildApi(new Configuration(), undefined, axiosInstance);
+
+
+
 const API_BASE_URL = "http://localhost:8080/api/v1";
 
 export function getLiveBuildUpdates(id: string): string {

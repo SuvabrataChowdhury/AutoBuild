@@ -11,7 +11,7 @@ import type {
   Stage
 } from "../../gen/api";
 
-import {pipelineApiInstance, pipelineBuildApiInstance} from "../../services/newPipeline.api";
+import {pipelineApiInstance, pipelineBuildApiInstance} from "../../services/pipelines.api";
 
 import { Pencil, Play, Trash } from "lucide-react";
 import NavBar from "../../components/common/navBar";

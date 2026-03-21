@@ -3,11 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 import BuildsListPage from "../../src/pages/BuildsPage/BuildsListPage";
-import { pipelineBuildApiInstance } from "../../src/services/newPipeline.api";
+import { pipelineBuildApiInstance } from "../../src/services/pipelines.api";
 import { PipelineBuildCurrentStateEnum } from "../../src/gen";
 
 // Mock the API calls
-vi.mock(import("../../src/services/newPipeline.api"));
+vi.mock(import("../../src/services/pipelines.api"));
 
 describe("BuildsListPage", () => {
   beforeEach(() => {
