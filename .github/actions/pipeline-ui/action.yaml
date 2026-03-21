@@ -39,4 +39,5 @@ runs:
         cd pipeline-ui
         npm ci
         echo "Running Tests"
+        npm run generate:clean-client-code
         npm run test:coverage-pipeline
