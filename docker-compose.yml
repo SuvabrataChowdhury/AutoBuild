@@ -29,13 +29,13 @@ services:
       - auth-service
     environment:
       SPRING_PROFILES_ACTIVE: demo
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:8180/realms/SpringBootRealm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8180/realms/SpringBootRealm/protocol/openid-connect/certs
       DB_HOST: mysql-db
       DB_PORT: 3306
       DB_NAME: pipeline
       DB_USER: testuser
       DB_PASSWORD: testpass
+      AUTH_HOST: auth-service
+      AUTH_PORT: 8080
     ports:
       - "8080:8080"
   auth-service:
@@ -45,6 +45,9 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_DB: dev-mem
+      KC_HOSTNAME: auth-service
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
     volumes:
       - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
     ports:
@@ -56,7 +59,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-
 
 volumes:
   mysql_data:

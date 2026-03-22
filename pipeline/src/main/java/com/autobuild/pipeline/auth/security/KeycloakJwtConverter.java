@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class KeycloakJwtConverter implements JwtAuthoritiesConverter {
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         List<GrantedAuthority> authorities = new ArrayList<>();
 

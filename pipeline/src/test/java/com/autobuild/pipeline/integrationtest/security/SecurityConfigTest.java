@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("demo")
 @TestPropertySource(properties = {
     "spring.security.oauth2.resourceserver.jwt.issuer-uri=https://mock-issuer.test",
+    "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://mock-jwk-set-uri.test",
     "spring.datasource.url=jdbc:h2:mem:testdb",
     "spring.datasource.driverClassName=org.h2.Driver",
     "spring.datasource.username=sa",

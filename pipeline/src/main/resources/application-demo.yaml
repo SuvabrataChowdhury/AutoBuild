@@ -18,12 +18,12 @@ spring:
     console:
       enabled: false
 
-    security:
+  security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth-service:8180/realms/SpringBootRealm
-          jwk-set-uri: http://auth-service:8180/realms/SpringBootRealm/protocol/openid-connect/certs
+          issuer-uri: http://${AUTH_HOST}:${AUTH_PORT}/realms/SpringBootRealm
+          jwk-set-uri: http://${AUTH_HOST}:${AUTH_PORT}/realms/SpringBootRealm/protocol/openid-connect/certs
 
   autoconfigure:
     exclude:
