@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
-  // deleteBuild,
   getLiveBuildUpdates,
 } from "../../services/pipelines.api";
 
@@ -110,7 +109,6 @@ export default function BuildsRunningPage() {
   const selectedStage = (build.stageBuilds ?? []).find((s) => s.id === selectedStageId);
 
   async function handleDelete() {
-    // await deleteBuild(build?.id as unknown as number);
     const {status} = await pipelineBuildApiInstance.deletePipelineBuild(build?.id as string);
 
     if (status !== 204) {

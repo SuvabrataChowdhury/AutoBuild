@@ -121,7 +121,6 @@ export default function PipelineDetailPage() {
   }
 
   async function handleDelete() {
-    // const response = await deletePipeline(id as unknown as number);
     const {status} = await pipelineApiInstance.deletePipeline(id as string);
     if (status === 204) {
       console.log("Pipeline deleted");

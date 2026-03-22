@@ -77,7 +77,6 @@ export default function StageList({
               >
                 <div>
                   <p className="font-medium text-lg">{stage.name}</p>
-                  {/* <p className="text-xs text-gray-500">Order: {stage.order}</p> */}
                 </div>
 
                 {canEdit && (

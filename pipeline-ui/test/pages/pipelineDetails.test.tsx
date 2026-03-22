@@ -278,8 +278,6 @@ describe("PipelineDetailsPage", () => {
     
     vi.mocked(pipelineApiInstance.deletePipeline).mockResolvedValueOnce({status: 204} as any);
 
-    // vi.mocked(deletePipeline).mockResolvedValueOnce(undefined as any);
-
     render(
       <MemoryRouter>
         <PipelineDetails />

@@ -224,21 +224,6 @@ describe("BuildsRunningPage", () => {
           },
         ]
     };
-    // vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(updatedBuildsResponse as any);
-    // const updatedBuildData = {
-    //   id: 1,
-    //   pipelineId: 10,
-    //   pipelineName: "Pipeline 1",
-    //   currentState: "SUCCESS",
-    //   stageBuilds: [
-    //     {
-    //       id: 1,
-    //       name: "Build Stage",
-    //       status: "SUCCESS",
-    //       logs: "Build completed successfully!",
-    //     },
-    //   ],
-    // };
 
     // Create and dispatch the message event
     const messageEvent = {
@@ -253,7 +238,6 @@ describe("BuildsRunningPage", () => {
     await waitFor(() => {
       // Look for the success icon (CheckCircle component renders when state is SUCCESS)
       const successIcon = document.querySelector(".lucide-circle-check-big");
-      // const successIcon = screen.getByLabelText("success-circle-pipeline");
       expect(successIcon).toBeInTheDocument();
     });
 

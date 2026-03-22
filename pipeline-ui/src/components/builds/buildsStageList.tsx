@@ -1,5 +1,4 @@
 import { CheckCircle, XCircle, Loader } from "lucide-react";
-// import type { StageBuilds } from "../../types/pipeline.types";
 import type { StageBuild } from "../../gen";
 
 interface Props {

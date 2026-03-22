@@ -8,22 +8,6 @@ interface BuildRowProps {
 
 export function BuildsRow({ build }: BuildRowProps) {
   const state = build.currentState;
-  // const pipelineId = build.pipelineId as string;
-
-  // const [data, setData] = useState<Pipeline>();
-
-  // useEffect(() => {
-  //   async function fetchData(id: string) {
-  //     const {status, data} = await pipelineApiInstance.getPipelineById(id);
-
-  //     if (status !== 200) {
-  //       console.error("Error fetching pipeline")
-  //     }
-  //     setData(data);
-  //   }
-
-  //   fetchData(pipelineId);
-  // }, [pipelineId]);
 
   return (
     <TableRow

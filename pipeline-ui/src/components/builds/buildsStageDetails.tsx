@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-// import type { StageBuilds } from "../../types/pipeline.types";
 import { StageBuildCurrentStateEnum, type StageBuild } from "../../gen";
-// import { getBuildStagesLogs } from "../../services/pipelines.api";
 import { stageBuildApiInstance } from "../../services/pipelines.api";
 
 type Props = {
@@ -16,7 +14,6 @@ export default function StageDetails({ stage }: Props) {
 
     async function fetchLogs() {
       try {
-        // const logData = await getBuildStagesLogs(stage.id);
         const {status, data} = await stageBuildApiInstance.getStageBuildLogs(stage.id as string);
 
         if (status !== 200) {
