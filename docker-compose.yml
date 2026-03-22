@@ -26,6 +26,7 @@ services:
       - pipeline_build_logs:/app/pipeline_build_logs
     depends_on:
       - mysql-db
+      - auth-service
     environment:
       SPRING_PROFILES_ACTIVE: demo
       DB_HOST: mysql-db
@@ -33,8 +34,31 @@ services:
       DB_NAME: pipeline
       DB_USER: testuser
       DB_PASSWORD: testpass
+      AUTH_HOST: auth-service
+      AUTH_PORT: 8080
     ports:
       - "8080:8080"
+  auth-service:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: auth-service
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-mem
+      KC_HOSTNAME: auth-service
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+    volumes:
+      - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
+    ports:
+      - "8180:8080"
+    command: start-dev --import-realm
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 volumes:
   mysql_data:
