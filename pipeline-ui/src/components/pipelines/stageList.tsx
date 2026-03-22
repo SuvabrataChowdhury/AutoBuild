@@ -1,15 +1,17 @@
-import type { Stage } from "../../types/pipeline.types";
+import type {
+  Stage 
+} from "../../gen/api";
 import { Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 
 interface Props {
   stages: Stage[];
-  selectedId: number;
-  onSelect: (id: number) => void;
+  selectedId: string;
+  onSelect: (id: string) => void;
   canEdit: boolean;
   onAddStage: () => void;
-  onDeleteStage: (id: number) => void;
-  onMoveStageUp: (id: number) => void;
-  onMoveStageDown: (id: number) => void;
+  onDeleteStage: (id: string) => void;
+  onMoveStageUp: (id: string) => void;
+  onMoveStageDown: (id: string) => void;
 }
 
 export default function StageList({
@@ -45,7 +47,7 @@ export default function StageList({
             return (
               <div
                 key={stage.id}
-                onClick={() => onSelect(stage.id)}
+                onClick={() => onSelect(stage.id as string)}
                 className={`
         w-10 h-10 rounded-full cursor-pointer text-sm font-medium
         border transition-all duration-200 select-none
@@ -62,26 +64,29 @@ export default function StageList({
           return (
             <div
               key={stage.id}
-              onClick={() => onSelect(stage.id)}
+              onClick={() => onSelect(stage.id as string)}
               className={`border rounded-lg p-4 cursor-pointer transition-all ${
                 isSelected
                   ? "bg-blue-50 border-blue-400 shadow-sm"
                   : "bg-white hover:bg-gray-50"
               }`}
             >
-              <div className="flex justify-between items-center">
+              <div
+                className="flex justify-between items-center"
+                data-testid="TestStage"
+              >
                 <div>
                   <p className="font-medium text-lg">{stage.name}</p>
-                  <p className="text-xs text-gray-500">Order: {stage.order}</p>
                 </div>
 
                 {canEdit && (
                   <div className="flex flex-col gap-2 ml-4">
                     {/* Move Up */}
                     <button
+                      data-testid="MoveUp"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onMoveStageUp(stage.id);
+                        onMoveStageUp(stage.id as string);
                       }}
                       disabled={index === 0}
                       className="p-1 rounded hover:bg-gray-200 disabled:opacity-30"
@@ -91,9 +96,10 @@ export default function StageList({
 
                     {/* Move Down */}
                     <button
+                      data-testid="MoveDown"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onMoveStageDown(stage.id);
+                        onMoveStageDown(stage.id as string);
                       }}
                       disabled={index === stages.length - 1}
                       className="p-1 rounded hover:bg-gray-200 disabled:opacity-30"
@@ -103,9 +109,10 @@ export default function StageList({
 
                     {/* Delete */}
                     <button
+                      data-testid="StageDelete"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDeleteStage(stage.id);
+                        onDeleteStage(stage.id as string);
                       }}
                       className="p-1 rounded hover:bg-red-100 text-red-600"
                     >
@@ -121,6 +128,7 @@ export default function StageList({
         {canEdit && (
           <div className="flex justify-center mt-6">
             <button
+              data-testid="Plus"
               onClick={onAddStage}
               className="h-10 w-10 rounded-full flex items-center justify-center 
                    bg-blue-600 text-white hover:bg-blue-700 transition-all shadow"

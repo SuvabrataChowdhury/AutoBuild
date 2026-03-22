@@ -2,8 +2,10 @@ import "./LandingPage.css";
 import { Button } from "../../components/ui/button";
 import { Workflow, Settings } from "lucide-react";
 import NavBar from "../../components/common/navBar";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
+  const navigate = useNavigate();
   return (
     <>
       <NavBar></NavBar>
@@ -17,7 +19,7 @@ function LandingPage() {
             variant="tile"
             size="lg"
             className="w-64 h-40 flex flex-col items-center justify-center gap-3"
-            onClick={() => (window.location.href = "/pipelines")}
+            onClick={() => navigate("/pipelines")}
           >
             <Workflow className="w-10 h-10 text-blue-500" />
             <span className="text-xl font-semibold">Pipelines</span>
@@ -28,7 +30,7 @@ function LandingPage() {
             variant="tile"
             size="lg"
             className="w-64 h-40 flex flex-col items-center justify-center gap-3"
-            onClick={() => (window.location.href = "/builds")}
+            onClick={() => navigate("/builds")}
           >
             <Settings className="w-10 h-10 text-green-500" />
             <span className="text-xl font-semibold">Builds</span>

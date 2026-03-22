@@ -1,4 +1,6 @@
-import type { Stage } from "../../types/pipeline.types";
+import type {
+  Stage
+} from "../../gen/api";
 import StageCommandsEditor from "./stageCommandsEditor";
 
 type Props = {

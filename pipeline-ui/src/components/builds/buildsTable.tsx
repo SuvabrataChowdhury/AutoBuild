@@ -5,10 +5,10 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import type { Build } from "../../types/pipeline.types";
 import { BuildsRow } from "./buildsRow";
+import type { PipelineBuild } from "../../gen";
 
-export default function BuildsTable({ data }: { data: Build[] }) {
+export default function BuildsTable({ data }: { data: PipelineBuild[] }) {
   return (
     <div className="mt-6 shadow-lg rounded-xl overflow-hidden bg-white">
       <Table>

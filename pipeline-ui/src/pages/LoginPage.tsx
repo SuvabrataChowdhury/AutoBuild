@@ -71,6 +71,7 @@ export default function LoginPage() {
           />
 
           <button
+            data-testid="togglePassword"
             type="button"
             className="absolute right-4 top-10 text-gray-500 hover:text-gray-700 transition"
             onClick={() => setShowPassword(!showPassword)}

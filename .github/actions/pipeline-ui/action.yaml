@@ -5,6 +5,9 @@ inputs:
   base-ref:
     required: true
     description: Reference to base github branch
+  has-openapi-contract-changed:
+    required: true
+    description: Boolean to indicate if openapi contract has changed or not
 
 runs:
   using: composite
@@ -27,9 +30,17 @@ runs:
           echo "Directory contents have changed. Proceeding with subsequent checks"
 
           cd pipeline-ui
-          npm install # TODO: use npm ci and introduce package-lock.json
+          npm ci
           npm run lint
         else
           echo "Directory contents are unchanged. Skipping subsequent checks"
         fi
-        
+    - name: Test
+      shell: bash
+      if: steps.is_pipeline_ui_changed.outputs.is_changed == 'true' || inputs.has-openapi-contract-changed == 'true'
+      run: |
+        cd pipeline-ui
+        npm ci
+        echo "Running Tests"
+        npm run generate:clean-client-code
+        npm run test:coverage-pipeline

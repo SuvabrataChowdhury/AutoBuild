@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
 import { PipelinesTable } from "../../components/pipelines/pipelinesTable";
 import { Button } from "../../components/ui/button";
-import type { Pipeline } from "../../types/pipeline.types";
-import { getPipelines } from "../../services/pipelines.api";
+import { pipelineApiInstance } from "../../services/pipelines.api";
+import type {Pipeline} from '../../gen/api';
 import "./PipelinePage.css";
 import NavBar from "../../components/common/navBar";
+import { useNavigate } from "react-router-dom";
 
 export default function PipelinePage() {
   const [search, setSearch] = useState("");
@@ -13,19 +14,29 @@ export default function PipelinePage() {
   const [data, setData] = useState<Pipeline[]>([]);
 
   const filtered = data.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+    p.name.toLowerCase().includes(search.toLowerCase()),
   );
+  
+  const navigate = useNavigate();
 
+  // TODO: check call is happening twice
   useEffect(() => {
     async function fetchData() {
-      const pipelines = await getPipelines();
+      const {status, data} = await pipelineApiInstance.getAllPipelines();
+
+      if (status != 200) {
+        console.log("obtained status: ", 200); //TODO: error popup
+        return;
+      }
+
+      const pipelines = data;
       setData(pipelines);
     }
     fetchData();
   }, []);
 
   function onCreate(): void {
-    window.location.href = "/pipelines/0";
+    navigate("/pipelines/0");
   }
 
   return (

@@ -30,6 +30,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
     put:
       tags:
       - Pipeline
@@ -57,6 +59,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
+      security:
+      - bearerAuth: []
     delete:
       tags:
       - Pipeline
@@ -69,8 +73,10 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
+      security:
+      - bearerAuth: []
     patch:
       tags:
       - Pipeline
@@ -98,6 +104,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
+      security:
+      - bearerAuth: []
   /api/v1/pipeline:
     get:
       tags:
@@ -113,6 +121,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
     post:
       tags:
       - Pipeline
@@ -125,12 +135,14 @@ paths:
               $ref: "#/components/schemas/Pipeline"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Pipeline"
+      security:
+      - bearerAuth: []
   /api/v1/execute/pipeline:
     post:
       tags:
@@ -144,12 +156,14 @@ paths:
               $ref: "#/components/schemas/PipelineExecuteRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "203":
+          description: Non-Authoritative Information
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
+      security:
+      - bearerAuth: []
   /api/v1/stage/build/logs/{stageBuildId}:
     get:
       tags:
@@ -187,6 +201,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PipelineBuild"
+      security:
+      - bearerAuth: []
   /api/v1/pipeline/build/{pipelineBuildId}:
     get:
       tags:
@@ -207,6 +223,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
+      security:
+      - bearerAuth: []
     delete:
       tags:
       - Pipeline Build
@@ -222,26 +240,8 @@ paths:
       responses:
         "200":
           description: OK
-  /api/v1/pipeline/build/sse/subscribe/{pipelineBuildId}:
-    get:
-      tags:
-      - Pipeline Build
-      summary: Get a live executing pipeline build as Server Sent Event
-      operationId: getLivePipelineBuild
-      parameters:
-      - name: pipelineBuildId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/SseEmitter"
+      security:
+      - bearerAuth: []
 components:
   schemas:
     Pipeline:
@@ -324,9 +324,9 @@ components:
           - SUCCESS
           - FAILED
           - STOPPED
-    SseEmitter:
-      type: object
-      properties:
-        timeout:
-          type: integer
-          format: int64
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: "JWT authentication. Enter token as: Bearer <token>"
+      scheme: bearer
+      bearerFormat: JWT
