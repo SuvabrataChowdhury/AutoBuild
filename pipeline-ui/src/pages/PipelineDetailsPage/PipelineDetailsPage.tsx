@@ -8,18 +8,10 @@ import { booleanFlags } from "../../flags/booleanFlags";
 
 import type {
   Pipeline,
-  PipelineAPIModel,
-  Stage,
-  StageAPIModel,
-} from "../../types/pipeline.types";
-import {
-  deletePipeline,
-  executeBuild,
-  getBuildsList,
-  getPipeline,
-  savePipeline,
-  updatePipeline,
-} from "../../services/pipelines.api";
+  Stage
+} from "../../gen/api";
+
+import {pipelineApiInstance, pipelineBuildApiInstance} from "../../services/pipelines.api";
 
 import { Pencil, Play, Trash } from "lucide-react";
 import NavBar from "../../components/common/navBar";
@@ -32,7 +24,7 @@ export default function PipelineDetailPage() {
   const [pipeline, setPipeline] = useState<Pipeline | null>(null);
 
   // The stage currently displayed on the right side
-  const [selectedStageId, setSelectedStageId] = useState<number>(0);
+  const [selectedStageId, setSelectedStageId] = useState<string>("");
 
   // Whether the user is editing or just viewing
   const [isEditing, setIsEditing] = useState(false);
@@ -50,11 +42,18 @@ export default function PipelineDetailPage() {
 
   const navigate = useNavigate();
 
-  async function checkDelete(id: number) {
-    const response = await getBuildsList();
+  // TODO: request change from backend as getBuildsList here is unnecessary dependency
+  async function checkDelete(id: string) {
+    const {status, data} = await pipelineBuildApiInstance.getAllBuilds();
+
+    if (status !== 200) {
+      console.error("Error getting builds");
+      return;
+    }
+
     let flag = true;
     //checking if pipeline id exists in the builds list
-    response.forEach((build) => {
+    data.forEach((build) => {
       if (build.pipelineId === id) {
         flag = false;
       }
@@ -70,7 +69,7 @@ export default function PipelineDetailPage() {
       if (id === "0") {
         // New pipeline template
         const newPipeline: Pipeline = {
-          id: 0,
+          id: crypto.randomUUID(),
           name: "New Pipeline",
           stages: [],
         };
@@ -80,18 +79,21 @@ export default function PipelineDetailPage() {
         setIsCreateMode(true);
         return;
       }
-      const data = await getPipeline(id as unknown as number);
-      if (!data) {
+      
+      const {status, data} = await pipelineApiInstance.getPipelineById(id as string);
+
+      if (status !== 200) {
         setError(["Pipeline not found"]);
         navigate("/pipelines");
       }
+
       setPipeline(data);
 
-      setIsDeleteVisible(await checkDelete(id as unknown as number));
+      setIsDeleteVisible(await checkDelete(id as string) as boolean);
 
       // Auto-select first stage on load
       if (data.stages.length > 0) {
-        setSelectedStageId(data.stages[0].id);
+        setSelectedStageId(data.stages[0].id as string);
       }
     }
 
@@ -119,14 +121,14 @@ export default function PipelineDetailPage() {
   }
 
   async function handleDelete() {
-    const response = await deletePipeline(id as unknown as number);
-    if (response) {
+    const {status} = await pipelineApiInstance.deletePipeline(id as string);
+    if (status === 204) {
       console.log("Pipeline deleted");
       navigate("/pipelines");
     }
   }
 
-  function removeOrderFromStages(stages: Stage[]): StageAPIModel[] {
+  function removeOrderFromStages(stages: Stage[]): Stage[] {
     return stages.map((stage) => ({
       name: stage.name,
       scriptType: stage.scriptType,
@@ -141,9 +143,10 @@ export default function PipelineDetailPage() {
       const pipelineToSave = {
         name: editablePipeline!.name,
         stages: removeOrderFromStages(editablePipeline!.stages),
-      } as unknown as PipelineAPIModel;
-      const data = await savePipeline(pipelineToSave as PipelineAPIModel);
-      if (typeof data.id === "undefined") {
+      } as unknown as Pipeline;
+      
+      const {status, data} = await pipelineApiInstance.createPipeline(pipelineToSave);
+      if (status !== 201 || typeof data.id === "undefined") {
         setError(data as unknown as string[]);
         setIsCreateMode(true);
         setTimeout(() => {
@@ -154,36 +157,7 @@ export default function PipelineDetailPage() {
       setIsEditing(false);
       navigate(`/pipelines/${data.id}`);
       return;
-    } else {
-      const pipelineToUpdate = {
-        name: editablePipeline!.name,
-        stages: removeOrderFromStages(editablePipeline!.stages),
-      } as unknown as PipelineAPIModel;
-
-      const data = await updatePipeline(
-        id as unknown as number,
-        pipelineToUpdate,
-      );
-      if (typeof data.id === "undefined") {
-        setError(data as unknown as string[]);
-        setTimeout(() => {
-          setError(null);
-        }, 5000);
-        return;
-      }
-      navigate(`/pipelines/${data.id}`);
-      return;
     }
-
-    if (!editablePipeline) return;
-
-    // TODO: API PUT call (updatePipeline)
-    // const updated = await updatePipeline(editablePipeline.id, editablePipeline);
-
-    setPipeline(editablePipeline); // update UI with edited copy
-    setEditablePipeline(null);
-    setIsEditing(false);
-    console.log("Saved pipeline:", editablePipeline);
   }
 
   // Cancel editing -> discard clone
@@ -196,7 +170,15 @@ export default function PipelineDetailPage() {
   }
 
   async function handleStartBuild() {
-    const data = await executeBuild(id as unknown as number);
+    const {status, data} = await pipelineApiInstance.executePipeline({
+      pipelineId: id as string
+    });
+
+    if (status !== 202) {
+      console.error("Error starting build");
+      return;
+    }
+
     navigate(`/builds/${data.id}`);
   }
 
@@ -217,17 +199,13 @@ export default function PipelineDetailPage() {
   function handleAddStage() {
     if (!editablePipeline) return;
 
-    const nextId =
-      editablePipeline.stages.length === 0
-        ? 1
-        : Math.max(...editablePipeline.stages.map((s) => s.id)) + 1;
+    const nextId = crypto.randomUUID();
 
     const newStage: Stage = {
       id: nextId,
       name: "New Stage",
       scriptType: "bash",
       command: "",
-      order: editablePipeline.stages.length + 1,
     };
 
     setEditablePipeline((prev) => ({
@@ -238,7 +216,7 @@ export default function PipelineDetailPage() {
     setSelectedStageId(nextId);
   }
 
-  function handleDeleteStage(stageId: number) {
+  function handleDeleteStage(stageId: string) {
     if (!editablePipeline) return;
 
     const stages = editablePipeline.stages
@@ -249,23 +227,23 @@ export default function PipelineDetailPage() {
 
     // ensure valid selection
     if (stages.length === 0) {
-      setSelectedStageId(0);
+      setSelectedStageId("");
     } else if (!stages.some((s) => s.id === selectedStageId)) {
-      setSelectedStageId(stages[0].id);
+      setSelectedStageId(stages[0].id as string); //TODO: what to do incase of undefined id?
     }
   }
 
-  function moveStage(stageId: number, direction: "up" | "down") {
+  function moveStage(stageId: string, direction: "up" | "down") {
     if (!editablePipeline) return;
 
-    const stages = [...editablePipeline.stages].sort(
-      (a, b) => a.order - b.order,
-    );
+    const stages = [...editablePipeline.stages]
+
     const index = stages.findIndex((s) => s.id === stageId);
 
     if (direction === "up" && index > 0) {
       [stages[index - 1], stages[index]] = [stages[index], stages[index - 1]];
     }
+
     if (direction === "down" && index < stages.length - 1) {
       [stages[index], stages[index + 1]] = [stages[index + 1], stages[index]];
     }
@@ -407,8 +385,8 @@ export default function PipelineDetailPage() {
             canEdit={isEditing}
             onAddStage={handleAddStage}
             onDeleteStage={handleDeleteStage}
-            onMoveStageUp={(id: number) => moveStage(id, "up")}
-            onMoveStageDown={(id: number) => moveStage(id, "down")}
+            onMoveStageUp={(id: string) => moveStage(id, "up")}
+            onMoveStageDown={(id: string) => moveStage(id, "down")}
           />
 
           <StageDetails

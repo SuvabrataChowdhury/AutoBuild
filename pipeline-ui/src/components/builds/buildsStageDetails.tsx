@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { StageBuilds } from "../../types/pipeline.types";
-import { getBuildStagesLogs } from "../../services/pipelines.api";
+import { StageBuildCurrentStateEnum, type StageBuild } from "../../gen";
+import { stageBuildApiInstance } from "../../services/pipelines.api";
 
 type Props = {
-  stage: StageBuilds;
+  stage: StageBuild;
 };
 
 export default function StageDetails({ stage }: Props) {
@@ -14,8 +14,13 @@ export default function StageDetails({ stage }: Props) {
 
     async function fetchLogs() {
       try {
-        const logData = await getBuildStagesLogs(stage.id);
-        setLogs(logData.log);
+        const {status, data} = await stageBuildApiInstance.getStageBuildLogs(stage.id as string);
+
+        if (status !== 200) {
+          console.error("Error getting stage build log");
+        }
+
+        setLogs(data.log);
       } catch (err) {
         console.error("Failed to load logs", err);
       }
@@ -24,8 +29,8 @@ export default function StageDetails({ stage }: Props) {
     // Load logs once immediately
     fetchLogs();
 
-    const isFinal = ["FAILED", "STOPPED", "SUCCESS"].includes(
-      stage.currentState
+    const isFinal = ([StageBuildCurrentStateEnum.Failed, StageBuildCurrentStateEnum.Stopped, StageBuildCurrentStateEnum.Success] as StageBuildCurrentStateEnum[]).includes(
+      stage.currentState ?? StageBuildCurrentStateEnum.Failed
     );
 
     // Only start polling if NOT in a final state

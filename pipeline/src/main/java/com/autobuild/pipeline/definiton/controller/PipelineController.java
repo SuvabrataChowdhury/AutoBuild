@@ -23,6 +23,7 @@ import com.autobuild.pipeline.definiton.service.PipelineService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,7 +63,10 @@ public class PipelineController {
         return ResponseEntity.ok(pipelineService.getAllPipelines());
     }
 
-    @Operation(summary = "Create a pipeline")
+    @Operation(
+        summary = "Create a pipeline",
+        responses = @ApiResponse(responseCode = "201")
+    )
     @PostMapping
     public ResponseEntity<PipelineDTO> createPipeline(@RequestBody @Valid PipelineDTO pipelineRequest)
             throws DuplicateEntryException, IOException, InvalidIdException {
@@ -84,7 +88,10 @@ public class PipelineController {
         return ResponseEntity.ok(pipelineService.modifyPipeline(pipelineId, patchRequest));
     }
 
-    @Operation(summary = "Delete a pipeline")
+    @Operation(
+        summary = "Delete a pipeline",
+        responses = @ApiResponse(responseCode = "204")
+    )
     @DeleteMapping("/{pipelineId}")
     public ResponseEntity<Void> deletePipeline(@PathVariable String pipelineId)
             throws IOException, InvalidIdException {

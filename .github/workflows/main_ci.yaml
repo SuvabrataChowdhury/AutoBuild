@@ -29,3 +29,4 @@ jobs:
         uses: ./.github/actions/pipeline-ui
         with:
           base-ref: ${{github.base_ref}}
+          has-openapi-contract-changed: ${{steps.is_openapi_contract_violated.outputs.has_contract_changed}}
