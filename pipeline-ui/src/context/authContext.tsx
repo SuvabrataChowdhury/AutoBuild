@@ -1,4 +1,14 @@
+import Keycloak from "keycloak-js";
 import { createContext, useContext, useState } from "react";
+
+export const keycloak = new Keycloak({
+  url: 'http://localhost:8180',  // Your Keycloak server
+  realm: 'SpringBootRealm',
+  clientId: 'pipeline-ui'
+});
+
+// const authenticated = await keycloak.init();
+// console.log(authenticated ? 'User authenticated' : 'Not authenticated');
 
 type AuthContextType = {
   token: string | null;
