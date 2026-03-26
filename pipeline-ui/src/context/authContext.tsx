@@ -11,7 +11,7 @@ const authenticated = await keycloak.init({
   onLoad: 'login-required', 
   checkLoginIframe: true 
 });
-console.log(authenticated ? 'User authenticated' : 'Not authenticated');
+// console.log(authenticated ? 'User authenticated' : 'Not authenticated');
 
 
 type AuthContextType = {

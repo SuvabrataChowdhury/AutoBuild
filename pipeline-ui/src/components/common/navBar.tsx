@@ -3,6 +3,7 @@ import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../services/auth.api";
 import type { UserInfo } from "../../types/user.types";
+import { keycloak } from "../../context/authContext";
 
 export default function NavBar() {
   const [loading, setLoading] = useState(true);
@@ -113,9 +114,8 @@ export default function NavBar() {
               <hr className="border-white/10 my-3" />
 
               <button
-                onClick={() => {
-                  sessionStorage.removeItem("token");
-                  navigate("/login");
+                onClick={async () => {
+                  await keycloak.logout();
                 }}
                 className="
               w-full flex items-center gap-2 px-3 py-2 
