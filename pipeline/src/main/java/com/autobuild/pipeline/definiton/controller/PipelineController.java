@@ -3,7 +3,7 @@ package com.autobuild.pipeline.definiton.controller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,14 +51,14 @@ public class PipelineController {
     private PipelineService pipelineService;
 
     @Operation(summary = "Get a pipeline")
-    @GetMapping("/{pipelineId}")
+    @GetMapping(value = "/{pipelineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineDTO> getPipelineById(@PathVariable String pipelineId)
             throws InvalidIdException, IOException {
         return ResponseEntity.ok(pipelineService.getPipelineById(pipelineId));
     }
 
     @Operation(summary = "Get all pipelines")
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PipelineDTO>> getAllPipelines() {
         return ResponseEntity.ok(pipelineService.getAllPipelines());
     }
@@ -67,7 +67,7 @@ public class PipelineController {
         summary = "Create a pipeline",
         responses = @ApiResponse(responseCode = "201")
     )
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineDTO> createPipeline(@RequestBody @Valid PipelineDTO pipelineRequest)
             throws DuplicateEntryException, IOException, InvalidIdException {
         PipelineDTO createdPipeline = pipelineService.createPipeline(pipelineRequest);
@@ -80,7 +80,7 @@ public class PipelineController {
         description = "API to update pipeline. It's currently under development. Do not use it!",
         deprecated = true
     )
-    @PatchMapping("/{pipelineId}")
+    @PatchMapping(value = "/{pipelineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineDTO> modifyPipeline(
             @PathVariable String pipelineId,
             @RequestBody PipelineDTO patchRequest)
@@ -92,7 +92,7 @@ public class PipelineController {
         summary = "Delete a pipeline",
         responses = @ApiResponse(responseCode = "204")
     )
-    @DeleteMapping("/{pipelineId}")
+    @DeleteMapping(value = "/{pipelineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deletePipeline(@PathVariable String pipelineId)
             throws IOException, InvalidIdException {
         pipelineService.deletePipelineById(pipelineId);
@@ -104,7 +104,7 @@ public class PipelineController {
         description = "API to update pipeline. It's currently under development. Do not use it!",
         deprecated = true
     )
-    @PutMapping("/{pipelineId}")
+    @PutMapping(value = "/{pipelineId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineDTO> updatePipeline(
             @PathVariable String pipelineId,
             @RequestBody @Valid PipelineDTO putRequest)
