@@ -9,14 +9,15 @@ export default function LoginPage() {
   const {keycloak} = useKeycloak();
   const navigate = useNavigate();
 
-  // await keycloak.login();
-  const login = useCallback(() => {
-    keycloak.login();
-  }, [keycloak]);
 
-  if (keycloak.authenticated) {
-    navigate("/"); 
-  }
+  // await keycloak.login();
+  // const login = useCallback(() => {
+  //   keycloak.login();
+  // }, [keycloak]);
+
+  // if (keycloak.authenticated) {
+  //   navigate("/"); 
+  // }
 
   return <></>
   // const { login } = useAuth();
