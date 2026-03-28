@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { keycloak } from "../../context/authContext";
+import { keycloak } from "../../auth/authContext";
 import type { KeycloakUserInfo } from "keycloak-js";
 
 export default function NavBar() {
@@ -100,7 +100,7 @@ export default function NavBar() {
             border border-white/10 p-4 animate-fadeIn
           "
             >
-              <p className="font-semibold text-lg">{user?.username}</p>
+              <p className="font-semibold text-lg">{user?.preferred_username}</p>
               <p className="text-sm text-gray-300 mb-3">{user?.email}</p>
 
               <hr className="border-white/10 my-3" />

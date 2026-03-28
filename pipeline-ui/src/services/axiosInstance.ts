@@ -1,5 +1,5 @@
 import axios from "axios";
-import { keycloak } from "../context/authContext";
+import { keycloak } from "../auth/authContext";
 
 const axiosInstance = axios.create();
 

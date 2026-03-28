@@ -1,5 +1,5 @@
 import { render, screen, act } from "@testing-library/react";
-import { AuthProvider, useAuth } from "../../src/context/authContext";
+import { AuthProvider, useAuth } from "../../src/auth/authContext";
 import { describe, beforeEach, it, expect } from "vitest";
 
 function TestComponent() {

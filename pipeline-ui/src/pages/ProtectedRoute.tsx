@@ -1,4 +1,4 @@
-import { keycloak } from "../context/authContext";
+import { keycloak } from "../auth/authContext";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function ProtectedRoute({ children }: any) {
