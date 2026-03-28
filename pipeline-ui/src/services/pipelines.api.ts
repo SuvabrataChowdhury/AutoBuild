@@ -8,19 +8,13 @@ import {
     StageBuildApi
 } from '../gen/api';
 
-import {
-    Configuration
-} from '../gen/configuration';
-
-import { localConfig } from '../config/localConfig';
-
-
+import { getApiConfiguration } from '../config/apiConfiguration';
 import axiosInstance from './axiosInstance';
-const isLocal = import.meta.env.VITE_ENV === "local";
 
-export const pipelineApiInstance = new PipelineApi(isLocal? localConfig : new Configuration(), undefined, axiosInstance);
-export const pipelineBuildApiInstance = new PipelineBuildApi(isLocal? localConfig : new Configuration(), undefined, axiosInstance);
-export const stageBuildApiInstance = new StageBuildApi(isLocal? localConfig : new Configuration(), undefined, axiosInstance);
+
+export const pipelineApiInstance = new PipelineApi(getApiConfiguration(), undefined, axiosInstance);
+export const pipelineBuildApiInstance = new PipelineBuildApi(getApiConfiguration(), undefined, axiosInstance);
+export const stageBuildApiInstance = new StageBuildApi(getApiConfiguration(), undefined, axiosInstance);
 
 const API_BASE_URL = "http://localhost:8080/api/v1";
 
