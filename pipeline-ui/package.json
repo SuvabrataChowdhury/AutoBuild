@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode local-mock-server",
+    "local-e2e": "vite --mode local-e2e",
     "production": "vite build && vite preview",
-    "local": "concurrently \"npm run mock\" \"vite\"",
+    "local-with-mock": "concurrently \"npm run mock\" \"vite --mode local-with-mock\"",
     "build": "tsc -b && vite build",
     "mock": "prism mock ./../apis/openapi-spec/pipeline-service.yaml -d",
     "lint": "eslint src",
