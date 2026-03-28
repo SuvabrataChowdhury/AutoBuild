@@ -1,5 +1,5 @@
 import Keycloak from "keycloak-js";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext} from "react";
 
 const keycloak = new Keycloak({
   url: 'http://localhost:8180', 
@@ -13,7 +13,6 @@ await keycloak.init({
 });
 
 type AuthContextType = {
-  // token: string | null;
   login: (token: string) => void;
   logout: () => void;
 };

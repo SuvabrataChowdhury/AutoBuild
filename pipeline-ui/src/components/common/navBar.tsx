@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser } from "../../services/auth.api";
-import type { UserInfo } from "../../types/user.types";
 import { keycloak } from "../../context/authContext";
 import type { KeycloakUserInfo } from "keycloak-js";
 
@@ -18,16 +16,6 @@ export default function NavBar() {
     async function fetchUser() {
       const data = await keycloak.loadUserInfo();
       setUser(data);
-
-      // const token = sessionStorage.getItem("token");
-      // if (token) {
-      //   try {
-      //     // const data = await getCurrentUser(token);
-      //     setUser(data);
-      //   } catch (err) {
-      //     console.error("Failed to fetch user:", err);
-      //   }
-      // }
     }
     fetchUser();
     return () => clearTimeout(t);
