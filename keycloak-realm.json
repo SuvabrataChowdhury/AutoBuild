@@ -1,6 +1,9 @@
 {
   "realm": "SpringBootRealm",
   "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": false,
+  "verifyEmail": false,
   "clients": [
     {
       "clientId": "pipeline-app",

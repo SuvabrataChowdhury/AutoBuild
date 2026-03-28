@@ -4,26 +4,30 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../services/auth.api";
 import type { UserInfo } from "../../types/user.types";
 import { keycloak } from "../../context/authContext";
+import type { KeycloakUserInfo } from "keycloak-js";
 
 export default function NavBar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserInfo>();
+  const [user, setUser] = useState<KeycloakUserInfo>();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     async function fetchUser() {
-      const token = sessionStorage.getItem("token");
-      if (token) {
-        try {
-          const data = await getCurrentUser(token);
-          setUser(data);
-        } catch (err) {
-          console.error("Failed to fetch user:", err);
-        }
-      }
+      const data = await keycloak.loadUserInfo();
+      setUser(data);
+
+      // const token = sessionStorage.getItem("token");
+      // if (token) {
+      //   try {
+      //     // const data = await getCurrentUser(token);
+      //     setUser(data);
+      //   } catch (err) {
+      //     console.error("Failed to fetch user:", err);
+      //   }
+      // }
     }
     fetchUser();
     return () => clearTimeout(t);
@@ -90,7 +94,7 @@ export default function NavBar() {
           >
             <User size={18} />
             <span className="text-sm font-medium">
-              {user?.username || "User"}
+              {user?.preferred_username || "User"}
             </span>
             <ChevronDown
               size={16}
