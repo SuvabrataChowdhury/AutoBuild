@@ -27,7 +27,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       security:
@@ -55,7 +55,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
@@ -100,7 +100,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
@@ -116,7 +116,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -138,7 +138,7 @@ paths:
         "201":
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       security:
@@ -159,7 +159,7 @@ paths:
         "203":
           description: Non-Authoritative Information
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
       security:
@@ -181,7 +181,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: object
                 additionalProperties:
@@ -196,7 +196,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -220,7 +220,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
       security:

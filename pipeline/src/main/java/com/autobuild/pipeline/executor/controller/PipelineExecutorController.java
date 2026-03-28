@@ -2,6 +2,7 @@ package com.autobuild.pipeline.executor.controller;
 
 import java.io.IOException;
 
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,7 @@ public class PipelineExecutorController {
     private PipelineExecutorService service;
 
     @Operation(summary = "Execute a pipeline", responses = @ApiResponse(responseCode = "203"))
-    @PostMapping("/pipeline")
+    @PostMapping(value = "/pipeline", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request)
             throws IOException {
         PipelineBuildDTO build = service.executePipeline(request);
