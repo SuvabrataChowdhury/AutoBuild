@@ -1,10 +1,10 @@
-import { keycloak } from "../auth/authContext";
+import { idp } from "../config/authConfig";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function ProtectedRoute({ children }: any) {
 
-  if (!keycloak.authenticated) {
-    keycloak.login();
+  if (!idp.isAuthenticated()) {
+    idp.login();
   }
 
   return children;

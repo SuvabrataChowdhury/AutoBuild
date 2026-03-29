@@ -1,16 +1,5 @@
-import Keycloak from "keycloak-js";
 import { createContext, useContext} from "react";
-
-const keycloak = new Keycloak({
-  url: 'http://localhost:8180', 
-  realm: 'SpringBootRealm',
-  clientId: 'pipeline-app'
-});
-
-await keycloak.init({
-  onLoad: 'login-required', 
-  checkLoginIframe: true 
-});
+import { idp } from "../config/authConfig";
 
 type AuthContextType = {
   login: (token: string) => void;
@@ -23,11 +12,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: any) {
   
   const login = async() => {
-    await keycloak.login();
+    await idp.login();
   };
 
   const logout = async () => {
-    await keycloak.logout();
+    await idp.logout();
   };
 
   return (
@@ -39,4 +28,4 @@ export function AuthProvider({ children }: any) {
 
 const useAuth = () => useContext(AuthContext)!;
 
-export {keycloak, useAuth};
+export {useAuth};

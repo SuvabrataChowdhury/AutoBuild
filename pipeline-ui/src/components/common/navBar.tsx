@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { keycloak } from "../../auth/authContext";
-import type { KeycloakUserInfo } from "keycloak-js";
+import { idp } from "../../config/authConfig";
+import type { UserInfo } from "../../types/user.types";
 
 export default function NavBar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [user, setUser] = useState<KeycloakUserInfo>();
+  const [user, setUser] = useState<UserInfo>();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     async function fetchUser() {
-      const data = await keycloak.loadUserInfo();
+      const data = await idp.getUserInfo();
       setUser(data);
     }
     fetchUser();
@@ -82,7 +82,7 @@ export default function NavBar() {
           >
             <User size={18} />
             <span className="text-sm font-medium">
-              {user?.preferred_username || "User"}
+              {user?.username || "User"}
             </span>
             <ChevronDown
               size={16}
@@ -100,14 +100,14 @@ export default function NavBar() {
             border border-white/10 p-4 animate-fadeIn
           "
             >
-              <p className="font-semibold text-lg">{user?.preferred_username}</p>
+              <p className="font-semibold text-lg">{user?.username}</p>
               <p className="text-sm text-gray-300 mb-3">{user?.email}</p>
 
               <hr className="border-white/10 my-3" />
 
               <button
                 onClick={async () => {
-                  await keycloak.logout();
+                  await idp.logout();
                 }}
                 className="
               w-full flex items-center gap-2 px-3 py-2 

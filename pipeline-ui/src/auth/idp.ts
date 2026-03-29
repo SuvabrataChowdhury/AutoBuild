@@ -1,7 +1,7 @@
 import type { UserInfo } from "../types/user.types";
 import Keycloak, { type KeycloakUserInfo } from "keycloak-js";
 
-interface Idp {
+export interface Idp {
     login(): Promise<void>,
     logout(): Promise<void>,
     getToken(): string | undefined,
@@ -9,7 +9,7 @@ interface Idp {
     getUserInfo(): Promise<UserInfo>
 }
 
-class KeycloakIdp implements Idp {
+export class KeycloakIdp implements Idp {
     private keycloakInstance: Keycloak;
 
     constructor(keycloak: Keycloak) {
@@ -41,5 +41,33 @@ class KeycloakIdp implements Idp {
         }
 
         return userInfo;
+    }
+}
+
+export class LocalMockIdp implements Idp {
+    private userInfo: UserInfo;
+
+    constructor(userInfo: UserInfo) {
+        this.userInfo = userInfo;
+    }
+
+    async login(): Promise<void> {
+        
+    }
+
+    async logout(): Promise<void> {
+        
+    }
+
+    getToken(): string | undefined {
+        return "dummy";
+    }
+
+    isAuthenticated(): boolean {
+        return true;
+    }
+
+    async getUserInfo(): Promise<UserInfo> {
+        return this.userInfo;
     }
 }
