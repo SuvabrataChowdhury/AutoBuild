@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "local-e2e": "vite --mode local-e2e",
+    "production": "vite build && vite preview",
+    "local-with-mock": "concurrently \"npm run mock\" \"vite --mode local-with-mock\"",
     "build": "tsc -b && vite build",
+    "mock": "prism mock ./../apis/openapi-spec/pipeline-service.yaml -d",
     "lint": "eslint src",
     "preview": "vite preview",
     "test": "vitest",
@@ -31,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@openapitools/openapi-generator-cli": "^2.30.2",
+    "@stoplight/prism-cli": "^5.14.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -41,6 +45,7 @@
     "@vitest/coverage-v8": "^4.1.0",
     "@vitest/ui": "^4.0.18",
     "autoprefixer": "^10.4.22",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
