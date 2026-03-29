@@ -14,8 +14,12 @@ export default function NavBar() {
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     async function fetchUser() {
-      const data = await idp.getUserInfo();
-      setUser(data);
+      try{
+        const data = await idp.getUserInfo();
+        setUser(data);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
     }
     fetchUser();
     return () => clearTimeout(t);

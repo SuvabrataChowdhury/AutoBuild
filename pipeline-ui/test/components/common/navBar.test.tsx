@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import NavBar from "../../../src/components/common/navBar";
-import { getCurrentUser } from "../../../src/services/auth.api";
 import type { UserInfo } from "../../../src/types/user.types";
+import { idp } from "../../../src/config/authConfig";
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -16,9 +16,7 @@ vi.mock("react-router-dom", async () => {
 });
 
 // Mock auth API
-vi.mock("../../../src/services/auth.api", () => ({
-  getCurrentUser: vi.fn(),
-}));
+vi.mock("../../../src/config/authConfig");
 
 describe("NavBar", () => {
   const mockUser: UserInfo = {
@@ -43,7 +41,7 @@ describe("NavBar", () => {
   describe("Logo and Branding", () => {
     beforeEach(() => {
       sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
       renderNavBar();
     });
 
@@ -68,7 +66,7 @@ describe("NavBar", () => {
   describe("Navigation Links", () => {
     beforeEach(() => {
       sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
       renderNavBar();
     });
 
@@ -131,19 +129,17 @@ describe("NavBar", () => {
   describe("User Profile - Fetching User Data", () => {
     it("fetches user data when token exists", async () => {
       const token = "test-token-123";
-      sessionStorage.setItem("token", token);
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
 
       renderNavBar();
 
       await waitFor(() => {
-        expect(getCurrentUser).toHaveBeenCalledWith(token);
+        expect(idp.getUserInfo).toHaveBeenCalled();
       });
     });
 
     it("displays fetched username in profile button", async () => {
-      sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
 
       renderNavBar();
 
@@ -156,8 +152,7 @@ describe("NavBar", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
-      sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockRejectedValue(new Error("API Error"));
+      vi.mocked(idp.getUserInfo).mockRejectedValue(new Error("API Error"));
 
       renderNavBar();
 
@@ -170,24 +165,12 @@ describe("NavBar", () => {
 
       consoleErrorSpy.mockRestore();
     });
-
-    it("does not fetch user when no token exists", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
-
-      renderNavBar();
-
-      await waitFor(() => {
-        expect(screen.getByText("AutoBuild")).toBeInTheDocument();
-      });
-
-      expect(getCurrentUser).not.toHaveBeenCalled();
-    });
   });
 
   describe("Profile Dropdown Menu", () => {
     beforeEach(() => {
       sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
       renderNavBar();
     });
 
@@ -254,7 +237,7 @@ describe("NavBar", () => {
   describe("Dropdown Click Outside", () => {
     beforeEach(() => {
       sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
       renderNavBar();
     });
 
@@ -304,47 +287,8 @@ describe("NavBar", () => {
 
   describe("Logout Functionality", () => {
     beforeEach(() => {
-      sessionStorage.setItem("token", "test-token");
-      vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
+      vi.mocked(idp.getUserInfo).mockResolvedValue(mockUser);
       renderNavBar();
-    });
-
-    it("removes token from sessionStorage on logout", async () => {
-      await waitFor(() => {
-        expect(screen.getByText("testuser")).toBeInTheDocument();
-      });
-
-      expect(sessionStorage.getItem("token")).toBe("test-token");
-
-      const profileButton = screen.getByText("testuser");
-      fireEvent.click(profileButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("Logout")).toBeInTheDocument();
-      });
-
-      const logoutButton = screen.getByText("Logout");
-      fireEvent.click(logoutButton);
-
-      expect(sessionStorage.getItem("token")).toBeNull();
-    });
-
-    it("navigates to login page on logout", async () => {
-      await waitFor(() => {
-        expect(screen.getByText("testuser")).toBeInTheDocument();
-      });
-
-      const profileButton = screen.getByText("testuser");
-      fireEvent.click(profileButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("Logout")).toBeInTheDocument();
-      });
-
-      const logoutButton = screen.getByText("Logout");
-      fireEvent.click(logoutButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith("/login");
     });
 
     it("displays logout icon", async () => {

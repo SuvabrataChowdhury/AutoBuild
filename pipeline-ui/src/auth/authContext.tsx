@@ -2,7 +2,7 @@ import { createContext, useContext} from "react";
 import { idp } from "../config/authConfig";
 
 type AuthContextType = {
-  login: (token: string) => void;
+  login: () => void;
   logout: () => void;
 };
 
