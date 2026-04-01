@@ -1,6 +1,5 @@
 import axios from "axios";
 import { idp } from "../config/authConfig";
-// import { keycloak } from "../auth/authContext";
 
 const axiosInstance = axios.create();
 
