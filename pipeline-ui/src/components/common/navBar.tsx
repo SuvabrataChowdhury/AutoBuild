@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser } from "../../services/auth.api";
+import { idp } from "../../config/authConfig";
 import type { UserInfo } from "../../types/user.types";
 
 export default function NavBar() {
@@ -14,14 +14,11 @@ export default function NavBar() {
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     async function fetchUser() {
-      const token = sessionStorage.getItem("token");
-      if (token) {
-        try {
-          const data = await getCurrentUser(token);
-          setUser(data);
-        } catch (err) {
-          console.error("Failed to fetch user:", err);
-        }
+      try{
+        const data = await idp.getUserInfo();
+        setUser(data);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
       }
     }
     fetchUser();
@@ -113,9 +110,8 @@ export default function NavBar() {
               <hr className="border-white/10 my-3" />
 
               <button
-                onClick={() => {
-                  sessionStorage.removeItem("token");
-                  navigate("/login");
+                onClick={async () => {
+                  await idp.logout();
                 }}
                 className="
               w-full flex items-center gap-2 px-3 py-2 
