@@ -19,6 +19,8 @@ function TestComponent() {
 describe("AuthProvider", () => {
   beforeEach(() => {
     sessionStorage.clear();
+    vi.mocked(idp.login).mockResolvedValue(undefined);
+    vi.mocked(idp.logout).mockResolvedValue(undefined);
   });
 
   it("provides null token by default", () => {
@@ -28,5 +30,29 @@ describe("AuthProvider", () => {
       </AuthProvider>,
     );
     expect(screen.getByTestId("token").textContent).toBe("");
+  });
+
+  it("calls idp.login when login is triggered", async () => {
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>,
+    );
+    await act(async () => {
+      screen.getByText("Login").click();
+    });
+    expect(idp.login).toHaveBeenCalled();
+  });
+
+  it("calls idp.logout when logout is triggered", async () => {
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>,
+    );
+    await act(async () => {
+      screen.getByText("Logout").click();
+    });
+    expect(idp.logout).toHaveBeenCalled();
   });
 });
