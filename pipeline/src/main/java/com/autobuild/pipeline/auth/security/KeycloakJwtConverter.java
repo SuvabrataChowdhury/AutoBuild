@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Component
 public class KeycloakJwtConverter implements JwtAuthoritiesConverter {
 
+    private static final String KC_ROLES_KEY = "roles";
+
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -35,8 +37,8 @@ public class KeycloakJwtConverter implements JwtAuthoritiesConverter {
     @SuppressWarnings("unchecked")
     private void extractRealmRoles(Jwt jwt, List<GrantedAuthority> authorities) {
         Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-        if (realmAccess != null && realmAccess.containsKey("roles")) {
-            List<String> roles = (List<String>) realmAccess.get("roles");
+        if (realmAccess != null && realmAccess.containsKey(KC_ROLES_KEY)) {
+            List<String> roles = (List<String>) realmAccess.get(KC_ROLES_KEY);
             authorities.addAll(roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                 .collect(Collectors.toList()));
@@ -50,8 +52,8 @@ public class KeycloakJwtConverter implements JwtAuthoritiesConverter {
             resourceAccess.values().forEach(clientData -> {
                 if (clientData instanceof Map) {
                     Map<String, Object> clientMap = (Map<String, Object>) clientData;
-                    if (clientMap.containsKey("roles")) {
-                        List<String> roles = (List<String>) clientMap.get("roles");
+                    if (clientMap.containsKey(KC_ROLES_KEY)) {
+                        List<String> roles = (List<String>) clientMap.get(KC_ROLES_KEY);
                         authorities.addAll(roles.stream()
                             .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                             .collect(Collectors.toList()));
