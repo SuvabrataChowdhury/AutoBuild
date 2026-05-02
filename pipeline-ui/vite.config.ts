@@ -22,7 +22,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: path.resolve(__dirname, 'test/setup.ts'),
+    unstubEnvs: true,
     include: ['test/**/*.test.{ts,tsx}', 'test/**/*.spec.{ts,tsx}'],
+    exclude: ['test/pages/loginPage.test.tsx', 'test/pages/registrationPage.test.tsx'], // TODO: Temporary exclusion as it's coming from IDP now
     coverage: {
       provider: 'v8',
       reporter: ['text'],

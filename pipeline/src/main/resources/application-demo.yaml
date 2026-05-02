@@ -17,15 +17,17 @@ spring:
   h2:
     console:
       enabled: false
-  
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${AUTH_HOST}:${AUTH_PORT}/realms/SpringBootRealm
+          jwk-set-uri: http://${AUTH_HOST}:${AUTH_PORT}/realms/SpringBootRealm/protocol/openid-connect/certs
+
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
-
-app:
-  jwt:
-    secret: demoSecretKeyForDevelopment1234567890
-    expiration: 86400000 # TODO: Too high of a expiration. Reduce it
+    - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
 logging:
   level:
