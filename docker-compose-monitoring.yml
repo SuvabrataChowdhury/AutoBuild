@@ -60,9 +60,19 @@ services:
            isDefault: true
            version: 1
            editable: true
+         - name: Prometheus
+           type: prometheus
+           access: proxy
+           orgId: 1
+           url: 'http://prometheus:9090'
+           basicAuth: false
+           isDefault: false
+           version: 1
+           editable: true
          EOF
          /run.sh
     networks:
+      - prometheus
       - loki
     
 networks:

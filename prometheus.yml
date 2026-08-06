@@ -1,3 +1,6 @@
+ global:
+  scrape_interval: 15s
+
  # A scrape configuration containing exactly one endpoint to scrape from Node exporter running on a host:
  scrape_configs:
      # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
