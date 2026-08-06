@@ -1,12 +1,12 @@
 // This component is responsible for disovering new containers within the docker environment
-discovery.docker "getting_started" {
+discovery.docker "autobuild" {
 	host = "unix:///var/run/docker.sock"
 	refresh_interval = "5s"
 }
 
 // This component is responsible for relabeling the discovered containers
-discovery.relabel "getting_started" {
-	targets = discovery.docker.getting_started.targets
+discovery.relabel "autobuild" {
+	targets = discovery.docker.autobuild.targets
 
 	rule {
 		source_labels = ["__meta_docker_container_name"]
@@ -16,26 +16,26 @@ discovery.relabel "getting_started" {
 }
 
 // This component is responsible for collecting logs from the discovered containers
-loki.source.docker "getting_started" {
+loki.source.docker "autobuild" {
 	host             = "unix:///var/run/docker.sock"
-	targets          = discovery.docker.getting_started.targets
-	forward_to       = [loki.process.getting_started.receiver]
-	relabel_rules    = discovery.relabel.getting_started.rules
+	targets          = discovery.docker.autobuild.targets
+	forward_to       = [loki.process.autobuild.receiver]
+	relabel_rules    = discovery.relabel.autobuild.rules
 	refresh_interval = "5s"
 }
 
 // This component is responsible for processing the logs (In this case adding static labels)
-loki.process "getting_started" {
+loki.process "autobuild" {
     stage.static_labels {
-    values = {
-      env = "production",
-    }
-}
-    forward_to = [loki.write.getting_started.receiver]
+		values = {
+			env = "production",
+		}
+	}
+    forward_to = [loki.write.autobuild.receiver]
 }
 
 // This component is responsible for writing the logs to Loki
-loki.write "getting_started" {
+loki.write "autobuild" {
 	endpoint {
 		url  = "http://loki:3100/loki/api/v1/push"
 	}

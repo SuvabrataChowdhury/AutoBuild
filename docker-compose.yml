@@ -41,6 +41,7 @@ services:
       - "8080:8080"
     networks:
       - autobuild_loki
+      - autobuild_prometheus
   auth-service:
     image: quay.io/keycloak/keycloak:23.0.0
     container_name: auth-service
@@ -75,4 +76,6 @@ volumes:
 
 networks:
     autobuild_loki:
+      external: true
+    autobuild_prometheus:
       external: true

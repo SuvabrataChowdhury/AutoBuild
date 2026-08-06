@@ -1,0 +1,12 @@
+ # A scrape configuration containing exactly one endpoint to scrape from Node exporter running on a host:
+ scrape_configs:
+     # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+     - job_name: 'scrape autobuild'
+
+     # metrics_path defaults to '/metrics'
+     # scheme defaults to 'http'.
+
+       static_configs:
+       - targets: ['pipeline-app:8080']
+
+       metrics_path: /actuator/prometheus
