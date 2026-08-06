@@ -17,7 +17,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
+    networks:
+      - autobuild_loki
   pipeline-app:
     image: pipeline-app 
     container_name: pipeline-app
@@ -38,6 +39,8 @@ services:
       AUTH_PORT: 8080
     ports:
       - "8080:8080"
+    networks:
+      - autobuild_loki
   auth-service:
     image: quay.io/keycloak/keycloak:23.0.0
     container_name: auth-service
@@ -61,8 +64,15 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    networks:
+      - autobuild_loki
 
 volumes:
   mysql_data:
   pipeline_scripts:
   pipeline_build_logs:
+
+
+networks:
+    autobuild_loki:
+      external: true
