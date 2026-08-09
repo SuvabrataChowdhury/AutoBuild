@@ -31,11 +31,9 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: demo
-      DB_HOST: mysql-db
-      DB_PORT: 3306
-      DB_NAME: pipeline
-      DB_USER: testuser
-      DB_PASSWORD: testpass
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       AUTH_HOST: auth-service
       AUTH_PORT: 8080
     ports:
@@ -46,10 +44,10 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: mysql
-      KC_DB_URL: jdbc:mysql://mysql-db:3306/pipeline?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      KC_DB_USERNAME: testuser
-      KC_DB_PASSWORD: testpass
+      KC_DB: ${DB}
+      KC_DB_URL: ${DB_URL}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 8180
       KC_HOSTNAME_STRICT: false
@@ -59,7 +57,6 @@ services:
       mysql-db:
         condition: service_healthy
     volumes:
-      - ./keycloak-data:/opt/keycloak/data  # Bind mount data dir
       - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - "8180:8080"
