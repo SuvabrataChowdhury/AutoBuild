@@ -13,8 +13,5 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 COPY --from=build /home/app/target/*.jar app.jar
-COPY wait-for-mysql.sh .
-RUN apt-get update && apt-get install -y netcat \
-    && chmod +x wait-for-mysql.sh
 EXPOSE 8080
-ENTRYPOINT ["sh","./wait-for-mysql.sh"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
