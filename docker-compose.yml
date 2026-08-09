@@ -1,43 +1,31 @@
+volumes:
+  mysql_data:
+  pipeline_scripts:
+  pipeline_build_logs:
+
+networks:
+  app:
+
 services:
   mysql-db:
     image: mysql:8.0
     container_name: mysql-db
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: pipeline
-      MYSQL_USER: testuser
-      MYSQL_PASSWORD: testpass
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
-
-  pipeline-app:
-    image: pipeline-app 
-    container_name: pipeline-app
-    volumes:
-      - pipeline_scripts:/app/pipeline_scripts
-      - pipeline_build_logs:/app/pipeline_build_logs
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-      auth-service:
-        condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: demo
-      DB_URL: ${DB_URL}
-      DB_USER: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      AUTH_HOST: auth-service
-      AUTH_PORT: 8080
-    ports:
-      - "8080:8080"
   auth-service:
     image: quay.io/keycloak/keycloak:23.0.0
     container_name: auth-service
@@ -53,22 +41,41 @@ services:
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
       KC_HEALTH_ENABLED: true
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-    volumes:
-      - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - "8180:8080"
     command: start-dev --import-realm
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080; echo -e 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3; grep -q 'HTTP/1.1 200 OK' <&3"]
-      interval: 10s              # Reduced from 30s for a faster initial check
-      timeout: 5s                # Fail early if stalled
-      retries: 3                 # Avoid keeping dependencies waiting
-      start_period: 20s  
-
-volumes:
-  mysql_data:
-  pipeline_scripts:
-  pipeline_build_logs:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    volumes:
+      - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
+    networks:
+      - app
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+  pipeline-app:
+    image: pipeline-app
+    container_name: pipeline-app
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      AUTH_HOST: auth-service
+      AUTH_PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - pipeline_scripts:/app/pipeline_scripts
+      - pipeline_build_logs:/app/pipeline_build_logs
+    networks:
+      - app
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
