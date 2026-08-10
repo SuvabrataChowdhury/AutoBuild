@@ -82,8 +82,7 @@ services:
       # Point out of the container to the alloy service name
       OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      # Prometheus already scrapes metrics via /actuator/prometheus — disable OTLP metrics to avoid duplication
-      OTEL_METRICS_EXPORTER: none
+      OTEL_METRICS_EXPORTER: otlp
     ports:
       - "8080:8080"
     volumes:

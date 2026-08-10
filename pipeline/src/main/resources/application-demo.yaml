@@ -34,6 +34,3 @@ logging:
     org.springframework.jdbc.datasource: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
-management.endpoints.web.exposure.include: prometheus
-management.endpoint.prometheus.enabled: true

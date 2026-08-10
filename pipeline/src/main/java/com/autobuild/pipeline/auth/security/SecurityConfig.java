@@ -46,7 +46,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/pipeline/build/sse/subscribe/*").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/actuator/prometheus").permitAll()
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt

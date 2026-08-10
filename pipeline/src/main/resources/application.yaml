@@ -36,6 +36,4 @@ spring:
       enabled: true
       path: /h2-console
 
-management.endpoints.web.exposure.include: prometheus
-management.endpoint.prometheus.enabled: true
 
