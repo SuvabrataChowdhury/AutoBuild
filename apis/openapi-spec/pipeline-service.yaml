@@ -27,7 +27,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       security:
@@ -55,7 +55,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
@@ -73,8 +73,8 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
       security:
       - bearerAuth: []
     patch:
@@ -100,7 +100,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       deprecated: true
@@ -116,7 +116,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -135,10 +135,10 @@ paths:
               $ref: "#/components/schemas/Pipeline"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Pipeline"
       security:
@@ -156,10 +156,10 @@ paths:
               $ref: "#/components/schemas/PipelineExecuteRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "203":
+          description: Non-Authoritative Information
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
       security:
@@ -181,7 +181,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: object
                 additionalProperties:
@@ -196,7 +196,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -220,7 +220,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/PipelineBuild"
       security:

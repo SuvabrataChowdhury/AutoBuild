@@ -6,7 +6,8 @@ import {
   TableRow,
 } from "../ui/table";
 import { PipelineRow } from "./pipelineRow";
-import type { Pipeline } from "../../types/pipeline.types";
+import type { Pipeline } from '../../gen/api';
+
 
 export function PipelinesTable({ data }: { data: Pipeline[] }) {
   return (

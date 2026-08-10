@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 import BuildsRunningPage from "../../src/pages/BuildsPage/BuildsRunningPage";
-import {
-  getBuildData,
-  getBuildStagesLogs,
-} from "../../src/services/pipelines.api";
+import { pipelineBuildApiInstance, stageBuildApiInstance } from "../../src/services/pipelines.api";
+import { PipelineBuildCurrentStateEnum, StageBuildCurrentStateEnum } from "../../src/gen";
+
+vi.mock(import("../../src/services/pipelines.api"));
 
 // Mock react-router-dom useParams
 const mockParams = { id: "1" };
@@ -46,12 +46,6 @@ class MockEventSource {
 global.EventSource = MockEventSource;
 
 // Mock API calls
-vi.mock("../../src/services/pipelines.api", () => ({
-  getBuildData: vi.fn(),
-  getLiveBuildUpdates: vi.fn(),
-  deleteBuild: vi.fn(),
-  getBuildStagesLogs: vi.fn(),
-}));
 
 describe("BuildsRunningPage", () => {
   beforeEach(() => {
@@ -61,14 +55,17 @@ describe("BuildsRunningPage", () => {
   });
 
   it("renders builds running page content", () => {
-    const mockBuilds = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "RUNNING",
-      stageBuilds: [],
+    const mockBuildsResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: []
+      }
     };
-    vi.mocked(getBuildData).mockResolvedValueOnce(mockBuilds as any);
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildsResponse as any);
 
     render(
       <MemoryRouter>
@@ -80,22 +77,25 @@ describe("BuildsRunningPage", () => {
   });
 
   it("displays running build", async () => {
-    const mockBuilds = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "RUNNING",
-      stageBuilds: [
-        {
-          id: 1,
-          name: "Stage 1",
-          status: "RUNNING",
-          logs: "Stage 1 logs...",
-        },
-      ],
+    const mockBuildsResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: [
+          {
+            id: "1",
+            name: "Stage 1",
+            status: StageBuildCurrentStateEnum.Running,
+            logs: "Stage 1 logs...",
+          },
+        ]
+      }
     };
-    vi.mocked(getBuildData).mockResolvedValueOnce(mockBuilds as any);
-    vi.mocked(getBuildStagesLogs).mockResolvedValueOnce({
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildsResponse as any);
+    vi.mocked(stageBuildApiInstance.getStageBuildLogs).mockResolvedValueOnce({
       log: "Stage 1 logs...",
     } as any);
 
@@ -110,26 +110,29 @@ describe("BuildsRunningPage", () => {
     expect(build).toBeInTheDocument();
 
     // Verify getBuildData was called (note: id is passed as string "1" from useParams)
-    expect(getBuildData).toHaveBeenCalledWith("1");
+    expect(pipelineBuildApiInstance.getPipelineBuild).toHaveBeenCalledWith("1");
   });
 
   it("creates EventSource for live updates when build is RUNNING", async () => {
-    const mockBuilds = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "RUNNING",
-      stageBuilds: [
-        {
-          id: 1,
-          name: "Stage 1",
-          status: "RUNNING",
-          logs: "Stage 1 logs...",
-        },
-      ],
+    const mockBuildsResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: [
+          {
+            id: "1",
+            name: "Stage 1",
+            status: StageBuildCurrentStateEnum.Running,
+            logs: "Stage 1 logs...",
+          },
+        ]
+      }
     };
-    vi.mocked(getBuildData).mockResolvedValueOnce(mockBuilds as any);
-    vi.mocked(getBuildStagesLogs).mockResolvedValueOnce({
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildsResponse as any);
+    vi.mocked(stageBuildApiInstance.getStageBuildLogs).mockResolvedValueOnce({
       log: "Stage 1 logs...",
     } as any);
 
@@ -163,23 +166,25 @@ describe("BuildsRunningPage", () => {
   });
 
   it("updates build state when receiving SSE message", async () => {
-    const mockBuilds = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "RUNNING",
-      stageBuilds: [
-        {
-          id: 1,
-          name: "Build Stage",
-          status: "RUNNING",
-          logs: "Building...",
-        },
-      ],
+    const mockBuildResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: [
+          {
+            id: "1",
+            stageId: "10",
+            name: "Build Stage",
+            status: StageBuildCurrentStateEnum.Running,
+          },
+        ]
+      }
     };
-
-    vi.mocked(getBuildData).mockResolvedValueOnce(mockBuilds as any);
-    vi.mocked(getBuildStagesLogs)
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildResponse as any);
+    vi.mocked(stageBuildApiInstance.getStageBuildLogs)
       .mockResolvedValueOnce({ log: "Building..." } as any)
       .mockResolvedValueOnce({ log: "Build completed successfully!" } as any);
 
@@ -206,24 +211,23 @@ describe("BuildsRunningPage", () => {
     expect(eventSourceInstance.onmessage).toBeDefined();
 
     // Simulate receiving an SSE message with updated build state
-    const updatedBuildData = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "SUCCESS",
-      stageBuilds: [
-        {
-          id: 1,
-          name: "Build Stage",
-          status: "SUCCESS",
-          logs: "Build completed successfully!",
-        },
-      ],
+    const updatedBuilds = {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Success,
+        stageBuilds: [
+          {
+            id: "1",
+            name: "Build Stage",
+            status: StageBuildCurrentStateEnum.Success
+          },
+        ]
     };
 
     // Create and dispatch the message event
     const messageEvent = {
-      data: JSON.stringify(updatedBuildData),
+      data: JSON.stringify(updatedBuilds),
     } as MessageEvent;
 
     // Call the onmessage handler
@@ -242,25 +246,28 @@ describe("BuildsRunningPage", () => {
   });
 
   it("displays stage details with logs section", async () => {
-    const mockBuilds = {
-      id: 1,
-      pipelineId: 10,
-      pipelineName: "Pipeline 1",
-      currentState: "RUNNING",
-      stageBuilds: [
-        {
-          id: 1,
-          stageName: "Test Stage",
-          currentState: "RUNNING",
-          logs: "Running tests...",
-        },
-      ],
+    const mockBuildResponse = {
+      status: 200,
+      data: {
+        id: "1",
+        pipelineId: "10",
+        pipelineName: "Pipeline 1",
+        currentState: PipelineBuildCurrentStateEnum.Running,
+        stageBuilds: [
+          {
+            id: "1",
+            stageId: "10",
+            name: "Build Stage",
+            status: StageBuildCurrentStateEnum.Running,
+          },
+        ]
+      }
     };
 
-    vi.mocked(getBuildData).mockResolvedValueOnce(mockBuilds as any);
+    vi.mocked(pipelineBuildApiInstance.getPipelineBuild).mockResolvedValueOnce(mockBuildResponse as any);
 
     // Mock logs
-    vi.mocked(getBuildStagesLogs).mockResolvedValueOnce({
+    vi.mocked(stageBuildApiInstance.getStageBuildLogs).mockResolvedValueOnce({
       log: "Running tests...\nTest 1 passed\nTest 2 passed",
     } as any);
 
@@ -279,6 +286,6 @@ describe("BuildsRunningPage", () => {
     });
 
     // Verify getBuildStagesLogs was called to fetch logs
-    expect(getBuildStagesLogs).toHaveBeenCalledWith(1);
+    expect(stageBuildApiInstance.getStageBuildLogs).toHaveBeenCalledWith("1");
   });
 });

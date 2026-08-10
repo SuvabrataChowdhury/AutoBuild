@@ -1,11 +1,11 @@
-import { useAuth } from "../context/authContext";
-import { Navigate } from "react-router-dom";
+import { idp } from "../config/authConfig";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function ProtectedRoute({ children }: any) {
-  const { token } = useAuth();
 
-  if (!token) return <Navigate to="/login" replace />;
+  if (!idp.isAuthenticated()) {
+    idp.login();
+  }
 
   return children;
 }

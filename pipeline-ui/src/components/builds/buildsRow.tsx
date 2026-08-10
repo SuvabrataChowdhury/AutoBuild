@@ -1,22 +1,13 @@
 import { TableCell, TableRow } from "../ui/table";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import type { Build, Pipeline } from "../../types/pipeline.types";
-import { useEffect, useState } from "react";
-import { getPipeline } from "../../services/pipelines.api";
+import type { PipelineBuild } from "../../gen";
 
-export function BuildsRow({ build }: { build: Build }) {
+interface BuildRowProps {
+  build: PipelineBuild
+};
+
+export function BuildsRow({ build }: BuildRowProps) {
   const state = build.currentState;
-  const pipelineId = build.pipelineId;
-
-  const [data, setData] = useState<Pipeline>();
-
-  useEffect(() => {
-    async function fetchData(id: number) {
-      const build = await getPipeline(id);
-      setData(build);
-    }
-    fetchData(pipelineId);
-  }, [pipelineId]);
 
   return (
     <TableRow
@@ -26,7 +17,7 @@ export function BuildsRow({ build }: { build: Build }) {
       className="hover:cursor-pointer"
     >
       <TableCell className="font-semibold text-left">{build.id}</TableCell>
-      <TableCell className="font-semibold text-left">{data?.name}</TableCell>
+      <TableCell className="font-semibold text-left">{build.pipelineName}</TableCell>
 
       <TableCell>
         {state === "SUCCESS" && <CheckCircle className="text-green-500" />}

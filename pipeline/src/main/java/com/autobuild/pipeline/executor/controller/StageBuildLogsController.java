@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +43,7 @@ public class StageBuildLogsController {
     // }
 
     @Operation(summary = "Get the logs related to a stage build")
-    @GetMapping("/{stageBuildId}")
+    @GetMapping(value = "/{stageBuildId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> getStageBuildLogs(@PathVariable UUID stageBuildId) throws IOException {
         return ResponseEntity.ok(service.getStageBuildLogs(stageBuildId));
     }

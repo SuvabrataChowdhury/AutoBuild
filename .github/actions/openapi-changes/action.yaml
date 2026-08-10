@@ -33,3 +33,8 @@ runs:
         fi
 
         echo "OpenAPI docs are consistent."
+
+outputs:
+  has_contract_changed:
+    value: $${{steps.is-openapi-docs-changed.outputs.is_changed}}
+    description: Value to indicate if OpenAPI contract has changed

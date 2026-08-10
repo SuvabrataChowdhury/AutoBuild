@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
 import { SearchBar } from "../../components/pipelines/searchBar";
-import type { Build } from "../../types/pipeline.types";
-import { getBuildsList } from "../../services/pipelines.api";
+import { pipelineBuildApiInstance } from "../../services/pipelines.api";
 import BuildsTable from "../../components/builds/buildsTable";
 import { useParams } from "react-router-dom";
 import NavBar from "../../components/common/navBar";
+import type { PipelineBuild } from "../../gen";
 
 export default function BuildsListPage() {
   const { id } = useParams();
   const [search, setSearch] = useState("");
 
-  const [data, setData] = useState<Build[]>([]);
+  const [data, setData] = useState<PipelineBuild[]>([]);
 
   const filtered = data.filter((p) =>
-    p.pipelineName.toLowerCase().includes(search.toLowerCase()),
+    (p.pipelineName ?? "").toLowerCase().includes(search.toLowerCase()),
   );
 
   useEffect(() => {
     async function fetchData() {
-      const builds = await getBuildsList();
-      setData(builds);
+      const {status, data} = await pipelineBuildApiInstance.getAllBuilds();
+
+      if (status !== 200) {
+        console.error("Error getting builds");
+      }
+
+      setData(data);
     }
     fetchData();
   }, [id]);

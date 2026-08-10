@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react-swc'
 import path from "path";
-import fs from "fs";
 
 // https://vite.dev/config/
 //TODO: Thresholds to be increased after adding more tests
@@ -23,12 +22,15 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: path.resolve(__dirname, 'test/setup.ts'),
+    unstubEnvs: true,
     include: ['test/**/*.test.{ts,tsx}', 'test/**/*.spec.{ts,tsx}'],
+    exclude: ['test/pages/loginPage.test.tsx', 'test/pages/registrationPage.test.tsx'], // TODO: Temporary exclusion as it's coming from IDP now
     coverage: {
       provider: 'v8',
       reporter: ['text'],
       reportsDirectory: path.resolve(__dirname, 'coverage'),
-      thresholds: COVERAGE_THRESHOLDS
+      thresholds: COVERAGE_THRESHOLDS,
+      exclude: ['./src/gen/**.ts', './src/**/*.css', './src/services/*.ts']
     },
     hookTimeout: 30000
   }

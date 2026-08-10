@@ -4,7 +4,6 @@ import PipelinePage from "../pages/PipelinePage/PipelinePage";
 import PipelineDetailsPage from "../pages/PipelineDetailsPage/PipelineDetailsPage";
 import BuildsRunningPage from "../pages/BuildsPage/BuildsRunningPage";
 import BuildsListPage from "../pages/BuildsPage/BuildsListPage";
-import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegistrationPage";
 import ProtectedRoute from "../pages/ProtectedRoute";
 import About from "../pages/About/About";
@@ -59,6 +58,6 @@ export const router = createBrowserRouter([
   },
 
   // Auth Routes
-  { path: "/login", element: <LoginPage /> },
+  // { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
 ]);

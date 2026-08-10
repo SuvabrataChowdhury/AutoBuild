@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,19 +47,19 @@ public class PipelineBuildController {
     private PipelineBuildService service;
 
     @Operation(summary = "Get a pipeline build")
-    @GetMapping("/{pipelineBuildId}")
+    @GetMapping(value = "/{pipelineBuildId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineBuildDTO> getPipelineBuild(@PathVariable UUID pipelineBuildId) {
         return ResponseEntity.ok(service.getPipelineBuild(pipelineBuildId));
     }
 
     @Operation(summary = "Get all pipeline builds")
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PipelineBuildDTO>> getAllBuilds() {
         return ResponseEntity.ok(service.getAllBuilds());
     }
 
     @Operation(summary = "Delete a pipeline build")
-    @DeleteMapping("/{pipelineBuildId}")
+    @DeleteMapping(value = "/{pipelineBuildId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deletePipelineBuild(@PathVariable UUID pipelineBuildId) throws IOException {
         service.deletePipelineBuild(pipelineBuildId);
         return ResponseEntity.noContent().build();

@@ -3,15 +3,14 @@ import { describe, it, expect, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 
 import PipelinePage from "../../src/pages/PipelinePage/PipelinePage";
+import { pipelineApiInstance } from "../../src/services/pipelines.api";
 
 //mocks for use Effect
-const mockGetPipelines = vi.fn();
-vi.mock("../../src/services/pipelines.api", () => ({
-  getPipelines: () => mockGetPipelines(),
-}));
+vi.mock("../../src/services/pipelines.api");
 
 //mocks for useNavigate
 const mockNavigate = vi.fn();
+
 vi.mock("react-router-dom", async (importActual) => {
   const actual: any = await importActual();
   return {
@@ -22,6 +21,15 @@ vi.mock("react-router-dom", async (importActual) => {
 
 describe("PipelinePage", () => {
   it("renders pipeline page content", () => {
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
+    
     render(
       <MemoryRouter>
         <PipelinePage />
@@ -32,11 +40,14 @@ describe("PipelinePage", () => {
   });
 
   it("fetches pipelines on load", async () => {
-    const mockPipelines = [
-      { id: "1", name: "Pipeline 1", status: "active" },
-      { id: "2", name: "Pipeline 2", status: "inactive" },
-    ];
-    mockGetPipelines.mockResolvedValueOnce(mockPipelines);
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
 
     render(
       <MemoryRouter>
@@ -44,7 +55,7 @@ describe("PipelinePage", () => {
       </MemoryRouter>,
     );
 
-    expect(mockGetPipelines).toHaveBeenCalled();
+    expect(pipelineApiInstance.getAllPipelines).toHaveBeenCalled();
     // Wait for the pipelines to be rendered
     const pipeline1 = await screen.findByText("Pipeline 1");
     const pipeline2 = await screen.findByText("Pipeline 2");
@@ -53,12 +64,15 @@ describe("PipelinePage", () => {
   });
 
   it("filters pipelines based on search input", async () => {
-    const mockPipelines = [
-      { id: "1", name: "Pipeline 1", status: "active" },
-      { id: "2", name: "Pipeline 2", status: "inactive" },
-      { id: "3", name: "Test Pipeline", status: "active" },
-    ];
-    mockGetPipelines.mockResolvedValueOnce(mockPipelines);
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+        { id: "3", name: "Test Pipeline"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
 
     render(
       <MemoryRouter>
@@ -85,12 +99,15 @@ describe("PipelinePage", () => {
   });
 
   it("filters pipelines with partial match (case insensitive)", async () => {
-    const mockPipelines = [
-      { id: "1", name: "Pipeline 1", status: "active" },
-      { id: "2", name: "Pipeline 2", status: "inactive" },
-      { id: "3", name: "Test Pipeline", status: "active" },
-    ];
-    mockGetPipelines.mockResolvedValueOnce(mockPipelines);
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+        { id: "3", name: "Test Pipeline"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
 
     render(
       <MemoryRouter>
@@ -115,11 +132,14 @@ describe("PipelinePage", () => {
   });
 
   it("shows no pipelines when search has no matches", async () => {
-    const mockPipelines = [
-      { id: "1", name: "Pipeline 1", status: "active" },
-      { id: "2", name: "Pipeline 2", status: "inactive" },
-    ];
-    mockGetPipelines.mockResolvedValueOnce(mockPipelines);
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
 
     render(
       <MemoryRouter>
@@ -143,11 +163,14 @@ describe("PipelinePage", () => {
   });
 
   it("shows all pipelines when search is cleared", async () => {
-    const mockPipelines = [
-      { id: "1", name: "Pipeline 1", status: "active" },
-      { id: "2", name: "Pipeline 2", status: "inactive" },
-    ];
-    mockGetPipelines.mockResolvedValueOnce(mockPipelines);
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
 
     render(
       <MemoryRouter>
@@ -178,6 +201,15 @@ describe("PipelinePage", () => {
   });
 
   it("navigates to pipeline creation page on Create button click", async () => {
+    const mockResponse =  {
+      status: 200,
+      data: [
+        { id: "1", name: "Pipeline 1"},
+        { id: "2", name: "Pipeline 2"},
+      ]
+    };
+    vi.mocked(pipelineApiInstance.getAllPipelines).mockResolvedValueOnce(mockResponse as any);
+
     render(
       <MemoryRouter>
         <PipelinePage />

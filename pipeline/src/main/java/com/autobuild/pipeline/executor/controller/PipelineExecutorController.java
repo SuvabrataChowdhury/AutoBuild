@@ -2,6 +2,7 @@ package com.autobuild.pipeline.executor.controller;
 
 import java.io.IOException;
 
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import com.autobuild.pipeline.executor.service.PipelineExecutorService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,8 +43,8 @@ public class PipelineExecutorController {
     @Autowired
     private PipelineExecutorService service;
 
-    @Operation(summary = "Execute a pipeline")
-    @PostMapping("/pipeline")
+    @Operation(summary = "Execute a pipeline", responses = @ApiResponse(responseCode = "203"))
+    @PostMapping(value = "/pipeline", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PipelineBuildDTO> executePipeline(@RequestBody @Valid PipelineExecuteRequest request)
             throws IOException {
         PipelineBuildDTO build = service.executePipeline(request);

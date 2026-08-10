@@ -1,9 +1,10 @@
 import axios from "axios";
+import { idp } from "../config/authConfig";
 
 const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("token");
+  const token = idp.getToken();
 
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
