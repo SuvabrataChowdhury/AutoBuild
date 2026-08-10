@@ -32,7 +32,7 @@ services:
       timeout: 5s
       retries: 10
   auth-service:
-    image: quay.io/keycloak/keycloak:23.0.0
+    image: quay.io/keycloak/keycloak:26.2.5
     container_name: auth-service
     environment:
       KEYCLOAK_ADMIN: admin
@@ -41,16 +41,21 @@ services:
       KC_DB_URL: ${DB_URL}
       KC_DB_USERNAME: ${DB_USERNAME}
       KC_DB_PASSWORD: ${DB_PASSWORD}
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 8180
+      KC_HOSTNAME: http://localhost:8180
       KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
       KC_HEALTH_ENABLED: true
+
+      KC_LOG_CONSOLE_FORMAT: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c trace_id=%X{traceId} span_id=%X{spanId} - %s%e%n"
+      KC_TRACING_ENABLED: true
+      KC_TRACING_ENDPOINT: http://alloy:4317
+      KC_TRACING_PROTOCOL: grpc
+      KC_LOG_LEVEL: DEBUG
+
     ports:
       - "8180:8080"
     command: start-dev --import-realm
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
       interval: 10s
       timeout: 5s
       retries: 3
