@@ -314,6 +314,40 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>monitoring</id>
+			<build>
+				<plugins>
+					<!-- Automatically fetch the OTel Java Agent JAR during build -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>copy-otel-agent</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifact>
+											<groupId>io.opentelemetry.javaagent</groupId>
+											<artifactId>opentelemetry-javaagent</artifactId>
+											<version>1.33.0</version> <!-- Use latest stable version -->
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${project.build.directory}/agents</outputDirectory>
+											<destFileName>opentelemetry-javaagent.jar</destFileName>
+										</artifact>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-
 </project>

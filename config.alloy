@@ -31,6 +31,20 @@ loki.process "autobuild" {
 			env = "production",
 		}
 	}
+
+	// Extract trace_id and span_id from the log line into the extracted map
+	stage.regex {
+		expression = "trace_id=(?P<trace_id>[a-f0-9]+) span_id=(?P<span_id>[a-f0-9]+)"
+	}
+
+	// Promote extracted values to structured metadata (high-cardinality — not stream labels)
+	stage.structured_metadata {
+		values = {
+			trace_id = "trace_id",
+			span_id  = "span_id",
+		}
+	}
+
     forward_to = [loki.write.autobuild.receiver]
 }
 
@@ -39,6 +53,34 @@ loki.write "autobuild" {
 	endpoint {
 		url  = "http://loki:3100/loki/api/v1/push"
 	}
+}
+
+// Receive OTLP spans from the Java OTel agent
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    traces = [otelcol.connector.spanlogs.default.input]
+  }
+}
+
+// Convert spans to log lines so they land in Loki (no Tempo needed)
+otelcol.connector.spanlogs "default" {
+  spans           = true
+  roots           = true
+  processes       = false
+  output {
+    logs = [otelcol.exporter.loki.default.input]
+  }
+}
+
+// Bridge from otelcol pipeline into the loki.write component
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.autobuild.receiver]
 }
 
 // Enables the ability to view logs in the Alloy UI in realtime
