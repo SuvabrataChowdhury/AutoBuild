@@ -8,7 +8,7 @@ server:
 
 common:
   instance_addr: 127.0.0.1
-  path_prefix: /tmp/loki
+  path_prefix: /loki
   storage:
     filesystem:
       chunks_directory: /tmp/loki/chunks
@@ -54,6 +54,6 @@ frontend:
   encoding: protobuf
 
 compactor:
-  working_directory: /tmp/loki/retention
+  working_directory: /loki/retention
   delete_request_store: filesystem
   retention_enabled: true
