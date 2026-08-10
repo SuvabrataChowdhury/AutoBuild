@@ -4,7 +4,7 @@
 - From project root execute,
 ```
 docker build -t pipeline-app .
-docker compose up
+docker compose --env-file .env.local up -d --build
 ```
 
 to start application and db.
