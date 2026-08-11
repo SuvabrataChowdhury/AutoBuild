@@ -13,7 +13,7 @@ services:
       - 4317:4317
       - 4318:4318
     volumes:
-      - ${MONITORING_STACK_DIR:-.}/config.alloy:/etc/alloy/config.alloy
+      - ${MONITORING_STACK_DIR:-.}/alloy/config.alloy:/etc/alloy/config.alloy
       - /var/run/docker.sock:/var/run/docker.sock
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     depends_on:
@@ -26,7 +26,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ${MONITORING_STACK_DIR:-.}/loki-config.yaml:/etc/loki/local-config.yaml
+      - ${MONITORING_STACK_DIR:-.}/loki/loki-config.yaml:/etc/loki/local-config.yaml
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     networks:
@@ -40,8 +40,8 @@ services:
       - --web.enable-remote-write-receiver
       - --web.enable-lifecycle
     volumes:
-      - ${MONITORING_STACK_DIR:-.}/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ${MONITORING_STACK_DIR:-.}/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - ${MONITORING_STACK_DIR:-.}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ${MONITORING_STACK_DIR:-.}/prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml
       - prometheus_data:/prometheus
     networks:
       - prometheus
@@ -52,7 +52,7 @@ services:
     command:
       - --config.file=/etc/alertmanager/alerts.yml
     volumes:
-      - ${MONITORING_STACK_DIR:-.}/alerts.yml:/etc/alertmanager/alerts.yml
+      - ${MONITORING_STACK_DIR:-.}/alertmanager/alerts.yml:/etc/alertmanager/alerts.yml
     networks:
       - prometheus
     
@@ -67,7 +67,7 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
-      - ${MONITORING_STACK_DIR:-.}/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ${MONITORING_STACK_DIR:-.}/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml
       - grafana_data:/var/lib/grafana
     networks:
       - prometheus

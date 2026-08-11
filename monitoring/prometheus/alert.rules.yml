@@ -1,3 +1,4 @@
+# TODO: Better meaningful alerts
 # alert.rules.yml
 
 groups:
@@ -22,12 +23,12 @@ groups:
           summary: "Instance {{ $labels.instance }} is down"
           description: "Prometheus has been unable to scrape {{ $labels.instance }} for more than 1 minute."
 
-      - alert: AlwaysFiring
-        expr: vector(1) > 0
-        for: 0m
-        labels:
-          severity: warning
-          team: devops
-        annotations:
-          summary: "Test alert — always firing"
-          description: "This rule is always true and fires immediately. Use it to verify the alert pipeline end-to-end."
+      # - alert: AlwaysFiring
+      #   expr: vector(1) > 0
+      #   for: 0m
+      #   labels:
+      #     severity: warning
+      #     team: devops
+      #   annotations:
+      #     summary: "Test alert — always firing"
+      #     description: "This rule is always true and fires immediately. Use it to verify the alert pipeline end-to-end."
