@@ -91,9 +91,9 @@ otelcol.connector.spanlogs "default" {
   }
 }
 
-// Bridge from otelcol pipeline into the loki.write component
+// Bridge from otelcol pipeline into loki.process (adds env label, trace extraction)
 otelcol.exporter.loki "default" {
-  forward_to = [loki.write.autobuild.receiver]
+  forward_to = [loki.process.autobuild.receiver]
 }
 
 // Enables the ability to view logs in the Alloy UI in realtime
