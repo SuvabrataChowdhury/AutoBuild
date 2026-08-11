@@ -5,10 +5,6 @@ volumes:
 
 networks:
   app:
-  autobuild_loki:
-    external: true
-  autobuild_prometheus:
-    external: true
 
 services:
   mysql-db:
@@ -25,7 +21,6 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - app
-      - autobuild_loki
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
@@ -46,9 +41,6 @@ services:
       KC_HEALTH_ENABLED: true
 
       KC_LOG_CONSOLE_FORMAT: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c trace_id=%X{traceId} span_id=%X{spanId} - %s%e%n"
-      KC_TRACING_ENABLED: true
-      KC_TRACING_ENDPOINT: http://alloy:4317
-      KC_TRACING_PROTOCOL: grpc
       KC_LOG_LEVEL: DEBUG
 
     ports:
@@ -64,7 +56,6 @@ services:
       - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json
     networks:
       - app
-      - autobuild_loki
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -79,10 +70,6 @@ services:
       AUTH_HOST: auth-service
       AUTH_PORT: 8080
       OTEL_SERVICE_NAME: pipeline-app
-      # Point out of the container to the alloy service name
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_METRICS_EXPORTER: otlp
     ports:
       - "8080:8080"
     volumes:
@@ -90,8 +77,6 @@ services:
       - pipeline_build_logs:/app/pipeline_build_logs
     networks:
       - app
-      - autobuild_loki
-      - autobuild_prometheus
     depends_on:
       mysql-db:
         condition: service_healthy

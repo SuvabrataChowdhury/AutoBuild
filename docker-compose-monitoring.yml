@@ -75,4 +75,6 @@ services:
 
 networks:
     loki:
+      name: autobuild_loki
     prometheus:
+      name: autobuild_prometheus
