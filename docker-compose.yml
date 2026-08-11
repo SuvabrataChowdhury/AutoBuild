@@ -41,8 +41,6 @@ services:
       KC_HEALTH_ENABLED: true
 
       KC_LOG_CONSOLE_FORMAT: "%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c trace_id=%X{traceId} span_id=%X{spanId} - %s%e%n"
-      KC_LOG_LEVEL: DEBUG
-
     ports:
       - "8180:8080"
     command: start-dev --import-realm

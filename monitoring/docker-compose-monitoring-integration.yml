@@ -1,13 +1,7 @@
-networks:
-  autobuild_loki:
-    external: true
-  autobuild_prometheus:
-    external: true
-
 services:
   mysql-db:
     networks:
-      - autobuild_loki
+      - loki
 
   auth-service:
     environment:
@@ -15,7 +9,7 @@ services:
       KC_TRACING_ENDPOINT: http://alloy:4317
       KC_TRACING_PROTOCOL: grpc
     networks:
-      - autobuild_loki
+      - loki
     depends_on:
       alloy:
         condition: service_started
@@ -26,8 +20,8 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_METRICS_EXPORTER: otlp
     networks:
-      - autobuild_loki
-      - autobuild_prometheus
+      - loki
+      - prometheus
     depends_on:
       alloy:
         condition: service_started
