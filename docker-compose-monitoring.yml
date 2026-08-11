@@ -38,11 +38,24 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.enable-remote-write-receiver
+      - --web.enable-lifecycle
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
       - prometheus_data:/prometheus
     networks:
       - prometheus
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    command:
+      - --config.file=/etc/alertmanager/alerts.yml
+    volumes:
+      - ./alerts.yml:/etc/alertmanager/alerts.yml
+    networks:
+      - prometheus
+    
   grafana:
     image: grafana/grafana:11.6.0
     environment:

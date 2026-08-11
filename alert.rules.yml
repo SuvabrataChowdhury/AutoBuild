@@ -1,0 +1,33 @@
+# alert.rules.yml
+
+groups:
+  - name: infrastructure_alerts
+    rules:
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "High CPU load on host {{ $labels.instance }}"
+          description: "CPU usage has been above 85% for more than 5 minutes. Current value: {{ $value | humanize }}%"
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "Prometheus has been unable to scrape {{ $labels.instance }} for more than 1 minute."
+
+      - alert: AlwaysFiring
+        expr: vector(1) > 0
+        for: 0m
+        labels:
+          severity: warning
+          team: devops
+        annotations:
+          summary: "Test alert — always firing"
+          description: "This rule is always true and fires immediately. Use it to verify the alert pipeline end-to-end."

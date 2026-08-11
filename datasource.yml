@@ -18,3 +18,15 @@ datasources:
     isDefault: false
     version: 1
     editable: true
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    orgId: 1
+    url: "http://alertmanager:9093"
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: true
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: true

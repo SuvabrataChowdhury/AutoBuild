@@ -1,0 +1,19 @@
+global:
+  resolve_timeout: 5m
+
+# 1. The Routing Tree
+route:
+  # Keep grouping tight for rapid testing feedback
+  group_by: ['alertname', 'instance']
+  group_wait: 10s       # Reduced from 30s so alerts show up faster in testing
+  group_interval: 30s   # Reduced from 5m to see updates quickly
+  repeat_interval: 1h
+
+  # Route absolutely everything to the local dashboard receiver
+  receiver: 'dashboard-only'
+
+# 2. The Local-Only Receiver
+receivers:
+  - name: 'dashboard-only'
+    # By leaving this blank, Alertmanager successfully processes 
+    # the alert state but sends no external API calls.
