@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+          - 'alertmanager:9093'
+      # timeout: 10s
+      # api_version: v2
+      # path_prefix: /
+      # scheme: http
+      # follow_redirects: true
+
+rule_files:
+  - "alert.rules.yml"

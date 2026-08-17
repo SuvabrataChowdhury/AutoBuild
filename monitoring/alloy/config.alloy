@@ -1,0 +1,102 @@
+// This component is responsible for disovering new containers within the docker environment
+discovery.docker "autobuild" {
+	host = "unix:///var/run/docker.sock"
+	refresh_interval = "5s"
+}
+
+// This component is responsible for relabeling the discovered containers
+discovery.relabel "autobuild" {
+	targets = discovery.docker.autobuild.targets
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container"
+	}
+}
+
+// This component is responsible for collecting logs from the discovered containers
+loki.source.docker "autobuild" {
+	host             = "unix:///var/run/docker.sock"
+	targets          = discovery.docker.autobuild.targets
+	forward_to       = [loki.process.autobuild.receiver]
+	relabel_rules    = discovery.relabel.autobuild.rules
+	refresh_interval = "5s"
+}
+
+// This component is responsible for processing the logs (In this case adding static labels)
+loki.process "autobuild" {
+    stage.static_labels {
+		values = {
+			env = "production",
+		}
+	}
+
+	// Extract trace_id and span_id from the log line into the extracted map
+	stage.regex {
+		expression = "trace_id=(?P<trace_id>[a-f0-9]+) span_id=(?P<span_id>[a-f0-9]+)"
+	}
+
+	// Promote extracted values to structured metadata (high-cardinality — not stream labels)
+	stage.structured_metadata {
+		values = {
+			trace_id = "trace_id",
+			span_id  = "span_id",
+		}
+	}
+
+    forward_to = [loki.write.autobuild.receiver]
+}
+
+// This component is responsible for writing the logs to Loki
+loki.write "autobuild" {
+	endpoint {
+		url  = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+// Receive OTLP data from instrumented services (traces and logs)
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    traces  = [otelcol.connector.spanlogs.default.input]
+    logs    = [otelcol.exporter.loki.default.input]
+    metrics = [otelcol.exporter.prometheus.default.input]
+  }
+}
+
+// Forward OTLP metrics to Prometheus via remote write
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}
+
+// Convert spans to log lines so they land in Loki (no Tempo needed)
+otelcol.connector.spanlogs "default" {
+  spans           = true
+  roots           = true
+  processes       = false
+  output {
+    logs = [otelcol.exporter.loki.default.input]
+  }
+}
+
+// Bridge from otelcol pipeline into loki.process (adds env label, trace extraction)
+otelcol.exporter.loki "default" {
+  forward_to = [loki.process.autobuild.receiver]
+}
+
+// Enables the ability to view logs in the Alloy UI in realtime
+livedebugging {
+  enabled = true
+}

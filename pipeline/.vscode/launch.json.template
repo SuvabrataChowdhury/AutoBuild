@@ -7,6 +7,7 @@
       "request": "launch",
       "mainClass": "com.autobuild.pipeline.PipelineApplication",
       "projectName": "pipeline",
+      "console": "internalConsole",
       "env": {
         "SPRING_PROFILES_ACTIVE": "default,h2InMemory"
       }
@@ -17,6 +18,7 @@
       "request": "launch",
       "mainClass": "com.autobuild.pipeline.PipelineApplication",
       "projectName": "pipeline",
+      "console": "internalConsole",
       "env": {
         "SPRING_PROFILES_ACTIVE": "basicAuth,h2InMemory"
       }

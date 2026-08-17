@@ -1,6 +1,10 @@
 spring:
   application:
     name: pipeline
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-} - %msg%n"
 ---
 
 spring:
@@ -31,3 +35,5 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+

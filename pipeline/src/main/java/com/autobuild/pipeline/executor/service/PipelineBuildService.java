@@ -51,7 +51,7 @@ public class PipelineBuildService {
 
     public List<PipelineBuildDTO> getAllBuilds() {
         List<PipelineBuild> builds = repository.findAll();
-        log.info("Fetched all pipelines, count: {}", builds.size());
+        log.info("Fetched all pipeline builds, count: {}", builds.size());
         return builds.stream()
                 .map(pipeline -> {
                     PipelineBuildDTO dto = mapper.entityToDto(pipeline);
