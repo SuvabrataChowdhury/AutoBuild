@@ -3,6 +3,7 @@ package com.autobuild.pipeline.definition.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -23,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.autobuild.pipeline.configuration.FeatureFlagService;
 import com.autobuild.pipeline.definiton.controller.PipelineController;
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.dto.StageDTO;
@@ -40,12 +42,16 @@ public class PipelineControllerTest {
     @Mock
     private PipelineService pipelineService;
 
+    @Mock
+    private FeatureFlagService featureFlagService;
+
     @InjectMocks
     private PipelineController controller;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        when(featureFlagService.getBooleanValue(anyString(), anyBoolean())).thenReturn(true);
     }
 
     @Test
@@ -91,6 +97,19 @@ public class PipelineControllerTest {
         doNothing().when(pipelineService).deletePipelineById(anyString());
         ResponseEntity<Void> response = controller.deletePipeline("abc");
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    public void testModifyPipelineReturnsForbiddenWhenFlagDisabled() throws Exception {
+        when(featureFlagService.getBooleanValue(anyString(), anyBoolean())).thenReturn(false);
+        StageDTO newStage = new StageDTO(null, "deploy", "bash", "#!/bin/bash\necho DEPLOY");
+        PipelineDTO request = new PipelineDTO();
+        request.setStages(new ArrayList<>());
+        request.getStages().add(newStage);
+
+        ResponseEntity<PipelineDTO> response = controller.modifyPipeline("pid", request);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -248,6 +267,17 @@ public class PipelineControllerTest {
         when(pipelineService.createPipeline(dto)).thenReturn(saved);
         ResponseEntity<PipelineDTO> resp = controller.createPipeline(dto);
         assertEquals(saved.getId(), resp.getBody().getId());
+    }
+
+    @Test
+    public void testUpdatePipelineReturnsForbiddenWhenFlagDisabled() throws Exception {
+        when(featureFlagService.getBooleanValue(anyString(), anyBoolean())).thenReturn(false);
+        PipelineDTO request = new PipelineDTO();
+        request.setName("should be blocked");
+
+        ResponseEntity<PipelineDTO> response = controller.updatePipeline("pid", request);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test

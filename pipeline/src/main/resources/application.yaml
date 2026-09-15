@@ -1,7 +1,9 @@
 spring:
   application:
     name: pipeline
-  
+
+feature-flags:
+  file: ../flags/feature-flags.json
 
 # logging:
 #   level:
@@ -14,7 +16,6 @@ spring:
     user:
       name: admin
       password: "{noop}admin"
-
 ---
 
 spring:

@@ -19,11 +19,12 @@ services:
       retries: 10
 
   pipeline-app:
-    image: pipeline-app 
+    image: pipeline-app
     container_name: pipeline-app
     volumes:
       - pipeline_scripts:/app/pipeline_scripts
       - pipeline_build_logs:/app/pipeline_build_logs
+      - ./flags:/flags
     depends_on:
       - mysql-db
     environment:
