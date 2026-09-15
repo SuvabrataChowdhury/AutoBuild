@@ -73,6 +73,7 @@ services:
     volumes:
       - pipeline_scripts:/app/pipeline_scripts
       - pipeline_build_logs:/app/pipeline_build_logs
+      - ./flags:/flags
     networks:
       - app
     depends_on:

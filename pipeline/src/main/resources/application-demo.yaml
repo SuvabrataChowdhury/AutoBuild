@@ -29,6 +29,9 @@ spring:
     exclude:
     - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
+feature-flags:
+  file: ${FEATURE_FLAGS_FILE:/flags/feature-flags.json}
+
 logging:
   level:
     org.springframework.jdbc.datasource: DEBUG

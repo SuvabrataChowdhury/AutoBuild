@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.autobuild.pipeline.configuration.FeatureFlagService;
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
@@ -47,8 +49,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
 
+    private static final String EDIT_PIPELINE_FLAG = "ENABLE_EDIT_PIPELINE";
+
     @Autowired
     private PipelineService pipelineService;
+
+    @Autowired
+    private FeatureFlagService featureFlagService;
 
     @Operation(summary = "Get a pipeline")
     @GetMapping(value = "/{pipelineId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,6 +92,9 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody PipelineDTO patchRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
+        if (!featureFlagService.getBooleanValue(EDIT_PIPELINE_FLAG, false)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(pipelineService.modifyPipeline(pipelineId, patchRequest));
     }
 
@@ -109,6 +119,9 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody @Valid PipelineDTO putRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
+        if (!featureFlagService.getBooleanValue(EDIT_PIPELINE_FLAG, false)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(pipelineService.replacePipeline(pipelineId, putRequest));
     }
 }
