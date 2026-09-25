@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -118,29 +119,13 @@ export default function BuildsRunningPage() {
     window.location.href = "/builds";
   }
 
-  let icon = null;
-  let color = "";
-
-  switch (build.currentState) {
-    case PipelineBuildCurrentStateEnum.Success:
-      icon = <CheckCircle className="text-green-600" size={18} aria-label="success-circle-pipeline"/>;
-      color = "text-green-600";
-      break;
-    case PipelineBuildCurrentStateEnum.Failed:
-      icon = <XCircle className="text-red-600" size={18} />;
-      color = "text-red-600";
-      break;
-    case PipelineBuildCurrentStateEnum.Running:
-      icon = <Loader className="text-yellow-600 animate-spin" size={25} />;
-      color = "text-yellow-600";
-      break;
-    case PipelineBuildCurrentStateEnum.Waiting:
-      icon = <Loader className="text-blue-600 animate-spin" size={18} />;
-      color = "text-blue-600";
-      break;
-    default:
-      color = "text-gray-500";
-  }
+  const stateMap: Record<string, { icon: React.ReactNode; color: string }> = {
+    [PipelineBuildCurrentStateEnum.Success]: { icon: <CheckCircle className="text-green-600" size={18} aria-label="success-circle-pipeline"/>, color: "text-green-600" },
+    [PipelineBuildCurrentStateEnum.Failed]: { icon: <XCircle className="text-red-600" size={18} />, color: "text-red-600" },
+    [PipelineBuildCurrentStateEnum.Running]: { icon: <Loader className="text-yellow-600 animate-spin" size={25} />, color: "text-yellow-600" },
+    [PipelineBuildCurrentStateEnum.Waiting]: { icon: <Loader className="text-blue-600 animate-spin" size={18} />, color: "text-blue-600" },
+  };
+  const { icon = null, color = "text-gray-500" } = stateMap[build.currentState ?? ""] ?? {};
 
   return (
     <>

@@ -98,7 +98,7 @@ export default function PipelineDetailPage() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, navigate]);
 
   // While loading
   if (!pipeline)
