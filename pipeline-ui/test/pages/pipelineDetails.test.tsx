@@ -314,7 +314,7 @@ describe("PipelineDetailsPage", () => {
     and we can add more detailed tests for stage creation in other tests
     */
     const mockResponse = {
-      status: 200,
+      status: 201,
       data: mockPipelineTemplate
     };
     (pipelineApiInstance.createPipeline as any).mockResolvedValueOnce(mockResponse);
