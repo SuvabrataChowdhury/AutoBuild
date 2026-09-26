@@ -80,12 +80,15 @@ export default function PipelineDetailPage() {
         return;
       }
       
-      const {status, data} = await pipelineApiInstance.getPipelineById(id as string);
+      const response = await pipelineApiInstance.getPipelineById(id as string);
 
-      if (status !== 200) {
+      if (!response || response.status !== 200) {
         setError(["Pipeline not found"]);
         navigate("/pipelines");
+        return;
       }
+
+      const { data } = response;
 
       setPipeline(data);
 
@@ -98,7 +101,7 @@ export default function PipelineDetailPage() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, navigate]);
 
   // While loading
   if (!pipeline)

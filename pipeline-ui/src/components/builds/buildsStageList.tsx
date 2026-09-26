@@ -1,3 +1,4 @@
+import type React from "react";
 import { CheckCircle, XCircle, Loader } from "lucide-react";
 import type { StageBuild } from "../../gen";
 
@@ -19,35 +20,14 @@ export default function BuildStageList({
       {stages.map((stage) => {
         const isSelected = stage.id === selectedId;
 
-        let icon = null;
-        let color = "";
-
-        switch (stage.currentState) {
-          case "SUCCESS":
-            icon = <CheckCircle className="text-green-600" size={18} aria-label="success-circle-stage"/>;
-            color = "text-green-600";
-            break;
-          case "FAILED":
-            icon = <XCircle className="text-red-600" size={18} />;
-            color = "text-red-600";
-            break;
-          case "RUNNING":
-            icon = (
-              <Loader className="text-yellow-600 animate-spin" size={18} />
-            );
-            color = "text-yellow-600";
-            break;
-          case "STOPPED":
-            icon = <XCircle className="text-gray-600" size={18} />;
-            color = "text-gray-600";
-            break;
-          case "WAITING":
-            icon = <Loader className="text-blue-600 animate-spin" size={18} />;
-            color = "text-blue-600";
-            break;
-          default:
-            color = "text-gray-500";
-        }
+        const stateMap: Record<string, { icon: React.ReactNode; color: string }> = {
+          SUCCESS: { icon: <CheckCircle className="text-green-600" size={18} aria-label="success-circle-stage"/>, color: "text-green-600" },
+          FAILED: { icon: <XCircle className="text-red-600" size={18} />, color: "text-red-600" },
+          RUNNING: { icon: <Loader className="text-yellow-600 animate-spin" size={18} />, color: "text-yellow-600" },
+          STOPPED: { icon: <XCircle className="text-gray-600" size={18} />, color: "text-gray-600" },
+          WAITING: { icon: <Loader className="text-blue-600 animate-spin" size={18} />, color: "text-blue-600" },
+        };
+        const { icon = null, color = "text-gray-500" } = stateMap[stage.currentState ?? ""] ?? {};
 
         return (
           <button
