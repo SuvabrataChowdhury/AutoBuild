@@ -1,7 +1,7 @@
 name: Enlist a Chore
 description: Form to enlist a chore.
 title: "[chore]: "
-labels: ["enhancement"]
+labels: ["chore"]
 body:
   - type: markdown
     attributes:
