@@ -22,3 +22,6 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+feature-flags:
+  file: ${FEATURE_FLAGS_FILE:../flags/feature-flags.json}

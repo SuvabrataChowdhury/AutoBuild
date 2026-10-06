@@ -3,7 +3,7 @@ spring:
     name: pipeline
 
 feature-flags:
-  file: ../flags/feature-flags.json
+  file: ${FEATURE_FLAGS_FILE:../flags/feature-flags.json}
 
 logging:
   pattern:

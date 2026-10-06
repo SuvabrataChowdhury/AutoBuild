@@ -68,6 +68,7 @@ services:
       AUTH_HOST: auth-service
       AUTH_PORT: 8080
       OTEL_SERVICE_NAME: pipeline-app
+      FEATURE_FLAGS_FILE: /flags/feature-flags.json
     ports:
       - "8080:8080"
     volumes:
