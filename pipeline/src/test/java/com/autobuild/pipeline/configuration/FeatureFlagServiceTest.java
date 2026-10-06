@@ -9,7 +9,6 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class FeatureFlagServiceTest {
 
@@ -19,9 +18,7 @@ public class FeatureFlagServiceTest {
     private FeatureFlagService serviceWithFile(String json) throws IOException {
         Path file = tempDir.resolve("feature-flags.json");
         Files.writeString(file, json);
-        FeatureFlagService service = new FeatureFlagService();
-        ReflectionTestUtils.setField(service, "flagsFilePath", file.toString());
-        return service;
+        return new FileBasedFeatureFlagService(file.toString());
     }
 
     @Test
@@ -45,8 +42,7 @@ public class FeatureFlagServiceTest {
 
     @Test
     void testFileNotFoundReturnsDefault() {
-        FeatureFlagService service = new FeatureFlagService();
-        ReflectionTestUtils.setField(service, "flagsFilePath", "/nonexistent/path/flags.json");
+        FeatureFlagService service = new FileBasedFeatureFlagService("/nonexistent/path/flags.json");
         assertTrue(service.getBooleanValue("ANY_FLAG", true));
         assertFalse(service.getBooleanValue("ANY_FLAG", false));
     }

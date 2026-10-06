@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobuild.pipeline.configuration.FeatureFlagService;
+import com.autobuild.pipeline.definiton.FeatureFlag;
 import com.autobuild.pipeline.definiton.dto.PipelineDTO;
 import com.autobuild.pipeline.definiton.exceptions.DuplicateEntryException;
 import com.autobuild.pipeline.definiton.exceptions.InvalidIdException;
@@ -48,8 +49,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/pipeline")
 public class PipelineController {
-
-    private static final String EDIT_PIPELINE_FLAG = "ENABLE_EDIT_PIPELINE";
 
     @Autowired
     private PipelineService pipelineService;
@@ -92,8 +91,8 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody PipelineDTO patchRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
-        if (!featureFlagService.getBooleanValue(EDIT_PIPELINE_FLAG, false)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.name(), false)) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
         }
         return ResponseEntity.ok(pipelineService.modifyPipeline(pipelineId, patchRequest));
     }
@@ -119,8 +118,8 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody @Valid PipelineDTO putRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
-        if (!featureFlagService.getBooleanValue(EDIT_PIPELINE_FLAG, false)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.name(), false)) {
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
         }
         return ResponseEntity.ok(pipelineService.replacePipeline(pipelineId, putRequest));
     }

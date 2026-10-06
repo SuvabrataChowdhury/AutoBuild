@@ -149,6 +149,12 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>dev.openfeature</groupId>
+			<artifactId>sdk</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
