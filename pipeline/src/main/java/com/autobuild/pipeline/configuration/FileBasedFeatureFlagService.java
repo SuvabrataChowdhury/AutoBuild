@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import dev.openfeature.sdk.Client;
 import dev.openfeature.sdk.OpenFeatureAPI;
 
+/** OpenFeature-backed feature flag service that reads flags from a JSON file. */
 @Service
 public class FileBasedFeatureFlagService implements FeatureFlagService {
 

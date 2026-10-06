@@ -109,7 +109,7 @@ public class PipelineControllerTest {
 
         ResponseEntity<PipelineDTO> response = controller.modifyPipeline("pid", request);
 
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_IMPLEMENTED, response.getStatusCode());
     }
 
     @Test
@@ -277,7 +277,7 @@ public class PipelineControllerTest {
 
         ResponseEntity<PipelineDTO> response = controller.updatePipeline("pid", request);
 
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_IMPLEMENTED, response.getStatusCode());
     }
 
     @Test
