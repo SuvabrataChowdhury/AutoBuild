@@ -24,4 +24,6 @@ spring:
       - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 
 feature-flags:
-  file: ${FEATURE_FLAGS_FILE:../flags/feature-flags.json}
+  flagd:
+    host: ${FLAGD_HOST:localhost}
+    port: ${FLAGD_PORT:8013}

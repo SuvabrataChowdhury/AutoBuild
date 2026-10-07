@@ -57,6 +57,16 @@ services:
     depends_on:
       mysql-db:
         condition: service_healthy
+  flagd:
+    image: ghcr.io/open-feature/flagd:v0.17.0
+    container_name: flagd
+    command: start --uri file:/flags/feature-flags.json
+    ports:
+      - "8013:8013"
+    volumes:
+      - ./flags:/flags
+    networks:
+      - app
   pipeline-app:
     image: pipeline-app
     container_name: pipeline-app
@@ -68,13 +78,13 @@ services:
       AUTH_HOST: auth-service
       AUTH_PORT: 8080
       OTEL_SERVICE_NAME: pipeline-app
-      FEATURE_FLAGS_FILE: /flags/feature-flags.json
+      FLAGD_HOST: flagd
+      FLAGD_PORT: 8013
     ports:
       - "8080:8080"
     volumes:
       - pipeline_scripts:/app/pipeline_scripts
       - pipeline_build_logs:/app/pipeline_build_logs
-      - ./flags:/flags
     networks:
       - app
     depends_on:
@@ -82,3 +92,5 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_healthy
+      flagd:
+        condition: service_started

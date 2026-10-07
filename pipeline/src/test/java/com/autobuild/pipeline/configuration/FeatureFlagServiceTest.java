@@ -2,48 +2,39 @@ package com.autobuild.pipeline.configuration;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+
+import dev.openfeature.sdk.Client;
 
 public class FeatureFlagServiceTest {
 
-    @TempDir
-    Path tempDir;
-
-    private FeatureFlagService serviceWithFile(String json) throws IOException {
-        Path file = tempDir.resolve("feature-flags.json");
-        Files.writeString(file, json);
-        return new FileBasedFeatureFlagService(file.toString());
+    private FeatureFlagService serviceWith(Client client) {
+        return (flagKey, defaultValue) -> client.getBooleanValue(flagKey, defaultValue);
     }
 
     @Test
-    void testFlagTrueReturnsTrue() throws IOException {
-        FeatureFlagService service = serviceWithFile("{\"MY_FLAG\": true}");
-        assertTrue(service.getBooleanValue("MY_FLAG", false));
+    void getBooleanValue_returnsTrue_whenClientReturnsTrue() {
+        Client client = mock(Client.class);
+        when(client.getBooleanValue("MY_FLAG", false)).thenReturn(true);
+        assertTrue(serviceWith(client).getBooleanValue("MY_FLAG", false));
     }
 
     @Test
-    void testFlagFalseReturnsFalse() throws IOException {
-        FeatureFlagService service = serviceWithFile("{\"MY_FLAG\": false}");
-        assertFalse(service.getBooleanValue("MY_FLAG", true));
+    void getBooleanValue_returnsFalse_whenClientReturnsFalse() {
+        Client client = mock(Client.class);
+        when(client.getBooleanValue("MY_FLAG", true)).thenReturn(false);
+        assertFalse(serviceWith(client).getBooleanValue("MY_FLAG", true));
     }
 
     @Test
-    void testMissingKeyReturnsDefault() throws IOException {
-        FeatureFlagService service = serviceWithFile("{}");
-        assertTrue(service.getBooleanValue("MISSING_FLAG", true));
-        assertFalse(service.getBooleanValue("MISSING_FLAG", false));
-    }
-
-    @Test
-    void testFileNotFoundReturnsDefault() {
-        FeatureFlagService service = new FileBasedFeatureFlagService("/nonexistent/path/flags.json");
-        assertTrue(service.getBooleanValue("ANY_FLAG", true));
-        assertFalse(service.getBooleanValue("ANY_FLAG", false));
+    void getBooleanValue_returnsDefault_whenClientReturnsDefault() {
+        Client client = mock(Client.class);
+        when(client.getBooleanValue("MISSING_FLAG", true)).thenReturn(true);
+        when(client.getBooleanValue("MISSING_FLAG", false)).thenReturn(false);
+        assertTrue(serviceWith(client).getBooleanValue("MISSING_FLAG", true));
+        assertFalse(serviceWith(client).getBooleanValue("MISSING_FLAG", false));
     }
 }

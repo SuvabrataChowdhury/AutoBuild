@@ -30,7 +30,9 @@ spring:
     - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration
 
 feature-flags:
-  file: ${FEATURE_FLAGS_FILE:/flags/feature-flags.json}
+  flagd:
+    host: ${FLAGD_HOST}
+    port: ${FLAGD_PORT:8013}
 
 logging:
   level:
