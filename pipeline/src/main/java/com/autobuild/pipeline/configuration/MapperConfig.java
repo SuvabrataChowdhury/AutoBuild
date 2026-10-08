@@ -63,12 +63,22 @@ public class MapperConfig {
         TypeMap<PipelineDTO, Pipeline> typeMapper = mapper.createTypeMap(PipelineDTO.class, Pipeline.class);
         typeMapper.addMapping(PipelineDTO::getId, Pipeline::setId);
         typeMapper.addMapping(PipelineDTO::getName, Pipeline::setName);
+        typeMapper.addMapping(
+            src -> src.getStages() == null ? null : src.getStages().stream()
+                .map(s -> mapper.map(s, Stage.class))
+                .toList(),
+            Pipeline::setStages);
     }
 
     private void setPipelineEntityDTOMapping(ModelMapper mapper) {
         TypeMap<Pipeline, PipelineDTO> typeMapper = mapper.createTypeMap(Pipeline.class, PipelineDTO.class);
         typeMapper.addMapping(Pipeline::getName, PipelineDTO::setName);
         typeMapper.addMapping(Pipeline::getId, PipelineDTO::setId);
+        typeMapper.addMapping(
+            src -> src.getStages() == null ? null : src.getStages().stream()
+                .map(s -> mapper.map(s, StageDTO.class))
+                .toList(),
+            PipelineDTO::setStages);
     }
 
     private void setStageBuildMappings(ModelMapper mapper) {

@@ -22,3 +22,8 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+feature-flags:
+  flagd:
+    host: ${FLAGD_HOST:localhost}
+    port: ${FLAGD_PORT:8013}
