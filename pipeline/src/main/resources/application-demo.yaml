@@ -31,7 +31,7 @@ spring:
 
 feature-flags:
   provider:
-    uri: ${FEATURE_PROVIDER_URI}
+    uri: ${FEATURE_PROVIDER_URI:}
 
 logging:
   level:
