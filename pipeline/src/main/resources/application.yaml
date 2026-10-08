@@ -2,11 +2,6 @@ spring:
   application:
     name: pipeline
 
-feature-flags:
-  flagd:
-    host: ${FLAGD_HOST:localhost}
-    port: ${FLAGD_PORT:8013}
-
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-} - %msg%n"

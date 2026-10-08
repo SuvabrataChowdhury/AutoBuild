@@ -63,6 +63,7 @@ services:
     command: start --uri file:/flags/feature-flags.json
     ports:
       - "8013:8013"
+      - "8016:8016"
     volumes:
       - ./flags:/flags
     networks:
@@ -78,8 +79,7 @@ services:
       AUTH_HOST: auth-service
       AUTH_PORT: 8080
       OTEL_SERVICE_NAME: pipeline-app
-      FLAGD_HOST: flagd
-      FLAGD_PORT: 8013
+      FEATURE_PROVIDER_URI: ${FEATURE_PROVIDER_URI}
     ports:
       - "8080:8080"
     volumes:

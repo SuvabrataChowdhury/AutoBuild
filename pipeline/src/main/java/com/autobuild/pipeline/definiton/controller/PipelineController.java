@@ -91,7 +91,7 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody PipelineDTO patchRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
-        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.name(), false)) {
+        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.getKey(), false)) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
         }
         return ResponseEntity.ok(pipelineService.modifyPipeline(pipelineId, patchRequest));
@@ -118,7 +118,7 @@ public class PipelineController {
             @PathVariable String pipelineId,
             @RequestBody @Valid PipelineDTO putRequest)
             throws InvalidIdException, IOException, DuplicateEntryException {
-        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.name(), false)) {
+        if (!featureFlagService.getBooleanValue(FeatureFlag.ENABLE_EDIT_PIPELINE.getKey(), false)) {
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
         }
         return ResponseEntity.ok(pipelineService.replacePipeline(pipelineId, putRequest));
