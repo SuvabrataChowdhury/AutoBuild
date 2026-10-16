@@ -1,0 +1,40 @@
+# Inputs Bazel tracks for cache invalidation — if none of these change,
+# both targets below are skipped entirely (cache hit).
+_SRCS = glob(
+    ["src/**", "pom.xml"],
+    exclude = ["target/**"],
+)
+
+# Compiles and packages the service via Maven.
+# Output: pipeline.jar in bazel-bin/pipeline/
+# Run with: bazel build //pipeline:jar
+genrule(
+    name = "jar",
+    srcs = _SRCS,
+    outs = ["pipeline.jar"],
+    cmd = """
+        export HOME=$$(echo ~)
+        OUT=$$PWD/$@
+        cd pipeline
+        ./mvnw --batch-mode -q package -DskipTests
+        cp target/pipeline-*.jar $$OUT
+    """,
+    local = True,  # Maven needs network access for first run; not sandboxed
+)
+
+# Runs the full Maven test suite.
+# Output: surefire XML reports in bazel-bin/pipeline/test-reports/
+# Run with: bazel test //pipeline:test
+genrule(
+    name = "test",
+    srcs = _SRCS,
+    outs = ["test-results.txt"],
+    cmd = """
+        export HOME=$$(echo ~)
+        OUT=$$PWD/$@
+        cd pipeline
+        ./mvnw --batch-mode test -Pintegration-test 2>&1 | tee $$OUT
+    """,
+    local = True,
+    tags = ["manual"],
+)
