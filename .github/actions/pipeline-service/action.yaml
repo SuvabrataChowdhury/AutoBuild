@@ -22,6 +22,7 @@ runs:
         java-version: "17"
         distribution: "temurin"
         cache: maven
+    # TODO: replace with bazel commands
     - name: Basic Validation
       id: basic-validation-step
       shell: bash
