@@ -2,10 +2,6 @@ spring:
   application:
     name: pipeline
 
-feature-flags:
-  local-overrides:
-    ENABLE_EDIT_PIPELINE: false
-
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} trace_id=%mdc{trace_id:-} span_id=%mdc{span_id:-} - %msg%n"
