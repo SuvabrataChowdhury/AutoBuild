@@ -11,11 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Dependencies
+        uses: ./.github/actions/setup-dependencies
+        with:
+          java-version: "17"
+          node-version: "22"
+
       - name: Pipeline Service Validation
         id: pipeline-service-validation
-        uses: ./.github/actions/pipeline-service
-        with:
-          base-ref: ${{github.base_ref}}
+        run: bazel test //pipeline:test --test_output=all
 
       - name: Check for OpenAPI contract violation
         id: is_openapi_contract_violated
@@ -26,7 +30,4 @@ jobs:
       
       - name: Pipeline UI Validation
         id: pipeline-ui-validation
-        uses: ./.github/actions/pipeline-ui
-        with:
-          base-ref: ${{github.base_ref}}
-          has-openapi-contract-changed: ${{steps.is_openapi_contract_violated.outputs.has_contract_changed}}
+        run: bazel test //pipeline-ui:test --test_output=all
