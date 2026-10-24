@@ -23,6 +23,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: "22"
+    # TODO: use bazel builds instead
     - name: Lint UI
       shell: bash
       run: |
