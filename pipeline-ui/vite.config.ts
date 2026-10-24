@@ -28,7 +28,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text'],
-      reportsDirectory: './coverage',
+      reportsDirectory: path.resolve(__dirname, 'coverage'),
       thresholds: COVERAGE_THRESHOLDS,
       exclude: ['./src/gen/**.ts', './src/**/*.css', './src/services/*.ts']
     },
