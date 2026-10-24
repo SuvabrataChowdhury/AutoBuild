@@ -46,6 +46,28 @@ The `--test_env=WORKSPACE_DIR` flag is automatically applied to all `bazel test`
 invocations via `.bazelrc`, so no extra flags are needed as long as `WORKSPACE_DIR`
 is set in your shell.
 
+## Viewing Test Output
+
+By default Bazel only prints output on failure. Use `--test_output` to control this:
+
+| Flag | Behaviour |
+|------|-----------|
+| `--test_output=errors` | Print output only on failure (default) |
+| `--test_output=all` | Always print full output, even on pass |
+| `--test_output=streamed` | Stream output live as the test runs (disables caching) |
+
+`--test_output=streamed` is the most useful during development — you see Maven/npm output in real time:
+
+```sh
+bazel test //pipeline:test --test_output=streamed
+```
+
+To read the log from a previous run:
+
+```sh
+cat $(bazel info bazel-testlogs)/pipeline/test/test.log
+```
+
 ## Caching
 
 Bazel caches test results based on input file changes. If no source files or `pom.xml`
