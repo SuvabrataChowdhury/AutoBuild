@@ -19,7 +19,7 @@
     "generate:clean-client-code": "npm run generate:clean && npm run generate:client-code"
   },
   "dependencies": {
-    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-navigation-menu": "^1.4.1",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-keycloak/web": "^3.4.0",
     "axios": "^1.20.0",
